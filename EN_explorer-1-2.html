@@ -91,6 +91,50 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
   #page-header,#controls,#warn-banner,#stats-area,.section-divider,#charts-area{padding-left:18px;padding-right:18px;}
   #tab-nav{padding:0 14px;}
 }
+
+/* ── data drawer ─────────────────────────────────────────────────────── */
+.chart-panel { position: relative; }
+.drawer-toggle {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  font-family: var(--mono); font-size: 8px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--cream3);
+  padding: 9px 18px; cursor: pointer; transition: color .2s;
+  background: none; border: none; border-top: 1px solid rgba(255,255,255,.05);
+  text-align: left;
+}
+.drawer-toggle:hover { color: var(--gold2); }
+.drawer-arrow { font-size: 10px; transition: transform .25s; display: inline-block; }
+.drawer-toggle.open .drawer-arrow { transform: rotate(180deg); }
+.data-drawer {
+  display: none; overflow-x: auto;
+  border-top: 1px solid rgba(255,255,255,.04);
+  background: rgba(0,0,0,.35);
+}
+.data-drawer.open { display: block; }
+.drawer-scroll { max-height: 260px; overflow-y: auto; }
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--mono); font-size: 9.5px;
+}
+.data-table th {
+  padding: 7px 12px; text-align: right;
+  color: var(--gold); font-weight: 400; letter-spacing: .08em;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  white-space: nowrap; position: sticky; top: 0;
+  background: #08080f;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 4px 12px; text-align: right;
+  color: rgba(255,255,255,.55); border-bottom: 1px solid rgba(255,255,255,.025);
+  white-space: nowrap;
+}
+.data-table td:first-child { text-align: left; color: rgba(255,255,255,.3); }
+.data-table tr.is-prime td { color: rgba(255,255,255,.85); }
+.data-table tr.is-prime td:first-child { color: var(--gold2); }
+.data-table tr.is-sc td:first-child::after { content: ' ·'; color: var(--coral); }
+.data-table tr:last-child td { border-bottom: none; }
+
 </style>
 </head>
 <body>
@@ -158,6 +202,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
       <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.7"></div>Fitted A/log N</div>
       <div class="legend-item"><div class="legend-swatch" style="background:var(--violet);opacity:.7"></div>|c₁|/log N</div>
     </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c1',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 01 — |E(N)|
+    </button>
+    <div class="data-drawer" id="drawer-c1">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c1"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
   </div>
 
   <div class="chart-panel">
@@ -170,6 +222,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
       <div class="legend-item"><div class="legend-swatch" style="background:var(--violet)"></div>E(N)·log N</div>
       <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);opacity:.6"></div>c₁ reference</div>
     </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c2',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 02 — E(N)·log N
+    </button>
+    <div class="data-drawer" id="drawer-c2">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c2"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
   </div>
 
   <div class="chart-panel">
@@ -181,6 +241,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <div class="chart-footer">
       <div class="legend-item"><div class="legend-swatch" style="background:var(--orange)"></div>log|E(N)|</div>
       <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.6"></div>Slope = −1 ref</div>
+    </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c3',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 03 — log|E| vs log(log N)
+    </button>
+    <div class="data-drawer" id="drawer-c3">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c3"><thead></thead><tbody></tbody></table>
+      </div>
     </div>
   </div>
 
@@ -197,6 +265,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
       <div class="legend-item"><div class="legend-swatch" style="background:var(--gold)"></div>Prime tick</div>
       <div class="legend-item"><div class="legend-swatch" style="background:var(--coral)"></div>Sign change</div>
     </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c4',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 04 — Signed E(N)
+    </button>
+    <div class="data-drawer" id="drawer-c4">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c4"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
   </div>
 
   <div class="chart-panel">
@@ -209,6 +285,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
       <div class="legend-item"><div class="legend-swatch" style="background:var(--green)"></div>SC(N)/π(N)</div>
       <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.5"></div>Empirical limit</div>
     </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c5',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 05 — SC/π(N)
+    </button>
+    <div class="data-drawer" id="drawer-c5">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c5"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
   </div>
 
   <div class="chart-panel">
@@ -219,6 +303,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <canvas class="main-chart" id="c6"></canvas>
     <div class="chart-footer">
       <div class="legend-item"><div class="legend-swatch" style="background:var(--coral)"></div>Gap frequency</div>
+    </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c6',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 06 — Gap hist
+    </button>
+    <div class="data-drawer" id="drawer-c6">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c6"><thead></thead><tbody></tbody></table>
+      </div>
     </div>
   </div>
 
@@ -235,6 +327,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
       <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.6"></div>Factor = 1</div>
       <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);opacity:.4"></div>Prime column</div>
     </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c7',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 07 — Lift factor
+    </button>
+    <div class="data-drawer" id="drawer-c7">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c7"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
   </div>
 
   <div class="chart-panel">
@@ -246,6 +346,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <div class="chart-footer">
       <div class="legend-item"><div class="legend-swatch" style="background:var(--gold)"></div>E_χ₄(N)</div>
       <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>χ₄ sign change</div>
+    </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c8',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 08 — χ₄-restricted
+    </button>
+    <div class="data-drawer" id="drawer-c8">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c8"><thead></thead><tbody></tbody></table>
+      </div>
     </div>
   </div>
 
@@ -518,6 +626,88 @@ let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>
 const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.06});
 document.querySelectorAll('.chart-panel').forEach(el=>obs.observe(el));
 updateWarning(parseInt(slider.value));
+
+// ── data drawer ───────────────────────────────────────────────────────────
+function toggleDrawer(cid, btn) {
+  const drawer = document.getElementById('drawer-' + cid);
+  if (!drawer) return;
+  const opening = !drawer.classList.contains('open');
+  if (opening && result) buildTable(cid, result);
+  drawer.classList.toggle('open', opening);
+  btn.classList.toggle('open', opening);
+  btn.setAttribute('aria-expanded', opening);
+}
+
+function f6(v)  { return isFinite(v) ? v.toFixed(6) : '—'; }
+function f4(v)  { return isFinite(v) ? v.toFixed(4) : '—'; }
+function fs(v,d){ return isFinite(v) ? (v>=0?'+':'')+v.toFixed(d??4) : '—'; }
+
+function buildTable(cid, r) {
+  const tbl = document.getElementById('tbl-' + cid);
+  if (!tbl) return;
+  tbl.innerHTML = '';
+  const thead = tbl.createTHead(), tbody = tbl.createTBody();
+  const data = r.data;
+
+  // compute slope-ref intercept for c3
+  const mid3 = data[Math.floor(data.length/2)];
+  const b3 = mid3.lgAbsE - (-1)*mid3.lglgm;
+
+  const cfgs = {
+    c1: {
+      heads: ['N','R(N)','E(N)','|E(N)|','|c₁|/logN','Prime'],
+      row: d => [d.m, f6(d.E+r.C), fs(d.E,6), f6(d.absE), f6(Math.abs(r.c1t)/d.lm), d.ip?'p':'']
+    },
+    c2: {
+      heads: ['N','E(N)','E·logN','c₁ theory','Prime'],
+      row: d => [d.m, fs(d.E,6), fs(d.Elgm,6), f6(r.c1t), d.ip?'p':'']
+    },
+    c3: {
+      heads: ['N','log(logN)','log|E(N)|','Slope−1 ref','Prime'],
+      row: d => [d.m, f4(d.lglgm), f4(d.lgAbsE), f4(-d.lglgm+b3), d.ip?'p':'']
+    },
+    c4: {
+      heads: ['N','E(N)','Sign','Prime','Sign chg'],
+      row: d => [d.m, fs(d.E,6), d.E>=0?'+1':'−1', d.ip?'p':'', d.isc?'SC':'']
+    },
+    c5: {
+      heads: ['N','π(N)','SC(N)','SC/π','Prime'],
+      row: d => [d.m, d.piC, d.scC, d.piC>0?f4(d.scC/d.piC):'—', d.ip?'p':'']
+    },
+    c6: {
+      heads: ['N','E(N)','Sign chg','Gap to prev SC','Prime'],
+      row: (d, i, arr) => {
+        let gap = '—';
+        if (d.isc) {
+          for (let j=i-1; j>=0; j--) { if(arr[j].isc){ gap=d.m-arr[j].m; break; } }
+        }
+        return [d.m, fs(d.E,6), d.isc?'SC':'', gap, d.ip?'p':''];
+      }
+    },
+    c7: {
+      heads: ['N','φ(M)/(M·C)','Factor−1','Direction','Prime'],
+      row: d => [d.m, f4(d.lf), fs(d.lf-1,4), d.lf>=1?'▲ up':'▼ dn', d.ip?'p':'']
+    },
+    c8: {
+      heads: ['N','E(N)','E_χ₄(N)','4·E_χ₄','χ₄ SC','Prime'],
+      row: d => [d.m, fs(d.E,6), fs(d.E4,6), fs(d.E4*4,6), d.isc4?'SC':'', d.ip?'p':'']
+    }
+  };
+
+  const cfg = cfgs[cid]; if (!cfg) return;
+  const hr = thead.insertRow();
+  for (const h of cfg.heads) { const th=document.createElement('th'); th.textContent=h; hr.appendChild(th); }
+
+  for (let i=0; i<data.length; i++) {
+    const d = data[i];
+    const vals = cfg.row.length === 3 ? cfg.row(d,i,data) : cfg.row(d);
+    const tr = tbody.insertRow();
+    if (d.ip) tr.classList.add('is-prime');
+    if (d.isc) tr.classList.add('is-sc');
+    for (const v of vals) { const td=tr.insertCell(); td.textContent=v; }
+  }
+}
+
 </script>
 </body>
 </html>
