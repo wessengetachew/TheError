@@ -8,358 +8,111 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
 
 :root {
-  --bg:     #04040a;
-  --bg1:    #080810;
-  --bg2:    #0d0d1a;
-  --bg3:    #13132a;
-  --gold:   #c8a84a;
-  --gold2:  #e8d080;
-  --gold3:  #f5e8a0;
-  --teal:   #3dc8b8;
-  --coral:  #e05060;
-  --violet: #9070d8;
-  --cream:  rgba(255,255,255,.93);
-  --cream2: rgba(255,255,255,.60);
-  --cream3: rgba(255,255,255,.28);
-  --mono:   'JetBrains Mono', monospace;
-  --serif:  'Cormorant Garamond', serif;
-  --disp:   'Cinzel Decorative', serif;
+  --bg:#04040a;--bg1:#080810;--bg2:#0d0d1a;--bg3:#13132a;
+  --gold:#c8a84a;--gold2:#e8d080;--gold3:#f5e8a0;
+  --teal:#3dc8b8;--coral:#e05060;--violet:#9070d8;
+  --orange:#e8904a;--green:#50c878;
+  --cream:rgba(255,255,255,.93);--cream2:rgba(255,255,255,.60);--cream3:rgba(255,255,255,.28);
+  --mono:'JetBrains Mono',monospace;--serif:'Cormorant Garamond',serif;--disp:'Cinzel Decorative',serif;
 }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:var(--serif);overflow-x:hidden;min-height:100vh;}
 
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body {
-  background: var(--bg);
-  color: var(--cream);
-  font-family: var(--serif);
-  overflow-x: hidden;
-  min-height: 100vh;
-}
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(4,4,10,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 28px;height:52px;}
+.back-btn{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);text-decoration:none;padding:6px 14px 6px 0;border-right:1px solid rgba(255,255,255,.08);margin-right:20px;transition:color .2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.back-btn:hover{color:var(--gold2);}
+.tabs{display:flex;flex:1;}
+.tab{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;padding:0 20px;height:52px;display:flex;align-items:center;gap:8px;color:var(--cream3);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
+.tab:hover{color:var(--cream2);}
+.tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;}
+.tab.active .tab-dot{opacity:1;background:var(--teal);}
+.nav-eq{font-family:var(--mono);font-size:9px;color:var(--cream3);letter-spacing:.08em;margin-left:auto;}
+@media(max-width:640px){.nav-eq{display:none;}}
 
-/* ── tab nav ── */
-#tab-nav {
-  position: sticky; top:0; z-index: 200;
-  background: rgba(4,4,10,.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  display: flex; align-items: center;
-  padding: 0 28px; height: 52px; gap: 0;
-}
-.back-btn {
-  font-family: var(--mono); font-size: 9px; letter-spacing: .2em;
-  text-transform: uppercase; color: var(--gold);
-  text-decoration: none; padding: 6px 14px 6px 0;
-  border-right: 1px solid rgba(255,255,255,.08);
-  margin-right: 20px;
-  transition: color .2s;
-  display: flex; align-items: center; gap: 8px;
-  white-space: nowrap;
-}
-.back-btn:hover { color: var(--gold2); }
-.back-arrow { font-size: 13px; }
+#page-header{padding:40px 40px 28px;max-width:1100px;margin:0 auto;border-bottom:1px solid rgba(255,255,255,.05);}
+.header-label{font-family:var(--mono);font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.header-title{font-family:var(--disp);font-size:clamp(1.4rem,3.5vw,2.5rem);font-weight:400;line-height:1.2;color:var(--cream);margin-bottom:10px;}
+.header-title em{color:var(--teal);font-family:var(--serif);font-style:italic;}
+.header-eq{font-family:var(--mono);font-size:clamp(.78rem,1.6vw,.95rem);color:var(--gold);background:rgba(200,168,74,.07);border:1px solid rgba(200,168,74,.18);display:inline-block;padding:7px 18px;}
 
-.tabs { display: flex; gap: 0; flex: 1; }
-.tab {
-  font-family: var(--mono); font-size: 9px; letter-spacing: .18em;
-  text-transform: uppercase; text-decoration: none;
-  padding: 0 20px; height: 52px;
-  display: flex; align-items: center; gap: 8px;
-  color: var(--cream3);
-  border-bottom: 2px solid transparent;
-  transition: color .2s, border-color .2s;
-  position: relative;
-}
-.tab:hover { color: var(--cream2); }
-.tab.active { color: var(--teal); border-bottom-color: var(--teal); }
-.tab-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: currentColor; opacity: .6;
-}
-.tab.active .tab-dot { opacity: 1; background: var(--teal); }
+#controls{max-width:1100px;margin:0 auto;padding:28px 40px 0;}
+.controls-grid{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;}
+@media(max-width:640px){.controls-grid{grid-template-columns:1fr;}}
+.control-label{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream3);margin-bottom:10px;}
+.slider-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+#n-slider{-webkit-appearance:none;appearance:none;width:260px;max-width:100%;height:3px;background:rgba(255,255,255,.1);outline:none;border-radius:2px;cursor:pointer;}
+#n-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(200,168,74,.4);}
+#n-display{font-family:var(--mono);font-size:1.05rem;color:var(--gold2);min-width:60px;}
+.compute-btn{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:var(--gold);color:var(--bg);border:none;padding:11px 22px;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.compute-btn:hover{background:var(--gold2);}
+.compute-btn:disabled{opacity:.5;cursor:not-allowed;}
 
-.nav-eq {
-  font-family: var(--mono); font-size: 9px;
-  color: var(--cream3); letter-spacing: .08em;
-  margin-left: auto;
-  display: none;
-}
-@media(min-width:640px){ .nav-eq { display: block; } }
+#warn-banner{max-width:1100px;margin:12px auto 0;padding:0 40px;display:none;}
+.warn-box{font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:10px 18px;border-left:3px solid;}
+.warn-box.level-1{background:rgba(200,168,74,.07);border-color:var(--gold);color:var(--gold2);}
+.warn-box.level-2{background:rgba(224,80,96,.08);border-color:var(--coral);color:#f08090;}
 
-/* ── page header ── */
-#page-header {
-  padding: 48px 40px 36px;
-  max-width: 1100px; margin: 0 auto;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-}
-.header-label {
-  font-family: var(--mono); font-size: 8px; letter-spacing: .28em;
-  text-transform: uppercase; color: var(--gold);
-  margin-bottom: 14px;
-}
-.header-title {
-  font-family: var(--disp);
-  font-size: clamp(1.5rem, 4vw, 2.8rem);
-  font-weight: 400; line-height: 1.2;
-  color: var(--cream); margin-bottom: 12px;
-}
-.header-title em { color: var(--teal); font-family: var(--serif); font-style: italic; }
-.header-eq {
-  font-family: var(--mono); font-size: clamp(.8rem, 1.8vw, 1rem);
-  color: var(--gold); background: rgba(200,168,74,.07);
-  border: 1px solid rgba(200,168,74,.18);
-  display: inline-block; padding: 8px 20px;
-}
+#stats-area{max-width:1100px;margin:20px auto 0;padding:0 40px;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:760px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);padding:12px 14px;}
+.stat-lbl{font-family:var(--mono);font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream3);margin-bottom:5px;}
+.stat-val{font-family:var(--mono);font-size:12px;color:var(--gold2);letter-spacing:.04em;}
+.stat-val.teal{color:var(--teal);}.stat-val.violet{color:var(--violet);}.stat-val.coral{color:var(--coral);}.stat-val.green{color:var(--green);}.stat-val.orange{color:var(--orange);}
 
-/* ── controls ── */
-#controls {
-  max-width: 1100px; margin: 0 auto;
-  padding: 32px 40px 0;
-}
-.controls-grid {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 20px; align-items: start;
-}
-@media(max-width:640px){ .controls-grid { grid-template-columns: 1fr; } }
+.section-divider{max-width:1100px;margin:28px auto 0;padding:0 40px;display:flex;align-items:center;gap:14px;}
+.div-line{flex:1;height:1px;background:rgba(255,255,255,.07);}
+.div-glyph{font-family:var(--mono);font-size:7.5px;letter-spacing:.22em;color:var(--cream3);text-transform:uppercase;white-space:nowrap;}
 
-.control-block { display: flex; flex-direction: column; gap: 12px; }
-.control-label {
-  font-family: var(--mono); font-size: 8px; letter-spacing: .22em;
-  text-transform: uppercase; color: var(--cream3);
-}
-.slider-row {
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-}
-#n-slider {
-  -webkit-appearance: none; appearance: none;
-  width: 280px; max-width: 100%;
-  height: 3px; background: rgba(255,255,255,.1);
-  outline: none; border-radius: 2px;
-  cursor: pointer;
-}
-#n-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: var(--gold); cursor: pointer;
-  border: 2px solid var(--bg);
-  box-shadow: 0 0 8px rgba(200,168,74,.4);
-}
-#n-slider::-moz-range-thumb {
-  width: 16px; height: 16px; border-radius: 50%;
-  background: var(--gold); cursor: pointer;
-  border: 2px solid var(--bg);
-}
-#n-display {
-  font-family: var(--mono); font-size: 1.1rem;
-  color: var(--gold2); min-width: 60px;
-}
+#charts-area{max-width:1100px;margin:0 auto;padding:20px 40px 80px;display:flex;flex-direction:column;gap:24px;}
+.chart-panel{background:var(--bg1);border:1px solid rgba(255,255,255,.06);overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.23,1,.32,1),transform .55s cubic-bezier(.23,1,.32,1);}
+.chart-panel.visible{opacity:1;transform:translateY(0);}
+.chart-header{padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+.chart-num{font-family:var(--mono);font-size:8px;letter-spacing:.2em;color:var(--cream3);}
+.chart-title{font-family:var(--mono);font-size:11.5px;color:var(--gold2);flex:1;}
+.chart-desc{font-family:var(--serif);font-size:.86rem;color:var(--cream2);line-height:1.65;width:100%;}
+canvas.main-chart{display:block;width:100%;height:220px;background:#050510;}
+@media(max-width:640px){canvas.main-chart{height:180px;}}
+.chart-footer{padding:9px 20px;display:flex;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.04);}
+.legend-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--cream3);}
+.legend-swatch{width:18px;height:2px;border-radius:1px;}
 
-.compute-btn {
-  font-family: var(--mono); font-size: 9px; letter-spacing: .18em;
-  text-transform: uppercase;
-  background: var(--gold); color: var(--bg);
-  border: none; padding: 11px 24px;
-  cursor: pointer;
-  transition: background .2s;
-  white-space: nowrap;
-}
-.compute-btn:hover { background: var(--gold2); }
-.compute-btn:active { background: var(--gold3); }
+#empty-state{max-width:1100px;margin:60px auto;padding:0 40px;text-align:center;}
+.empty-icon{font-family:var(--mono);font-size:2rem;color:var(--cream3);margin-bottom:14px;}
+.empty-text{font-size:1.05rem;color:var(--cream2);line-height:1.8;font-weight:300;}
 
-/* ── warning banner ── */
-#warn-banner {
-  max-width: 1100px; margin: 16px auto 0;
-  padding: 0 40px;
-  display: none;
-}
-.warn-box {
-  font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
-  padding: 10px 18px;
-  border-left: 3px solid;
-  display: flex; align-items: center; gap: 10px;
-}
-.warn-box.level-1 {
-  background: rgba(200,168,74,.07);
-  border-color: var(--gold);
-  color: var(--gold2);
-}
-.warn-box.level-2 {
-  background: rgba(224,80,96,.08);
-  border-color: var(--coral);
-  color: #f08090;
-}
-
-/* ── stats row ── */
-#stats-row {
-  max-width: 1100px; margin: 20px auto 0;
-  padding: 0 40px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-@media(max-width:640px){ #stats-row { grid-template-columns: repeat(2,1fr); } }
-
-.stat-card {
-  background: var(--bg2);
-  border: 1px solid rgba(255,255,255,.06);
-  padding: 14px 16px;
-}
-.stat-lbl {
-  font-family: var(--mono); font-size: 7px; letter-spacing: .2em;
-  text-transform: uppercase; color: var(--cream3); margin-bottom: 6px;
-}
-.stat-val {
-  font-family: var(--mono); font-size: 13px;
-  color: var(--gold2); letter-spacing: .04em;
-}
-.stat-val.teal { color: var(--teal); }
-.stat-val.violet { color: var(--violet); }
-.stat-val.coral { color: var(--coral); }
-
-/* ── divider ── */
-.section-divider {
-  max-width: 1100px; margin: 36px auto 0;
-  padding: 0 40px;
-  display: flex; align-items: center; gap: 16px;
-}
-.div-line { flex:1; height:1px; background: rgba(255,255,255,.07); }
-.div-glyph {
-  font-family: var(--mono); font-size: 7.5px; letter-spacing: .22em;
-  color: var(--cream3); text-transform: uppercase; white-space: nowrap;
-}
-
-/* ── charts ── */
-#charts-area {
-  max-width: 1100px; margin: 0 auto;
-  padding: 24px 40px 80px;
-  display: flex; flex-direction: column; gap: 32px;
-}
-
-.chart-panel {
-  background: var(--bg1);
-  border: 1px solid rgba(255,255,255,.06);
-  overflow: hidden;
-  opacity: 0; transform: translateY(24px);
-  transition: opacity .6s cubic-bezier(.23,1,.32,1),
-              transform .6s cubic-bezier(.23,1,.32,1);
-}
-.chart-panel.visible { opacity:1; transform: translateY(0); }
-.chart-panel:nth-child(2){ transition-delay:.1s; }
-.chart-panel:nth-child(3){ transition-delay:.2s; }
-
-.chart-header {
-  padding: 18px 22px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
-}
-.chart-num {
-  font-family: var(--mono); font-size: 8px; letter-spacing: .2em;
-  color: var(--cream3);
-}
-.chart-title {
-  font-family: var(--mono); font-size: 12px;
-  color: var(--gold2); flex:1;
-}
-.chart-desc {
-  font-family: var(--serif); font-size: .88rem;
-  color: var(--cream2); line-height: 1.65;
-  width: 100%;
-}
-
-canvas.main-chart {
-  display: block; width: 100%;
-  height: 260px;
-  background: #050510;
-}
-@media(max-width:640px){ canvas.main-chart { height: 200px; } }
-
-.chart-footer {
-  padding: 10px 22px;
-  display: flex; gap: 20px; flex-wrap: wrap;
-  border-top: 1px solid rgba(255,255,255,.04);
-}
-.legend-item {
-  display: flex; align-items: center; gap: 6px;
-  font-family: var(--mono); font-size: 8px; letter-spacing: .12em;
-  color: var(--cream3);
-}
-.legend-swatch {
-  width: 20px; height: 2px; border-radius: 1px;
-}
-.legend-swatch.dashed {
-  background: repeating-linear-gradient(90deg,
-    currentColor 0,currentColor 4px,transparent 4px,transparent 8px);
-}
-
-/* ── empty state ── */
-#empty-state {
-  max-width: 1100px; margin: 60px auto;
-  padding: 0 40px; text-align: center;
-}
-.empty-icon {
-  font-family: var(--mono); font-size: 2rem;
-  color: var(--cream3); margin-bottom: 16px;
-}
-.empty-text {
-  font-size: 1.1rem; color: var(--cream2);
-  line-height: 1.8; font-weight: 300;
-}
-
-/* ── footer ── */
-footer {
-  border-top: 1px solid rgba(255,255,255,.06);
-  padding: 24px 40px;
-  display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 10px;
-}
-.footer-left {
-  font-family: var(--mono); font-size: 8px; letter-spacing: .18em;
-  text-transform: uppercase; color: var(--cream3);
-}
-.footer-right {
-  font-family: var(--serif); font-size: .88rem;
-  color: var(--cream3); font-style: italic;
-}
+footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-left{font-family:var(--mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream3);}
+.footer-right{font-family:var(--serif);font-size:.86rem;color:var(--cream3);font-style:italic;}
 
 @media(max-width:600px){
-  #page-header,#controls,#warn-banner,#stats-row,
-  .section-divider,#charts-area { padding-left:20px; padding-right:20px; }
-  #tab-nav { padding: 0 16px; }
-  .nav-eq { display:none !important; }
+  #page-header,#controls,#warn-banner,#stats-area,.section-divider,#charts-area{padding-left:18px;padding-right:18px;}
+  #tab-nav{padding:0 14px;}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════ TAB NAV ═══════ -->
 <nav id="tab-nav">
-  <a href="index.html" class="back-btn">
-    <span class="back-arrow">◁</span> Main
-  </a>
+  <a href="index.html" class="back-btn"><span>◁</span> Main</a>
   <div class="tabs">
-    <a href="index.html" class="tab">
-      <span class="tab-dot"></span> Opener
-    </a>
-    <div class="tab active">
-      <span class="tab-dot"></span> Explorer
-    </div>
+    <a href="index.html" class="tab"><span class="tab-dot"></span> Opener</a>
+    <div class="tab active"><span class="tab-dot"></span> Explorer</div>
   </div>
-  <div class="nav-eq">E(N) = R(N) − C = O(1 / log N)</div>
+  <div class="nav-eq">E(N) = R(N) − C = O(1/log N)</div>
 </nav>
 
-<!-- ═══════ PAGE HEADER ═══════ -->
 <div id="page-header">
   <div class="header-label">Interactive Explorer · W. Getachew · 2026</div>
-  <h1 class="header-title">
-    The <em>E(N)</em> Convergence Explorer
-  </h1>
-  <div class="header-eq">R(N) = C + c₁ / log N + O(1 / log² N)</div>
+  <h1 class="header-title">The <em>E(N)</em> Convergence Explorer</h1>
+  <div class="header-eq">R(N) = C + c₁/log N + O(1/log² N)</div>
 </div>
 
-<!-- ═══════ CONTROLS ═══════ -->
 <div id="controls">
   <div class="controls-grid">
-    <div class="control-block">
+    <div>
       <div class="control-label">Compute up to N</div>
       <div class="slider-row">
         <input type="range" id="n-slider" min="100" max="10000" step="50" value="500">
@@ -370,493 +123,400 @@ footer {
   </div>
 </div>
 
-<!-- ═══════ WARNING BANNER ═══════ -->
-<div id="warn-banner">
-  <div class="warn-box" id="warn-box"></div>
-</div>
+<div id="warn-banner"><div class="warn-box" id="warn-box"></div></div>
 
-<!-- ═══════ STATS ═══════ -->
-<div id="stats-row">
-  <div class="stat-card">
-    <div class="stat-lbl">Computed N</div>
-    <div class="stat-val" id="stat-n">—</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-lbl">Constant C</div>
-    <div class="stat-val teal" id="stat-c">—</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-lbl">c₁ estimate</div>
-    <div class="stat-val violet" id="stat-c1">—</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-lbl">Sign changes</div>
-    <div class="stat-val coral" id="stat-signs">—</div>
+<div id="stats-area">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-lbl">Computed N</div><div class="stat-val" id="st-n">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">Constant C</div><div class="stat-val teal" id="st-c">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">c₁ estimate</div><div class="stat-val violet" id="st-c1">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">Sign changes</div><div class="stat-val coral" id="st-sc">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">π(N) primes</div><div class="stat-val" style="color:var(--gold2)" id="st-pi">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">SC / π(N)</div><div class="stat-val green" id="st-ratio">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">Prime-at-SC</div><div class="stat-val orange" id="st-psc">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">Longest SC gap</div><div class="stat-val" id="st-gap">—</div></div>
   </div>
 </div>
 
-<!-- ═══════ DIVIDER ═══════ -->
-<div class="section-divider">
-  <div class="div-line"></div>
-  <div class="div-glyph">Three views of convergence</div>
-  <div class="div-line"></div>
-</div>
+<div class="section-divider"><div class="div-line"></div><div class="div-glyph">Convergence — three views</div><div class="div-line"></div></div>
 
-<!-- ═══════ EMPTY STATE ═══════ -->
 <div id="empty-state">
   <div class="empty-icon">⟳</div>
-  <p class="empty-text">
-    Set N above and click <strong style="color:var(--gold)">Compute →</strong><br>
-    to render all three convergence charts.
-  </p>
+  <p class="empty-text">Set N and click <strong style="color:var(--gold)">Compute →</strong><br>to render all eight charts.</p>
 </div>
 
-<!-- ═══════ CHARTS ═══════ -->
 <div id="charts-area" style="display:none;">
 
-  <!-- Chart 01 -->
-  <div class="chart-panel" id="panel-1">
+  <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 01</span>
-      <span class="chart-title">|E(N)| = |R(N) − C|</span>
-      <span class="chart-desc">
-        The absolute error term, with a fitted A/log N envelope (dashed gold) and the
-        theoretical |c₁|/log N curve (dashed violet). All three should track closely
-        if the 1/log N rate is correct.
-      </span>
+      <span class="chart-num">Chart 01</span><span class="chart-title">|E(N)| with A/log N envelope</span>
+      <span class="chart-desc">Absolute error with fitted gold envelope and theoretical |c₁|/log N in violet. All three should track closely if the 1/log N rate holds.</span>
     </div>
-    <canvas class="main-chart" id="chart-1"></canvas>
+    <canvas class="main-chart" id="c1"></canvas>
     <div class="chart-footer">
       <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>|E(N)|</div>
-      <div class="legend-item"><div class="legend-swatch dashed" style="color:var(--gold)"></div>Fitted A/log N</div>
-      <div class="legend-item"><div class="legend-swatch dashed" style="color:var(--violet)"></div>|c₁|/log N</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.7"></div>Fitted A/log N</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--violet);opacity:.7"></div>|c₁|/log N</div>
     </div>
   </div>
 
-  <!-- Chart 02 -->
-  <div class="chart-panel" id="panel-2">
+  <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 02</span>
-      <span class="chart-title">E(N) · log N → c₁</span>
-      <span class="chart-desc">
-        Multiplying E(N) by log N cancels the denominator. If the convergence rate
-        is exactly 1/log N, this product should stabilise toward the constant c₁
-        (shown as a dashed teal reference line).
-      </span>
+      <span class="chart-num">Chart 02</span><span class="chart-title">E(N) · log N → c₁</span>
+      <span class="chart-desc">Rescaled error. Flattening toward the teal c₁ line confirms the convergence rate is exactly 1/log N.</span>
     </div>
-    <canvas class="main-chart" id="chart-2"></canvas>
+    <canvas class="main-chart" id="c2"></canvas>
     <div class="chart-footer">
       <div class="legend-item"><div class="legend-swatch" style="background:var(--violet)"></div>E(N)·log N</div>
-      <div class="legend-item"><div class="legend-swatch dashed" style="color:var(--teal)"></div>c₁ reference</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);opacity:.6"></div>c₁ reference</div>
     </div>
   </div>
 
-  <!-- Chart 03 -->
-  <div class="chart-panel" id="panel-3">
+  <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 03</span>
-      <span class="chart-title">log|E(N)| vs log(log N) · slope → −1</span>
-      <span class="chart-desc">
-        On a log–log plot against log log N, the 1/log N rate requires slope exactly −1.
-        A gold dashed reference line at slope = −1 is drawn for direct comparison.
-        Sign changes of E(N) appear as gap breaks in the curve.
-      </span>
+      <span class="chart-num">Chart 03</span><span class="chart-title">log|E(N)| vs log(log N) · slope → −1</span>
+      <span class="chart-desc">Log-log diagnostic. Slope of −1 (gold dashed) is the 1/log N signature. Breaks in the curve are sign changes where |E(N)| passes through zero.</span>
     </div>
-    <canvas class="main-chart" id="chart-3"></canvas>
+    <canvas class="main-chart" id="c3"></canvas>
     <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:#e8904a"></div>log|E(N)|</div>
-      <div class="legend-item"><div class="legend-swatch dashed" style="color:var(--gold)"></div>Slope = −1 ref</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--orange)"></div>log|E(N)|</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.6"></div>Slope = −1 ref</div>
+    </div>
+  </div>
+
+  <div class="section-divider" style="margin:4px 0;"><div class="div-line"></div><div class="div-glyph">Sign change analysis</div><div class="div-line"></div></div>
+
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 04</span><span class="chart-title">Signed E(N) · prime markers · sign-change dots</span>
+      <span class="chart-desc">Full signed oscillation of E(N). Gold ticks on the baseline mark every prime. Coral dots mark sign changes. Most sign changes fall near primes — but not every prime triggers one; consecutive primes can push in the same direction before a reversal.</span>
+    </div>
+    <canvas class="main-chart" id="c4"></canvas>
+    <div class="chart-footer">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>E(N)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold)"></div>Prime tick</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--coral)"></div>Sign change</div>
+    </div>
+  </div>
+
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 05</span><span class="chart-title">SC(N) / π(N) — sign changes per prime</span>
+      <span class="chart-desc">Ratio of cumulative sign changes to cumulative prime count. Converges to a constant strictly less than 1 — the fraction of primes that actually reverse the direction of E(N). This limit is an original quantity; its analytic value is not yet known.</span>
+    </div>
+    <canvas class="main-chart" id="c5"></canvas>
+    <div class="chart-footer">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--green)"></div>SC(N)/π(N)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.5"></div>Empirical limit</div>
+    </div>
+  </div>
+
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 06</span><span class="chart-title">Sign change gap distribution</span>
+      <span class="chart-desc">Histogram of gap sizes between consecutive sign changes. An approximately exponential tail is consistent with pseudo-random oscillation driven by primes. A heavy tail or periodicity would indicate structured interference.</span>
+    </div>
+    <canvas class="main-chart" id="c6"></canvas>
+    <div class="chart-footer">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--coral)"></div>Gap frequency</div>
+    </div>
+  </div>
+
+  <div class="section-divider" style="margin:4px 0;"><div class="div-line"></div><div class="div-glyph">Local structure & χ₄ connection</div><div class="div-line"></div></div>
+
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 07</span><span class="chart-title">Local lift factor φ(M+1) / [(M+1)·C]</span>
+      <span class="chart-desc">Each term L(M) pushes R(N) upward when this factor exceeds 1 (gold line), downward when below. At M = prime, φ(M) = M−1 is maximal — the teal vertical bands show prime positions. The sign of (factor − 1) directly predicts which way E(N) will move next.</span>
+    </div>
+    <canvas class="main-chart" id="c7"></canvas>
+    <div class="chart-footer">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--violet)"></div>Local factor</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.6"></div>Factor = 1</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);opacity:.4"></div>Prime column</div>
+    </div>
+  </div>
+
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 08</span><span class="chart-title">χ₄-restricted E(N) · gcd(M, 4) = 1</span>
+      <span class="chart-desc">E(N) restricted to M ≡ 1 or 3 (mod 4) — the support of the Dirichlet character χ₄. Scaling by ×4 (the conductor) connects this to the Farey–χ₄ discrepancy and the zeros of L(s, χ₄). Teal dots mark sign changes in this restricted sum — these are genuine Franel–Landau probes.</span>
+    </div>
+    <canvas class="main-chart" id="c8"></canvas>
+    <div class="chart-footer">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold)"></div>E_χ₄(N)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>χ₄ sign change</div>
     </div>
   </div>
 
 </div>
 
-<!-- ═══════ FOOTER ═══════ -->
 <footer>
   <div class="footer-left">W. Getachew · E(N) Explorer · math.NT · 2026</div>
-  <div class="footer-right">c₁ = −C · Σ<sub>p</sub> log p / (p² − 2)</div>
+  <div class="footer-right">gcd(r,4)=1 · χ₄ · Franel–Landau</div>
 </footer>
 
 <script>
-// ── device / performance thresholds ──────────────────────────────────────
-const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-const WARN_1  = isTouch ?  1000 :  6000;
-const WARN_2  = isTouch ?  2500 : 12000;
+const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+const WARN_1=isTouch?1000:6000, WARN_2=isTouch?2500:12000;
+const DPR=Math.min(window.devicePixelRatio||1,2);
 
-// ── sieve & phi ───────────────────────────────────────────────────────────
-function buildSieve(limit){
-  const a = new Uint8Array(limit+1).fill(1);
-  a[0]=a[1]=0;
-  for(let i=2;i*i<=limit;i++)
-    if(a[i]) for(let j=i*i;j<=limit;j+=i) a[j]=0;
-  const p=[];
-  for(let i=2;i<=limit;i++) if(a[i]) p.push(i);
-  return p;
-}
-
-let cachedPrimes = buildSieve(200);
-
-function phi(m, primes){
-  if(m===1) return 1;
-  let r=m, n=m;
-  for(const p of primes){
-    if(p*p>n) break;
-    if(n%p===0){ r-=Math.floor(r/p); while(n%p===0) n=Math.floor(n/p); }
-  }
-  if(n>1) r-=Math.floor(r/n);
-  return r;
-}
-
-// ── Euler product for C ───────────────────────────────────────────────────
-function computeC(primes){
-  let C=1;
-  for(const p of primes) C *= (p*p-2)/(p*p-1);
-  return C;
-}
-
-// c₁ = -C · Σ_p log(p)/(p²-2)
-function computeC1(C, primes){
-  let s=0;
-  for(const p of primes) s += Math.log(p)/(p*p-2);
-  return -C*s;
-}
-
-// ── main computation ──────────────────────────────────────────────────────
-let computedData = null;
-
-function compute(N){
-  // rebuild sieve if needed
-  if(cachedPrimes[cachedPrimes.length-1] < N)
-    cachedPrimes = buildSieve(N+100);
-
-  const primes = cachedPrimes;
-  const C_euler = computeC(primes);
-  const c1_theory = computeC1(C_euler, primes);
-
-  // Precompute phi array
-  const phiArr = new Float64Array(N+2);
-  for(let m=1;m<=N+1;m++) phiArr[m] = phi(m, primes);
-
-  // Compute R(m), E(m) for m = 2..N
-  const pts = [];
-  let sumL=0, sumPh=0;
-  for(let m=1;m<=N;m++){
-    sumL  += phiArr[m]*phiArr[m+1]/(m+1);
-    sumPh += phiArr[m];
-    if(m >= 10){
-      const R = sumL/sumPh;
-      pts.push({ m, R });
+// ── phi sieve (linear sieve method — fastest) ──────────────────────────
+function buildPhiAndPrimes(N){
+  const phi=new Int32Array(N+2);
+  const isPrime=new Uint8Array(N+2).fill(1);
+  const primes=[];
+  phi[1]=1;
+  for(let i=2;i<=N+1;i++){
+    if(isPrime[i]){primes.push(i);phi[i]=i-1;}
+    for(let j=0;j<primes.length&&i*primes[j]<=N+1;j++){
+      const p=primes[j];
+      isPrime[i*p]=0;
+      if(i%p===0){phi[i*p]=phi[i]*p;break;}
+      else{phi[i*p]=phi[i]*(p-1);}
     }
   }
+  return{phi,isPrime,primes};
+}
 
-  // C from the ratio at large N (empirical, as cross-check)
-  const C_emp = pts[pts.length-1].R;
-  // Use the better of Euler product vs empirical
-  const C = C_euler;
+function eulerC(primes){
+  let C=1;for(const p of primes)C*=(p*p-2)/(p*p-1);return C;
+}
+function theoreticalC1(C,primes){
+  let s=0;for(const p of primes)s+=Math.log(p)/(p*p-2);return -C*s;
+}
 
-  // Build E(m), E(m)*logm, sign changes
-  let signChanges = 0;
-  let prevSign = 0;
-  const data = [];
-  for(const {m,R} of pts){
-    const E = R - C;
-    const logm = Math.log(m);
-    const absE = Math.abs(E);
-    const Elogm = E * logm;
-    const logAbsE = absE > 1e-15 ? Math.log(absE) : NaN;
-    const loglogm = Math.log(logm);
-    const sgn = E >= 0 ? 1 : -1;
-    if(prevSign !== 0 && sgn !== prevSign) signChanges++;
-    prevSign = sgn;
-    data.push({ m, E, absE, Elogm, logAbsE, loglogm, logm });
+// ── compute ───────────────────────────────────────────────────────────
+let result=null;
+function compute(N){
+  const{phi,isPrime,primes}=buildPhiAndPrimes(N);
+  const C=eulerC(primes);
+  const c1t=theoreticalC1(C,primes);
+
+  let sumL=0,sumPh=0,sumL4=0,sumPh4=0;
+  const raw=[];
+  for(let m=1;m<=N;m++){
+    const Lm=phi[m]*phi[m+1]/(m+1);
+    sumL+=Lm;sumPh+=phi[m];
+    const r4=m%4;
+    if(r4===1||r4===3){sumL4+=Lm;sumPh4+=phi[m];}
+    if(m>=10) raw.push({m,R:sumL/sumPh,R4:sumPh4>0?sumL4/sumPh4:0,ip:isPrime[m]===1,lf:phi[m+1]/((m+1)*C)});
   }
+  const C4=raw[raw.length-1].R4;
 
-  // Fit A: median of |E(m)|*log(m) over later half
-  const half = Math.floor(data.length/2);
-  const vals = data.slice(half).map(d=>d.absE*d.logm).filter(v=>isFinite(v));
-  vals.sort((a,b)=>a-b);
-  const A_fit = vals[Math.floor(vals.length/2)] || 0.01;
+  // fit A (median of |E|*logm over second half)
+  const half=Math.floor(raw.length/2);
+  const fv=raw.slice(half).map(d=>Math.abs(d.R-C)*Math.log(d.m)).filter(v=>isFinite(v)&&v>0).sort((a,b)=>a-b);
+  const A=fv[Math.floor(fv.length/2)]||0.01;
 
-  return { data, C, C_euler, c1_theory, A_fit, signChanges, N };
-}
-
-// ── canvas drawing helpers ────────────────────────────────────────────────
-function setupCanvas(id){
-  const c = document.getElementById(id);
-  c.width  = c.offsetWidth  * (window.devicePixelRatio||1);
-  c.height = c.offsetHeight * (window.devicePixelRatio||1);
-  const ctx = c.getContext('2d');
-  ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
-  const W = c.offsetWidth, H = c.offsetHeight;
-  ctx.fillStyle='#050510'; ctx.fillRect(0,0,W,H);
-  return {ctx, W, H};
-}
-
-function drawAxes(ctx,W,H,pad){
-  ctx.strokeStyle='rgba(255,255,255,.06)';
-  ctx.lineWidth=1;
-  // horizontal grid lines
-  for(let i=1;i<4;i++){
-    const y=pad+(H-2*pad)*i/4;
-    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+  let ps=0,ps4=0,sc=0,sc4=0,primeSC=0,piN=0;
+  let lastSC=10;const scGaps=[];
+  const data=[];
+  for(const r of raw){
+    const E=r.R-C,E4=r.R4-C4,lm=Math.log(r.m);
+    const sg=E>=0?1:-1,sg4=E4>=0?1:-1;
+    if(r.ip)piN++;
+    let isc=false,isc4=false;
+    if(ps!==0&&sg!==ps){sc++;isc=true;if(r.ip)primeSC++;scGaps.push(r.m-lastSC);lastSC=r.m;}
+    if(ps4!==0&&sg4!==ps4){sc4++;isc4=true;}
+    ps=sg;ps4=sg4;
+    data.push({m:r.m,E,absE:Math.abs(E),Elgm:E*lm,lgAbsE:Math.abs(E)>1e-15?Math.log(Math.abs(E)):NaN,lglgm:Math.log(lm),lm,E4,ip:r.ip,isc,isc4,lf:r.lf,piC:piN,scC:sc});
   }
-  // zero line will be drawn per chart
+  const longestGap=scGaps.length?Math.max(...scGaps):0;
+  return{data,C,C4,c1t,A,sc,sc4,primeSC,piN,scRatio:piN>0?sc/piN:0,longestGap,scGaps,N};
 }
 
-function mapRange(val,inMin,inMax,outMin,outMax){
-  return outMin+(val-inMin)/(inMax-inMin)*(outMax-outMin);
+// ── canvas ────────────────────────────────────────────────────────────
+function setup(id){
+  const c=document.getElementById(id);
+  const W=c.offsetWidth,H=c.offsetHeight;
+  c.width=W*DPR;c.height=H*DPR;
+  const ctx=c.getContext('2d');ctx.scale(DPR,DPR);
+  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
+  return{ctx,W,H};
+}
+function grid(ctx,W,H,p){
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(let i=1;i<4;i++){const y=p+(H-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-p,y);ctx.stroke();}
+}
+function mp(v,i0,i1,o0,o1){return o0+(v-i0)/(i1-i0)*(o1-o0);}
+function axlbl(ctx,W,H,p,mn,mx){
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('N='+mn,p,H-4);ctx.fillText('N='+mx,W-60,H-4);
+}
+function line(ctx,pts,px,py,color,lw){
+  ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.beginPath();
+  let s=false;for(const p of pts){const x=px(p[0]),y=py(p[1]);if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);}
+  ctx.stroke();
 }
 
-// ── Chart 1: |E(N)| with envelopes ───────────────────────────────────────
-function drawChart1(result){
-  const {ctx,W,H} = setupCanvas('chart-1');
-  const pad=24;
-  const {data, A_fit, c1_theory, C} = result;
-  const valid = data.filter(d=>isFinite(d.absE) && d.absE>0);
-  if(!valid.length) return;
+// ── 8 chart draw functions ────────────────────────────────────────────
+function drawC1(r){
+  const{ctx,W,H}=setup('c1');const p=22;
+  const d=r.data.filter(x=>isFinite(x.absE)&&x.absE>0);if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m,yMx=Math.max(...d.slice(0,8).map(x=>x.absE))*1.15;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(Math.max(v,0),0,yMx,H-p,p);
+  grid(ctx,W,H,p);
+  ctx.strokeStyle='rgba(200,168,74,.5)';ctx.lineWidth=1.2;ctx.setLineDash([4,8]);
+  line(ctx,d.map(x=>[x.m,r.A/x.lm]),px,py,'rgba(200,168,74,.5)',1.2);ctx.setLineDash([]);
+  ctx.setLineDash([2,6]);line(ctx,d.map(x=>[x.m,Math.abs(r.c1t)/x.lm]),px,py,'rgba(144,112,216,.5)',1.2);ctx.setLineDash([]);
+  line(ctx,d.map(x=>[x.m,x.absE]),px,py,'rgba(61,200,184,.9)',1.6);
+  axlbl(ctx,W,H,p,mn,mx);
+}
 
-  const mMin = valid[0].m, mMax = valid[valid.length-1].m;
-  const yMax = Math.max(...valid.slice(0,10).map(d=>d.absE)) * 1.1;
-  const yMin = 0;
+function drawC2(r){
+  const{ctx,W,H}=setup('c2');const p=22;
+  const d=r.data.filter(x=>isFinite(x.Elgm));if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const vs=d.map(x=>x.Elgm),vMn=Math.min(...vs),vMx=Math.max(...vs),mg=(vMx-vMn)*.12||.01;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
+  grid(ctx,W,H,p);
+  if(vMn<0&&vMx>0){ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();}
+  ctx.setLineDash([4,7]);line(ctx,[[mn,r.c1t],[mx,r.c1t]],px,py,'rgba(61,200,184,.5)',1.2);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(61,200,184,.65)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('c₁≈'+r.c1t.toFixed(5),W-118,py(r.c1t)-5);
+  line(ctx,d.map(x=>[x.m,x.Elgm]),px,py,'rgba(144,112,216,.9)',1.6);
+  axlbl(ctx,W,H,p,mn,mx);
+}
 
-  const px = m => mapRange(m, mMin, mMax, pad, W-pad);
-  const py = v => mapRange(Math.max(v,0), yMin, yMax, H-pad, pad);
+function drawC3(r){
+  const{ctx,W,H}=setup('c3');const p=22;
+  const d=r.data.filter(x=>isFinite(x.lgAbsE)&&isFinite(x.lglgm)&&x.lglgm>0);if(!d.length)return;
+  const xMn=d[0].lglgm,xMx=d[d.length-1].lglgm;
+  const ys=d.map(x=>x.lgAbsE),yMn=Math.min(...ys),yMx=Math.max(...ys),mg=(yMx-yMn)*.1||.5;
+  const px=x=>mp(x,xMn,xMx,p,W-p),py=y=>mp(y,yMn-mg,yMx+mg,H-p,p);
+  grid(ctx,W,H,p);
+  const mid=d[Math.floor(d.length/2)],b=mid.lgAbsE-(-1)*mid.lglgm;
+  ctx.setLineDash([4,8]);line(ctx,[[xMn,-xMn+b],[xMx,-xMx+b]],px,py,'rgba(200,168,74,.48)',1.2);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.55)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('slope=−1',px(xMn)+4,py(-xMn+b)-5);
+  line(ctx,d.map(x=>[x.lglgm,x.lgAbsE]),px,py,'#e8904a',1.6);
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('log(log N)',W/2-25,H-4);
+}
 
-  drawAxes(ctx,W,H,pad);
-
+function drawC4(r){
+  const{ctx,W,H}=setup('c4');const p=22;
+  const d=r.data.filter(x=>isFinite(x.E));if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const vs=d.map(x=>x.E),vMn=Math.min(...vs),vMx=Math.max(...vs),mg=(vMx-vMn)*.12||.001;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
+  grid(ctx,W,H,p);
   // zero line
-  ctx.strokeStyle='rgba(255,255,255,.1)';
-  ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(pad,py(0)); ctx.lineTo(W-pad,py(0)); ctx.stroke();
-
-  // fitted A/log N envelope (gold dashed)
-  ctx.strokeStyle='rgba(200,168,74,.55)';
-  ctx.lineWidth=1.2; ctx.setLineDash([4,8]);
-  ctx.beginPath(); let s=false;
-  for(const d of valid){
-    const y=py(A_fit/d.logm);
-    const x=px(d.m);
-    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
-  }
-  ctx.stroke(); ctx.setLineDash([]);
-
-  // theoretical |c1|/log N (violet dashed)
-  const absC1 = Math.abs(c1_theory);
-  ctx.strokeStyle='rgba(144,112,216,.55)';
-  ctx.lineWidth=1.2; ctx.setLineDash([2,6]);
-  ctx.beginPath(); s=false;
-  for(const d of valid){
-    const y=py(absC1/d.logm);
-    const x=px(d.m);
-    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
-  }
-  ctx.stroke(); ctx.setLineDash([]);
-
-  // |E(N)| (teal)
-  ctx.strokeStyle='rgba(61,200,184,.9)';
-  ctx.lineWidth=1.5;
-  ctx.beginPath(); s=false;
-  for(const d of valid){
-    const y=py(d.absE);
-    const x=px(d.m);
-    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
-  }
-  ctx.stroke();
-
-  // axis labels
-  ctx.fillStyle='rgba(255,255,255,.22)';
-  ctx.font=`10px JetBrains Mono,monospace`;
-  ctx.fillText('N='+mMin, pad, H-6);
-  ctx.fillText('N='+mMax, W-60, H-6);
+  ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+  // prime ticks
+  ctx.strokeStyle='rgba(200,168,74,.35)';ctx.lineWidth=1;
+  for(const x of d)if(x.ip){ctx.beginPath();ctx.moveTo(px(x.m),H-p);ctx.lineTo(px(x.m),H-p+5);ctx.stroke();}
+  // E(N) curve
+  line(ctx,d.map(x=>[x.m,x.E]),px,py,'rgba(61,200,184,.85)',1.5);
+  // sign change dots
+  for(const x of d)if(x.isc){ctx.beginPath();ctx.arc(px(x.m),py(x.E),3,0,Math.PI*2);ctx.fillStyle='rgba(224,80,96,.9)';ctx.fill();}
+  axlbl(ctx,W,H,p,mn,mx);
 }
 
-// ── Chart 2: E(N)·log N → c₁ ─────────────────────────────────────────────
-function drawChart2(result){
-  const {ctx,W,H} = setupCanvas('chart-2');
-  const pad=24;
-  const {data, c1_theory} = result;
-  const valid = data.filter(d=>isFinite(d.Elogm));
-  if(!valid.length) return;
-
-  const mMin = valid[0].m, mMax = valid[valid.length-1].m;
-  const vals = valid.map(d=>d.Elogm);
-  const rawMax = Math.max(...vals), rawMin = Math.min(...vals);
-  const margin = (rawMax-rawMin)*0.15 || 0.01;
-  const yMin = rawMin-margin, yMax = rawMax+margin;
-
-  const px = m => mapRange(m, mMin, mMax, pad, W-pad);
-  const py = v => mapRange(v, yMin, yMax, H-pad, pad);
-
-  drawAxes(ctx,W,H,pad);
-
-  // c1 reference (teal dashed)
-  ctx.strokeStyle='rgba(61,200,184,.5)';
-  ctx.lineWidth=1.2; ctx.setLineDash([4,7]);
-  ctx.beginPath();
-  ctx.moveTo(pad, py(c1_theory));
-  ctx.lineTo(W-pad, py(c1_theory));
-  ctx.stroke(); ctx.setLineDash([]);
-
-  // zero line
-  if(yMin<0 && yMax>0){
-    ctx.strokeStyle='rgba(255,255,255,.1)';
-    ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(pad,py(0)); ctx.lineTo(W-pad,py(0)); ctx.stroke();
-  }
-
-  // E(N)·log N (violet)
-  ctx.strokeStyle='rgba(144,112,216,.9)';
-  ctx.lineWidth=1.5;
-  ctx.beginPath(); let s=false;
-  for(const d of valid){
-    const y=py(d.Elogm), x=px(d.m);
-    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
-  }
-  ctx.stroke();
-
-  // c1 label
-  ctx.fillStyle='rgba(61,200,184,.7)';
-  ctx.font=`9px JetBrains Mono,monospace`;
-  ctx.fillText('c₁ ≈ '+c1_theory.toFixed(5), W-110, py(c1_theory)-6);
-
-  ctx.fillStyle='rgba(255,255,255,.22)';
-  ctx.font=`10px JetBrains Mono,monospace`;
-  ctx.fillText('N='+mMin, pad, H-6);
-  ctx.fillText('N='+mMax, W-60, H-6);
+function drawC5(r){
+  const{ctx,W,H}=setup('c5');const p=22;
+  const d=r.data.filter(x=>x.piC>0);if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const ratios=d.map(x=>x.scC/x.piC);
+  const yMx=Math.max(...ratios)*1.1||1;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,0,yMx,H-p,p);
+  grid(ctx,W,H,p);
+  const lim=ratios[ratios.length-1];
+  ctx.setLineDash([4,8]);line(ctx,[[mn,lim],[mx,lim]],px,py,'rgba(200,168,74,.4)',1.2);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.6)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('≈'+lim.toFixed(4),W-72,py(lim)-5);
+  line(ctx,d.map((x,i)=>[x.m,ratios[i]]),px,py,'rgba(80,200,120,.9)',1.6);
+  axlbl(ctx,W,H,p,mn,mx);
 }
 
-// ── Chart 3: log|E(N)| vs log(log N) ─────────────────────────────────────
-function drawChart3(result){
-  const {ctx,W,H} = setupCanvas('chart-3');
-  const pad=24;
-  const {data} = result;
-  const valid = data.filter(d=>isFinite(d.logAbsE) && isFinite(d.loglogm) && d.loglogm>0);
-  if(!valid.length) return;
-
-  const xMin = valid[0].loglogm, xMax = valid[valid.length-1].loglogm;
-  const ys = valid.map(d=>d.logAbsE);
-  const yMin = Math.min(...ys), yMax = Math.max(...ys);
-  const margin = (yMax-yMin)*0.1 || 0.5;
-
-  const px = x => mapRange(x, xMin, xMax, pad, W-pad);
-  const py = y => mapRange(y, yMin-margin, yMax+margin, H-pad, pad);
-
-  drawAxes(ctx,W,H,pad);
-
-  // slope -1 reference through midpoint (gold dashed)
-  const mid = valid[Math.floor(valid.length/2)];
-  const b = mid.logAbsE - (-1)*mid.loglogm;
-  ctx.strokeStyle='rgba(200,168,74,.5)';
-  ctx.lineWidth=1.2; ctx.setLineDash([4,8]);
-  ctx.beginPath();
-  ctx.moveTo(px(xMin), py(-1*xMin+b));
-  ctx.lineTo(px(xMax), py(-1*xMax+b));
-  ctx.stroke(); ctx.setLineDash([]);
-
-  // slope label
-  ctx.fillStyle='rgba(200,168,74,.6)';
-  ctx.font=`9px JetBrains Mono,monospace`;
-  ctx.fillText('slope = −1', px(xMin)+4, py(-1*xMin+b)-6);
-
-  // log|E(N)| (orange), breaking on NaN (sign changes → |E|=0)
-  ctx.strokeStyle='#e8904a';
-  ctx.lineWidth=1.5;
-  ctx.beginPath(); let s=false;
-  for(const d of valid){
-    const x=px(d.loglogm), y=py(d.logAbsE);
-    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
+function drawC6(r){
+  const{ctx,W,H}=setup('c6');const p=22;
+  const gaps=r.scGaps;
+  if(!gaps.length){ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='10px JetBrains Mono,monospace';ctx.fillText('Increase N to see gap distribution',p,H/2);return;}
+  const maxG=Math.max(...gaps);
+  const bins=Math.min(40,Math.ceil(Math.sqrt(gaps.length)));
+  const bw=maxG/bins;
+  const counts=new Array(bins).fill(0);
+  for(const g of gaps)counts[Math.min(bins-1,Math.floor(g/bw))]++;
+  const maxC=Math.max(...counts);
+  const bpw=(W-2*p)/bins;
+  const py=v=>mp(v,0,maxC*1.1,H-p,p);
+  grid(ctx,W,H,p);
+  for(let i=0;i<bins;i++){
+    const x=p+i*bpw,ht=H-p-py(counts[i]);
+    if(ht>0){ctx.fillStyle=`rgba(224,80,96,${.5+.3*(counts[i]/maxC)})`;ctx.fillRect(x,py(counts[i]),bpw-1,ht);}
   }
-  ctx.stroke();
-
-  ctx.fillStyle='rgba(255,255,255,.22)';
-  ctx.font=`10px JetBrains Mono,monospace`;
-  ctx.fillText('log(log N)', W/2-28, H-6);
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('gap size',W/2-18,H-4);
+  ctx.fillText('max='+maxG,p,p+12);
 }
 
-// ── render all charts ─────────────────────────────────────────────────────
-function renderAll(result){
+function drawC7(r){
+  const{ctx,W,H}=setup('c7');const p=22;
+  const step=Math.max(1,Math.floor(r.data.length/250));
+  const d=r.data.filter((_,i)=>i%step===0&&isFinite(_.lf));if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const vs=d.map(x=>x.lf),vMn=Math.min(...vs)*.95,vMx=Math.max(...vs)*1.05;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn,vMx,H-p,p);
+  grid(ctx,W,H,p);
+  // prime columns
+  ctx.strokeStyle='rgba(61,200,184,.18)';ctx.lineWidth=1;
+  for(const x of d)if(x.ip){ctx.beginPath();ctx.moveTo(px(x.m),p);ctx.lineTo(px(x.m),H-p);ctx.stroke();}
+  // factor=1 line
+  ctx.setLineDash([4,6]);line(ctx,[[mn,1],[mx,1]],px,py,'rgba(200,168,74,.55)',1.2);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.6)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('factor=1',W-70,py(1)-5);
+  line(ctx,d.map(x=>[x.m,x.lf]),px,py,'rgba(144,112,216,.8)',1.4);
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
+function drawC8(r){
+  const{ctx,W,H}=setup('c8');const p=22;
+  const d=r.data.filter(x=>isFinite(x.E4));if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const vs=d.map(x=>x.E4),vMn=Math.min(...vs),vMx=Math.max(...vs),mg=(vMx-vMn)*.12||.001;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
+  grid(ctx,W,H,p);
+  ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+  line(ctx,d.map(x=>[x.m,x.E4]),px,py,'rgba(200,168,74,.9)',1.6);
+  for(const x of d)if(x.isc4){ctx.beginPath();ctx.arc(px(x.m),py(x.E4),3,0,Math.PI*2);ctx.fillStyle='rgba(61,200,184,.85)';ctx.fill();}
+  ctx.fillStyle='rgba(200,168,74,.45)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('gcd(M,4)=1 sublattice',p,p+12);
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
+function renderAll(res){
   document.getElementById('charts-area').style.display='flex';
   document.getElementById('empty-state').style.display='none';
-
-  drawChart1(result);
-  drawChart2(result);
-  drawChart3(result);
-
-  // update stats
-  document.getElementById('stat-n').textContent  = result.N.toLocaleString();
-  document.getElementById('stat-c').textContent  = result.C.toFixed(7);
-  document.getElementById('stat-c1').textContent = result.c1_theory.toFixed(6);
-  document.getElementById('stat-signs').textContent = result.signChanges;
-
-  // reveal panels
-  setTimeout(()=>{
-    document.querySelectorAll('.chart-panel').forEach(p=>p.classList.add('visible'));
-  }, 50);
+  drawC1(res);drawC2(res);drawC3(res);drawC4(res);
+  drawC5(res);drawC6(res);drawC7(res);drawC8(res);
+  document.getElementById('st-n').textContent   =res.N.toLocaleString();
+  document.getElementById('st-c').textContent   =res.C.toFixed(7);
+  document.getElementById('st-c1').textContent  =res.c1t.toFixed(6);
+  document.getElementById('st-sc').textContent  =res.sc;
+  document.getElementById('st-pi').textContent  =res.piN;
+  document.getElementById('st-ratio').textContent=res.scRatio.toFixed(4);
+  document.getElementById('st-psc').textContent =(res.primeSC)+' ('+(res.sc>0?(100*res.primeSC/res.sc).toFixed(1):0)+'%)';
+  document.getElementById('st-gap').textContent =res.longestGap;
+  setTimeout(()=>document.querySelectorAll('.chart-panel').forEach(el=>el.classList.add('visible')),40);
 }
 
-// ── warning logic ─────────────────────────────────────────────────────────
+const slider=document.getElementById('n-slider');
+const display=document.getElementById('n-display');
+const btn=document.getElementById('compute-btn');
+
 function updateWarning(N){
-  const banner = document.getElementById('warn-banner');
-  const box    = document.getElementById('warn-box');
-  if(N >= WARN_2){
-    banner.style.display='block';
-    box.className='warn-box level-2';
-    box.textContent='⛔  N = '+N.toLocaleString()+' — very large. Risk of freezing on mobile or low-powered devices. Proceed with caution.';
-  } else if(N >= WARN_1){
-    banner.style.display='block';
-    box.className='warn-box level-1';
-    box.textContent='⚠  N = '+N.toLocaleString()+' — larger N may slow on mobile. Desktop recommended above this range.';
-  } else {
-    banner.style.display='none';
-  }
+  const b=document.getElementById('warn-banner'),bx=document.getElementById('warn-box');
+  if(N>=WARN_2){b.style.display='block';bx.className='warn-box level-2';bx.textContent='⛔  N='+N.toLocaleString()+' — very large. Risk of freezing on mobile.';}
+  else if(N>=WARN_1){b.style.display='block';bx.className='warn-box level-1';bx.textContent='⚠  N='+N.toLocaleString()+' — may slow on mobile. Desktop recommended above this range.';}
+  else b.style.display='none';
 }
 
-// ── controls ──────────────────────────────────────────────────────────────
-const slider = document.getElementById('n-slider');
-const display = document.getElementById('n-display');
-const btn = document.getElementById('compute-btn');
-
-slider.addEventListener('input', ()=>{
-  const N = parseInt(slider.value);
-  display.textContent = N.toLocaleString();
-  updateWarning(N);
+slider.addEventListener('input',()=>{const N=parseInt(slider.value);display.textContent=N.toLocaleString();updateWarning(N);});
+btn.addEventListener('click',()=>{
+  const N=parseInt(slider.value);
+  btn.textContent='Computing…';btn.disabled=true;
+  setTimeout(()=>{try{result=compute(N);renderAll(result);}catch(e){console.error(e);}btn.textContent='Compute →';btn.disabled=false;},20);
 });
 
-btn.addEventListener('click', ()=>{
-  const N = parseInt(slider.value);
-  btn.textContent = 'Computing…';
-  btn.disabled = true;
-  // defer so the UI can repaint before the heavy computation
-  setTimeout(()=>{
-    try {
-      computedData = compute(N);
-      renderAll(computedData);
-    } catch(e){
-      console.error(e);
-    }
-    btn.textContent = 'Compute →';
-    btn.disabled = false;
-  }, 20);
-});
-
-// ── redraw on resize ──────────────────────────────────────────────────────
-let resizeTimer;
-window.addEventListener('resize', ()=>{
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(()=>{
-    if(computedData) renderAll(computedData);
-  }, 200);
-});
-
-// ── scroll reveal ─────────────────────────────────────────────────────────
-const obs = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting) e.target.classList.add('visible');
-  });
-},{threshold:.08});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(result)renderAll(result);},220);});
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.06});
 document.querySelectorAll('.chart-panel').forEach(el=>obs.observe(el));
-
-// ── initial warning check ─────────────────────────────────────────────────
 updateWarning(parseInt(slider.value));
 </script>
 </body>
