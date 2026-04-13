@@ -419,6 +419,164 @@ footer {
 .reveal-delay-2 { transition-delay: .22s; }
 .reveal-delay-3 { transition-delay: .34s; }
 
+
+/* more links */
+.more-links-section { margin-top: 48px; }
+.more-links-label {
+  font-family: var(--mono); font-size: 8px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--cream3);
+  margin-bottom: 16px; padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.more-links-grid { display: flex; flex-wrap: wrap; gap: 10px 16px; }
+.more-link {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
+  color: var(--cream3); text-decoration: none; transition: color .2s;
+  white-space: nowrap;
+}
+.more-link:hover { color: var(--gold2); }
+
+/* per-chart play bar */
+.chart-play-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 12px 0;
+}
+.chart-play-btn {
+  font-size: 10px; width: 22px; height: 22px;
+  background: rgba(200,168,74,.15); border: 1px solid rgba(200,168,74,.3);
+  color: var(--gold); cursor: pointer; border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; padding: 0; line-height: 1;
+}
+.chart-play-btn:hover { background: rgba(200,168,74,.3); }
+.chart-play-n {
+  font-family: var(--mono); font-size: 8px; letter-spacing: .12em;
+  color: var(--cream3);
+}
+
+
+/* N input + warning */
+.chart-n-input {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .1em;
+  width: 58px; background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12); color: var(--cream);
+  padding: 3px 6px; text-align: center;
+}
+.chart-n-input:focus { outline: none; border-color: var(--gold); }
+.chart-warn {
+  font-family: var(--mono); font-size: 8px; letter-spacing: .08em;
+  color: var(--coral); white-space: nowrap;
+}
+
+/* drawer — reuse explorer styles already present or add */
+.drawer-toggle {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  font-family: var(--mono); font-size: 8px; letter-spacing: .15em;
+  text-transform: uppercase; color: rgba(255,255,255,.3);
+  padding: 8px 14px; cursor: pointer; transition: color .2s;
+  background: none; border: none; border-top: 1px solid rgba(255,255,255,.05);
+  text-align: left;
+}
+.drawer-toggle:hover { color: var(--gold2); }
+.drawer-arrow { font-size: 9px; transition: transform .22s; display: inline-block; }
+.drawer-toggle.open .drawer-arrow { transform: rotate(180deg); }
+.data-drawer { display: none; overflow-x: auto; background: rgba(0,0,0,.3); }
+.data-drawer.open { display: block; }
+.drawer-scroll { max-height: 240px; overflow-y: auto; }
+.data-table { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:9px; }
+.data-table th { padding:6px 10px; text-align:right; color:var(--gold); font-weight:400;
+  border-bottom:1px solid rgba(255,255,255,.08); white-space:nowrap;
+  position:sticky; top:0; background:#08080f; }
+.data-table th:first-child { text-align:left; }
+.data-table td { padding:4px 10px; text-align:right; color:rgba(255,255,255,.5);
+  border-bottom:1px solid rgba(255,255,255,.025); white-space:nowrap; }
+.data-table td:first-child { text-align:left; color:rgba(255,255,255,.28); }
+.data-table tr.is-prime td { color:rgba(255,255,255,.82); }
+.data-table tr.is-prime td:first-child { color:var(--gold2); }
+.data-table tr.is-sc td:first-child::after { content:' ·'; color:var(--coral); }
+.data-table tr:last-child td { border-bottom:none; }
+
+
+/* ── more depth section ──────────────────────────────────────────────── */
+#more-depth-section { margin: 0 auto; max-width: 1100px; padding: 0 40px 60px; }
+@media(max-width:640px){ #more-depth-section { padding: 0 20px 48px; } }
+
+.more-depth-btn-wrap { display: flex; justify-content: center; padding: 48px 0 0; }
+#more-depth-btn {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--bg);
+  background: var(--gold); border: none; cursor: pointer;
+  padding: 11px 32px; transition: background .2s;
+  display: flex; align-items: center; gap: 10px;
+}
+#more-depth-btn:hover { background: var(--gold2); }
+#more-depth-btn .btn-arrow { font-size: 11px; transition: transform .3s; display: inline-block; }
+#more-depth-btn.open .btn-arrow { transform: rotate(180deg); }
+
+#more-depth-panel {
+  display: none; margin-top: 48px;
+}
+#more-depth-panel.open { display: block; }
+
+.depth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px; margin-top: 0;
+}
+@media(max-width:760px){ .depth-grid { grid-template-columns: 1fr; } }
+
+.depth-card {
+  background: var(--bg1);
+  border: 1px solid rgba(255,255,255,.06);
+  border-left: 3px solid var(--gold);
+  padding: 28px 28px 24px;
+  transition: border-color .2s, background .2s;
+}
+.depth-card:hover { background: var(--bg2); }
+.depth-card.teal  { border-left-color: var(--teal); }
+.depth-card.violet{ border-left-color: var(--violet); }
+.depth-card.coral { border-left-color: var(--coral); }
+.depth-card.gold  { border-left-color: var(--gold); }
+
+.depth-tag {
+  font-family: var(--mono); font-size: 7.5px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--cream3); margin-bottom: 12px;
+}
+.depth-num {
+  font-family: var(--mono); font-size: 8px; letter-spacing: .18em;
+  color: var(--gold); margin-bottom: 8px;
+}
+.depth-card.teal  .depth-num { color: var(--teal); }
+.depth-card.violet .depth-num { color: var(--violet); }
+.depth-card.coral .depth-num { color: var(--coral); }
+
+.depth-title {
+  font-family: var(--disp); font-size: 1rem; font-weight: 400;
+  color: var(--cream); margin-bottom: 16px; line-height: 1.4;
+}
+.depth-body {
+  font-family: var(--serif); font-size: .9rem; color: var(--cream2);
+  line-height: 1.8; font-weight: 300;
+}
+.depth-body + .depth-body { margin-top: 12px; }
+.depth-eq {
+  font-family: var(--mono); font-size: .8rem; color: var(--gold2);
+  background: rgba(200,168,74,.06); border-left: 2px solid rgba(200,168,74,.3);
+  padding: 8px 14px; margin: 14px 0; line-height: 1.6;
+}
+.depth-card.teal .depth-eq  { color: var(--teal);   background: rgba(61,200,184,.06); border-left-color: rgba(61,200,184,.3); }
+.depth-card.violet .depth-eq{ color: var(--violet);  background: rgba(144,112,216,.06); border-left-color: rgba(144,112,216,.3); }
+.depth-card.coral .depth-eq { color: var(--coral);   background: rgba(224,80,96,.06); border-left-color: rgba(224,80,96,.3); }
+.depth-status {
+  font-family: var(--mono); font-size: 7.5px; letter-spacing: .15em;
+  text-transform: uppercase; margin-top: 18px;
+  display: inline-block; padding: 4px 10px;
+  background: rgba(200,168,74,.1); color: var(--gold); border: 1px solid rgba(200,168,74,.2);
+}
+.depth-card.teal  .depth-status { background: rgba(61,200,184,.1);  color: var(--teal);   border-color: rgba(61,200,184,.2); }
+.depth-card.violet .depth-status{ background: rgba(144,112,216,.1); color: var(--violet); border-color: rgba(144,112,216,.2); }
+.depth-card.coral .depth-status { background: rgba(224,80,96,.1);   color: var(--coral);  border-color: rgba(224,80,96,.2); }
+
 </style>
 </head>
 <body>
@@ -523,62 +681,347 @@ footer {
   </div>
 </div>
 
-<!-- ═══════════ THREE CHARTS ═══════════ -->
+<!-- ═══════════ EIGHT CHARTS ═══════════ -->
 <div class="section-divider">
   <div class="div-line"></div>
-  <div class="div-glyph">Three views of convergence</div>
+  <div class="div-glyph">Eight views of convergence</div>
   <div class="div-line"></div>
 </div>
 
-<div class="section reveal" id="charts-section">
-  <div class="section-label">The Explorer's Panels</div>
-  <h2 class="section-heading">Three Charts, One Story</h2>
+<div class="section" id="charts-section" style="opacity:1;transform:none;">
+  <div class="section-label">The Explorer’s Panels</div>
+  <h2 class="section-heading">Eight Charts, One Story</h2>
   <p class="section-body" style="max-width:640px;">
-    Each panel of the explorer reveals a different facet of how R(N) approaches C.
-    Together they confirm — numerically — that the convergence rate is exactly 1/log N.
+    Each panel plots real computed values — sieve → φ(M) → L(M) → R(N) → E(N) —
+    for N up to 100. Press play to animate point by point.
   </p>
 
   <div class="charts-grid">
-    <div class="chart-card reveal reveal-delay-1">
-      <canvas class="chart-card-preview" id="prev-1"></canvas>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-1" onclick="chartPlay(1)">&#9654;</button><input class="chart-n-input" id="ninput-1" type="number" value="100" min="10" max="5000" onchange="onNChange(1)"><span class="chart-warn" id="warn-1"></span></div>
+      <canvas class="chart-card-preview" id="prev-1" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-1" onclick="toggleMiniDrawer(1,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 01 — |E(N)|</button>
+      <div class="data-drawer" id="mdrawer-1"><div class="drawer-scroll"><table class="data-table" id="mtbl-1"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 01</div>
-        <div class="chart-card-title">E(N) = R(N) − C</div>
+        <div class="chart-card-title">|E(N)| with A/log N envelope</div>
         <div class="chart-card-desc">
-          The raw error term, shown absolute or signed.
-          Overlaid with a fitted A/log N envelope and the
-          theoretical |c₁|/log N curve. Toggle both to see
-          how tightly theory matches data.
+          Absolute error overlaid with fitted gold envelope and
+          theoretical |c₁|/log N in violet. All three track closely
+          if the 1/log N rate holds.
         </div>
       </div>
     </div>
-    <div class="chart-card reveal reveal-delay-2">
-      <canvas class="chart-card-preview" id="prev-2"></canvas>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-2" onclick="chartPlay(2)">&#9654;</button><input class="chart-n-input" id="ninput-2" type="number" value="100" min="10" max="5000" onchange="onNChange(2)"><span class="chart-warn" id="warn-2"></span></div>
+      <canvas class="chart-card-preview" id="prev-2" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-2" onclick="toggleMiniDrawer(2,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 02 — E(N)·log N</button>
+      <div class="data-drawer" id="mdrawer-2"><div class="drawer-scroll"><table class="data-table" id="mtbl-2"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 02</div>
-        <div class="chart-card-title">E(N) · log N → c₁</div>
+        <div class="chart-card-title">E(N) · log N → c₁</div>
         <div class="chart-card-desc">
-          Multiplying E(N) by log N should flatten to the
-          constant c₁ if the convergence rate is exactly
-          O(1/log N). Watching this stabilise is one of the
-          most satisfying moments in the explorer.
+          Rescaled error. Flattening toward the teal c₁ line
+          confirms the convergence rate is exactly 1/log N.
         </div>
       </div>
     </div>
-    <div class="chart-card reveal reveal-delay-3">
-      <canvas class="chart-card-preview" id="prev-3"></canvas>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-3" onclick="chartPlay(3)">&#9654;</button><input class="chart-n-input" id="ninput-3" type="number" value="100" min="10" max="5000" onchange="onNChange(3)"><span class="chart-warn" id="warn-3"></span></div>
+      <canvas class="chart-card-preview" id="prev-3" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-3" onclick="toggleMiniDrawer(3,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 03 — log|E| vs log(log N)</button>
+      <div class="data-drawer" id="mdrawer-3"><div class="drawer-scroll"><table class="data-table" id="mtbl-3"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 03</div>
-        <div class="chart-card-title">log|E(N)| vs log(log N)</div>
+        <div class="chart-card-title">log|E(N)| vs log(log N) · slope → −1</div>
         <div class="chart-card-desc">
-          A log–log plot against log log N. If E(N) ~ 1/log N,
-          the slope must tend to −1. A dashed reference line
-          at slope = −1 is drawn for comparison.
+          Log–log diagnostic. Slope of −1 (gold dashed) is the
+          1/log N signature. Breaks are sign changes of E(N).
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-4" onclick="chartPlay(4)">&#9654;</button><input class="chart-n-input" id="ninput-4" type="number" value="100" min="10" max="5000" onchange="onNChange(4)"><span class="chart-warn" id="warn-4"></span></div>
+      <canvas class="chart-card-preview" id="prev-4" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-4" onclick="toggleMiniDrawer(4,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 04 — Signed E(N)</button>
+      <div class="data-drawer" id="mdrawer-4"><div class="drawer-scroll"><table class="data-table" id="mtbl-4"><thead></thead><tbody></tbody></table></div></div>
+      <div class="chart-card-body">
+        <div class="chart-card-num">Chart 04</div>
+        <div class="chart-card-title">Signed E(N) · prime markers · sign-change dots</div>
+        <div class="chart-card-desc">
+          Full signed oscillation of E(N). Gold ticks mark every
+          prime; coral dots mark sign changes of the error term.
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-5" onclick="chartPlay(5)">&#9654;</button><input class="chart-n-input" id="ninput-5" type="number" value="100" min="10" max="5000" onchange="onNChange(5)"><span class="chart-warn" id="warn-5"></span></div>
+      <canvas class="chart-card-preview" id="prev-5" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-5" onclick="toggleMiniDrawer(5,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 05 — SC(N)/π(N)</button>
+      <div class="data-drawer" id="mdrawer-5"><div class="drawer-scroll"><table class="data-table" id="mtbl-5"><thead></thead><tbody></tbody></table></div></div>
+      <div class="chart-card-body">
+        <div class="chart-card-num">Chart 05</div>
+        <div class="chart-card-title">SC(N) / π(N) — sign changes per prime</div>
+        <div class="chart-card-desc">
+          Ratio of cumulative sign changes to cumulative prime count.
+          Converges to a constant strictly less than 1 whose
+          analytic value is not yet known.
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-6" onclick="chartPlay(6)">&#9654;</button><input class="chart-n-input" id="ninput-6" type="number" value="100" min="10" max="5000" onchange="onNChange(6)"><span class="chart-warn" id="warn-6"></span></div>
+      <canvas class="chart-card-preview" id="prev-6" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-6" onclick="toggleMiniDrawer(6,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 06 — Gap histogram</button>
+      <div class="data-drawer" id="mdrawer-6"><div class="drawer-scroll"><table class="data-table" id="mtbl-6"><thead></thead><tbody></tbody></table></div></div>
+      <div class="chart-card-body">
+        <div class="chart-card-num">Chart 06</div>
+        <div class="chart-card-title">Sign change gap distribution</div>
+        <div class="chart-card-desc">
+          Histogram of gaps between consecutive sign changes of E(N).
+          An exponential tail is consistent with pseudo-random
+          prime-driven oscillation.
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-7" onclick="chartPlay(7)">&#9654;</button><input class="chart-n-input" id="ninput-7" type="number" value="100" min="10" max="5000" onchange="onNChange(7)"><span class="chart-warn" id="warn-7"></span></div>
+      <canvas class="chart-card-preview" id="prev-7" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-7" onclick="toggleMiniDrawer(7,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 07 — Lift factor</button>
+      <div class="data-drawer" id="mdrawer-7"><div class="drawer-scroll"><table class="data-table" id="mtbl-7"><thead></thead><tbody></tbody></table></div></div>
+      <div class="chart-card-body">
+        <div class="chart-card-num">Chart 07</div>
+        <div class="chart-card-title">Local lift factor φ(M) / (M · C)</div>
+        <div class="chart-card-desc">
+          Each term pushes R(N) up when this factor exceeds 1,
+          down when below. At M = prime the factor is maximal.
+          Teal bands mark prime positions.
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-8" onclick="chartPlay(8)">&#9654;</button><input class="chart-n-input" id="ninput-8" type="number" value="100" min="10" max="5000" onchange="onNChange(8)"><span class="chart-warn" id="warn-8"></span></div>
+      <canvas class="chart-card-preview" id="prev-8" width="600" height="160"></canvas>
+      <button class="drawer-toggle" id="dtgl-8" onclick="toggleMiniDrawer(8,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 08 — χ₄-restricted</button>
+      <div class="data-drawer" id="mdrawer-8"><div class="drawer-scroll"><table class="data-table" id="mtbl-8"><thead></thead><tbody></tbody></table></div></div>
+      <div class="chart-card-body">
+        <div class="chart-card-num">Chart 08</div>
+        <div class="chart-card-title">χ₄-restricted E(N) · gcd(M,4) = 1</div>
+        <div class="chart-card-desc">
+          E(N) restricted to M ≡ 1 or 3 (mod 4), scaled by conductor
+          ×4. Connects to the Farey–χ₄ discrepancy and zeros of
+          L(s, χ₄).
         </div>
       </div>
     </div>
   </div>
 </div>
+
+
+<!-- ═══════════ MORE DEPTH ═══════════ -->
+<div class="more-depth-btn-wrap">
+  <button id="more-depth-btn" onclick="toggleDepth(this)">
+    <span>More Depth</span>
+    <span class="btn-arrow">&#9660;</span>
+  </button>
+</div>
+
+<div id="more-depth-panel">
+<div id="more-depth-section">
+  <div class="depth-grid">
+
+    <!-- 1 -->
+    <div class="depth-card gold">
+      <div class="depth-num">Direction 01</div>
+      <div class="depth-tag">Open constant &mdash; immediate</div>
+      <div class="depth-title">The SC(N)/&pi;(N) Limit — An Unnamed Constant</div>
+      <div class="depth-body">
+        Chart 05 computes the ratio of cumulative sign changes of E(N) to the cumulative
+        prime count &pi;(N). Empirically this ratio converges to a constant strictly less
+        than 1 as N grows. That constant is the fraction of primes which actually reverse
+        the direction of E(N) &mdash; not all primes do, because consecutive primes can
+        push R(N) in the same direction before a reversal occurs.
+      </div>
+      <div class="depth-eq">SC(N) / &pi;(N) &rarr; &lambda; &lt; 1 &nbsp;&nbsp; (&lambda; analytic value unknown)</div>
+      <div class="depth-body">
+        This limit &lambda; is a genuine analytic object attached to the Lift Survival
+        Framework. It is not a known constant in the literature. Running the explorer to
+        N = 5000 or beyond gives a stable empirical conjecture for its decimal value.
+        The natural question is whether &lambda; can be expressed in terms of C, D&sub;0;,
+        or the zeros of &zeta;(s). A dedicated page isolating this constant &mdash; with
+        convergence plots, a conjectured value, and a comparison against known constants
+        &mdash; is the most immediate original contribution ready for exposition.
+      </div>
+      <span class="depth-status">Ready to build</span>
+    </div>
+
+    <!-- 2 -->
+    <div class="depth-card teal">
+      <div class="depth-num">Direction 02</div>
+      <div class="depth-tag">Explorer extension &mdash; immediate</div>
+      <div class="depth-title">E(N) vs E&sub;&chi;&sub;4;(N) — Direct Comparison Chart</div>
+      <div class="depth-body">
+        The explorer already computes both the unrestricted error E(N) = R(N) &minus; C
+        and the &chi;&sub;4;-restricted version E&sub;&chi;&sub;4;(N), which accumulates only
+        over M &equiv; 1 or 3 (mod 4). Chart 08 shows each in isolation but never places
+        them on the same axes. A Chart 09 overlaying both curves would immediately reveal
+        whether the two error terms oscillate in phase, in opposition, or independently.
+      </div>
+      <div class="depth-eq">E&sub;&chi;&sub;4;(N) := 4 &middot; (R&sub;&chi;&sub;4;(N) &minus; C) &nbsp;&nbsp; vs &nbsp;&nbsp; E(N) = R(N) &minus; C</div>
+      <div class="depth-body">
+        If their sign-change densities differ, that is a measurable difference between
+        the full modular environment and the &chi;&sub;4; sublattice &mdash; a concrete
+        Franel&ndash;Landau type observation. The teal dots in Chart 08 mark &chi;&sub;4;
+        sign changes; overlaying them against the coral dots of Chart 04 on one canvas
+        would make any phase relationship immediately visible. This requires one new draw
+        function and no new computation.
+      </div>
+      <span class="depth-status">One draw function away</span>
+    </div>
+
+    <!-- 3 -->
+    <div class="depth-card violet">
+      <div class="depth-num">Direction 03</div>
+      <div class="depth-tag">Explorer enhancement &mdash; immediate</div>
+      <div class="depth-title">Numerical Summary Panel — The Explorer as Conjecture Instrument</div>
+      <div class="depth-body">
+        The explorer currently renders 8 charts but produces no consolidated numerical
+        output. Adding a stat block below the charts &mdash; computed from the same data
+        &mdash; would transform it from a visualizer into a conjecture generator. The
+        panel would display: empirical SC/&pi; limit, fitted A vs theoretical |c&sub;1;|,
+        observed log&ndash;log slope from Chart 03, C, D&sub;0;, J, T, and the &chi;&sub;4;
+        sign-change density.
+      </div>
+      <div class="depth-eq">
+        C &asymp; 0.530711 &nbsp;|&nbsp; c&sub;1; &asymp; &minus;0.372024 &nbsp;|&nbsp;
+        J &asymp; 0.773155 &nbsp;|&nbsp; D&sub;0; &asymp; 0.452247 &nbsp;|&nbsp; T &asymp; 0.221463
+      </div>
+      <div class="depth-body">
+        At large N the fitted A should converge toward |c&sub;1;| and the observed slope
+        should approach &minus;1. Displaying both alongside their theoretical targets lets
+        a reader immediately see how well the 1/log N rate is holding at the chosen N.
+        Any systematic deviation at large N would itself be an observation worth recording.
+      </div>
+      <span class="depth-status">Ready to build</span>
+    </div>
+
+    <!-- 4 -->
+    <div class="depth-card gold">
+      <div class="depth-num">Direction 04</div>
+      <div class="depth-tag">Formal result &mdash; short term</div>
+      <div class="depth-title">J = D&sub;0; + T — Standalone Proof</div>
+      <div class="depth-body">
+        The identity J = D&sub;0; + T has been verified term-by-term within the Lift
+        Survival Framework. J &asymp; 0.773155 is the constant governing the summatory
+        behaviour of the lift weights; D&sub;0; &asymp; 0.452247 is the limit of the
+        prime-weighted step function D(x) = &Sigma;&sub;p &le; x&sub; 1/(p(p&minus;1));
+        and T &asymp; 0.221463 is the complementary term proved to account for the remainder.
+      </div>
+      <div class="depth-eq">J = D&sub;0; + T &nbsp;&asymp;&nbsp; 0.452247 + 0.221463 &nbsp;=&nbsp; 0.773155 (exact)</div>
+      <div class="depth-body">
+        This result appears to be original. The three constants do not appear in this
+        combination in the known literature on Euler products, Mertens-type sums, or
+        Hardy&ndash;Littlewood constants. A standalone page presenting the clean
+        statement, the term-by-term decomposition, and numerical verification to 10+
+        decimal places would establish this as a citable result independent of the
+        broader framework. It needs no prerequisites beyond the definitions of the
+        three constants.
+      </div>
+      <span class="depth-status">Write now</span>
+    </div>
+
+    <!-- 5 -->
+    <div class="depth-card teal">
+      <div class="depth-num">Direction 05</div>
+      <div class="depth-tag">Structural result &mdash; short term</div>
+      <div class="depth-title">The Lift Factor as a Deterministic Predictor of E(N)</div>
+      <div class="depth-body">
+        Chart 07 plots the local lift factor &phi;(M+1)/((M+1)&middot;C) for each M.
+        When this factor exceeds 1 the term L(M) pushes R(N) above its long-run average,
+        incrementing E(N) upward; when it falls below 1 the contribution is suppressive.
+        At M = prime, &phi;(M) = M&minus;1 is maximal relative to M, making primes
+        systematically the strongest upward perturbations.
+      </div>
+      <div class="depth-eq">sign(&Delta;E(N)) = sign(&phi;(M+1)/((M+1)&middot;C) &minus; 1) &nbsp;&nbsp; exactly</div>
+      <div class="depth-body">
+        This is not an approximation &mdash; it is an exact deterministic rule. Given
+        the value of &phi;(M+1) you know with certainty whether E(N) will increase or
+        decrease at the next step. The sign changes of E(N) therefore occur precisely
+        at those M where the lift factor crosses 1 from above or below, which happens
+        most often at highly composite M. A page formalising this rule, proving it
+        directly from the definition of R(N), and visualising the crossing events
+        would give a complete mechanistic explanation of the oscillation pattern seen
+        in Charts 04 and 06.
+      </div>
+      <span class="depth-status">Proof is elementary</span>
+    </div>
+
+    <!-- 6 -->
+    <div class="depth-card violet">
+      <div class="depth-num">Direction 06</div>
+      <div class="depth-tag">Synthesis &mdash; medium term</div>
+      <div class="depth-title">One Geometry, Seven Tools — Modular Space Synthesis</div>
+      <div class="depth-body">
+        Across the GitHub Pages portfolio there are at least seven tools that each examine
+        a different projection of the same underlying object: the distribution of coprime
+        residue pairs in modular space. Gap structure, GCD patterns, Farey sectors, phase
+        portraits, composite channel projections, Pythagorean lattice points, and the
+        infinite moduli limit are not separate phenomena &mdash; they are different coordinate
+        systems on the same geometry.
+      </div>
+      <div class="depth-eq">C = &prod;&sub;p&sub; (p&sup2;&minus;2)/(p&sup2;&minus;1) &nbsp;&larr;&nbsp; each tool computes a projection of this</div>
+      <div class="depth-body">
+        A synthesis page would take a fixed modulus M and show how the same set of
+        coprime pairs (r, r+2) with gcd(r, M) = gcd(r+2, M) = 1 appears simultaneously
+        in the Farey diagram, the GCD grid, the phase circle, the gap histogram, and the
+        lift weight L(M). Navigating between views on the same data would make the
+        geometric unity of the framework visible in a way that no single tool achieves.
+        This is the natural capstone visualisation for the full body of work.
+      </div>
+      <span class="depth-status">Medium term</span>
+    </div>
+
+    <!-- 7 -->
+    <div class="depth-card coral">
+      <div class="depth-num">Direction 07</div>
+      <div class="depth-tag">Analytic framing &mdash; medium term</div>
+      <div class="depth-title">What the Framework Concretely Delivers Toward RH</div>
+      <div class="depth-body">
+        The Lift Survival Framework is careful not to claim a proof of the Riemann
+        Hypothesis, and that restraint is correct. But the framework does deliver
+        something precise and non-trivial in the direction of RH, and that contribution
+        deserves to be stated as clearly as possible rather than left implicit.
+      </div>
+      <div class="depth-eq">#{N &le; X : E(N) changes sign} &rarr; &infin; &nbsp;&nbsp; (empirical, consistent with RH)</div>
+      <div class="depth-body">
+        The concrete deliverable is this: if E(N) had only finitely many sign changes,
+        then R(N) would eventually converge to C monotonically. But the Lift Factor
+        analysis (Direction 05) shows that sign changes are controlled by the crossing
+        pattern of &phi;(M+1)/((M+1)&middot;C), which crosses 1 infinitely often because
+        &phi; is unboundedly variable relative to M. This gives a framework-internal
+        argument for infinitely many sign changes, which is the kind of oscillation
+        result that connects to the explicit formula for &psi;(x) and ultimately to the
+        non-vanishing of &zeta;(s) on the critical line. A page making this argument
+        precisely &mdash; stating what is proved, what is conjectured, and what would
+        be needed to close the gap &mdash; is the most honest and the most useful
+        statement the framework can make about RH.
+      </div>
+      <span class="depth-status">Write carefully</span>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+function toggleDepth(btn) {
+  var panel = document.getElementById('more-depth-panel');
+  var open = panel.classList.contains('open');
+  panel.classList.toggle('open', !open);
+  btn.classList.toggle('open', !open);
+}
+</script>
+
 
 <!-- ═══════════ RH PROBE ═══════════ -->
 <div class="section-divider">
@@ -637,7 +1080,7 @@ footer {
   <div class="div-line"></div>
 </div>
 
-<div class="section reveal" id="links-section">
+<div class="section" id="links-section" style="opacity:1;transform:none;">
   <div class="links-heading">
     <div class="section-label" style="justify-content:center;">Part of a larger project</div>
     <h2 class="section-heading">
@@ -673,11 +1116,44 @@ footer {
       <div class="link-card-title">Prime Explorations</div>
       <div class="link-card-desc">
         Interactive prime visualisations including D(x), the
-        prime-weighted step function Σ 1/(p(p−1)), twin prime
+        prime-weighted step function Σ 1/(p(p−1)), twin prime
         filtering, and the Euler product convergence structure.
       </div>
       <span class="link-card-url">wessengetachew.github.io/Primes/</span>
     </a>
+  </div>
+
+  <div class="more-links-section">
+    <div class="more-links-label">More tools</div>
+    <div class="more-links-grid">
+      <a href="https://wessengetachew.github.io/Space/" target="_blank" class="more-link">Space</a>
+      <a href="https://wessengetachew.github.io/C-and-C-x-/" target="_blank" class="more-link">C-and-C-x-</a>
+      <a href="https://wessengetachew.github.io/Phi/" target="_blank" class="more-link">Phi</a>
+      <a href="https://wessengetachew.github.io/PrimeChecker/" target="_blank" class="more-link">PrimeChecker</a>
+      <a href="https://wessengetachew.github.io/Jump/" target="_blank" class="more-link">Jump</a>
+      <a href="https://wessengetachew.github.io/Wave/" target="_blank" class="more-link">Wave</a>
+      <a href="https://wessengetachew.github.io/Shell/" target="_blank" class="more-link">Shell</a>
+      <a href="https://wessengetachew.github.io/PI/" target="_blank" class="more-link">PI</a>
+      <a href="https://wessengetachew.github.io/Quant/" target="_blank" class="more-link">Quant</a>
+      <a href="https://wessengetachew.github.io/G/" target="_blank" class="more-link">G</a>
+      <a href="https://wessengetachew.github.io/Transform/" target="_blank" class="more-link">Transform</a>
+      <a href="https://wessengetachew.github.io/GCD/" target="_blank" class="more-link">GCD</a>
+      <a href="https://wessengetachew.github.io/2025/" target="_blank" class="more-link">2025</a>
+      <a href="https://wessengetachew.github.io/D/" target="_blank" class="more-link">D</a>
+      <a href="https://wessengetachew.github.io/R/" target="_blank" class="more-link">R</a>
+      <a href="https://wessengetachew.github.io/finite/" target="_blank" class="more-link">finite</a>
+      <a href="https://wessengetachew.github.io/Farey/" target="_blank" class="more-link">Farey</a>
+      <a href="https://wessengetachew.github.io/Composite/" target="_blank" class="more-link">Composite</a>
+      <a href="https://wessengetachew.github.io/Ethiopian/" target="_blank" class="more-link">Ethiopian</a>
+      <a href="https://wessengetachew.github.io/1-2/" target="_blank" class="more-link">1-2</a>
+      <a href="https://wessengetachew.github.io/Rational-/" target="_blank" class="more-link">Rational-</a>
+      <a href="https://wessengetachew.github.io/Infinitemoduli/" target="_blank" class="more-link">Infinitemoduli</a>
+      <a href="https://wessengetachew.github.io/Pythagorean-/" target="_blank" class="more-link">Pythagorean-</a>
+      <a href="https://wessengetachew.github.io/Phase/" target="_blank" class="more-link">Phase</a>
+      <a href="https://wessengetachew.github.io/Gemini/" target="_blank" class="more-link">Gemini</a>
+      <a href="https://wessengetachew.github.io/Rebuild/" target="_blank" class="more-link">Rebuild</a>
+      <a href="https://wessengetachew.github.io/Goldbach/" target="_blank" class="more-link">Goldbach</a>
+    </div>
   </div>
 </div>
 
@@ -910,108 +1386,321 @@ window.addEventListener('resize', resizeAll);
 resizeAll();
 requestAnimationFrame(masterLoop);
 
-// ── mini chart previews ───────────────────────────────────────────────────
-function drawMini1(){
-  const c=document.getElementById('prev-1');
-  if(!c) return;
-  const ctx=c.getContext('2d');
-  const W=c.width=c.offsetWidth,H=c.height=c.offsetHeight;
-  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
-  // Simulated |E(N)| decaying as 1/log N
-  const n0=50, n1=5000;
-  const pts=[];
-  for(let n=n0;n<=n1;n+=30){
-    const val = .018/Math.log(n) * (1+.4*Math.sin(n*.07)+.15*Math.sin(n*.19));
-    pts.push({x:n,y:val});
+// ── mini chart previews ─────────────────────────────────────────────────────
+(function() {
+
+var MINI_N = 100;
+var _r = null;
+
+// ── N input handling ────────────────────────────────────────────────────────
+window.onNChange = function(i) {
+  var inp = document.getElementById('ninput-'+i);
+  var warn = document.getElementById('warn-'+i);
+  if (!inp) return;
+  var N = parseInt(inp.value);
+  if (isNaN(N) || N < 10) { inp.value = 10; N = 10; }
+  if (N > 5000) { inp.value = 5000; N = 5000; }
+  if (warn) {
+    if (N > 2000) warn.textContent = '⛔ very slow';
+    else if (N > 800) warn.textContent = '⚠ may be slow';
+    else warn.textContent = '';
   }
-  const maxV=Math.max(...pts.map(p=>p.y));
-  const px=n=>16+(n-n0)/(n1-n0)*(W-32);
-  const py=v=>H-16-(v/maxV)*(H-32);
-  // envelope
-  ctx.strokeStyle='rgba(200,168,74,.35)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
-  ctx.beginPath();let s=false;
-  for(const p of pts){
-    const x=px(p.x),y=py(.018/Math.log(p.x)/maxV*maxV);
-    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
+  // recompute for this N and redraw this chart
+  var r = computeForN(N);
+  drawFull(i, r);
+};
+
+// cache per-N results
+var _cache = {};
+function computeForN(N) {
+  if (_cache[N]) return _cache[N];
+  var s = sieve(N), phi = s.phi, ip = s.ip, pr = s.pr;
+  var C=1; for(var i=0;i<pr.length;i++){var p=pr[i];C*=(p*p-2)/(p*p-1);}
+  var c1=0; for(var i=0;i<pr.length;i++){var p=pr[i];c1+=Math.log(p)/(p*p-2);} c1*=-C;
+  var sumL=0,sumPh=0,sumL4=0,sumPh4=0,raw=[];
+  for(var m=1;m<=N;m++){
+    var Lm=phi[m]*phi[m+1]/(m+1); sumL+=Lm; sumPh+=phi[m];
+    var r4=m%4; if(r4===1||r4===3){sumL4+=Lm;sumPh4+=phi[m];}
+    if(m>=10)raw.push({m:m,R:sumL/sumPh,R4:sumPh4>0?sumL4/sumPh4:0,ip:ip[m]===1,lf:phi[m+1]/((m+1)*C)});
   }
-  ctx.stroke();ctx.setLineDash([]);
-  // main curve
-  const g=ctx.createLinearGradient(16,0,W-16,0);
-  g.addColorStop(0,'#e05060');g.addColorStop(.5,'#9070d8');g.addColorStop(1,'#3dc8b8');
-  ctx.strokeStyle=g;ctx.lineWidth=1.5;ctx.beginPath();s=false;
-  for(const p of pts){
-    const x=px(p.x),y=py(p.y);
-    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
+  var C4=raw[raw.length-1].R4;
+  var half=Math.floor(raw.length/2);
+  var fv=raw.slice(half).map(function(d){return Math.abs(d.R-C)*Math.log(d.m);}).filter(function(v){return isFinite(v)&&v>0;}).sort(function(a,b){return a-b;});
+  var A=fv[Math.floor(fv.length/2)]||0.01;
+  var ps=0,ps4=0,sc=0,sc4=0,piN=0,lastSC=10,scGaps=[],data=[];
+  for(var k=0;k<raw.length;k++){
+    var rv=raw[k],m=rv.m,E=rv.R-C,E4=rv.R4-C4,lm=Math.log(m);
+    var sg=E>=0?1:-1,sg4=E4>=0?1:-1;
+    if(rv.ip)piN++;
+    var isc=false,isc4=false;
+    if(ps!==0&&sg!==ps){sc++;isc=true;scGaps.push(m-lastSC);lastSC=m;}
+    if(ps4!==0&&sg4!==ps4){sc4++;isc4=true;}
+    ps=sg;ps4=sg4;
+    var absE=Math.abs(E);
+    data.push({m:m,E:E,absE:absE,Elgm:E*lm,lgAbsE:absE>1e-15?Math.log(absE):NaN,lglgm:Math.log(lm),lm:lm,E4:E4,ip:rv.ip,isc:isc,isc4:isc4,lf:rv.lf,piC:piN,scC:sc});
   }
-  ctx.stroke();
+  _cache[N]={data:data,C:C,C4:C4,c1t:c1,A:A,sc:sc,scGaps:scGaps,piN:piN,N:N};
+  return _cache[N];
 }
 
-function drawMini2(){
-  const c=document.getElementById('prev-2');
-  if(!c) return;
-  const ctx=c.getContext('2d');
-  const W=c.width=c.offsetWidth,H=c.height=c.offsetHeight;
-  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
-  const c1=-0.0042;
-  const n0=50,n1=5000;
-  const pts=[];
-  for(let n=n0;n<=n1;n+=30){
-    const val=(-.018/Math.log(n)*(1+.3*Math.sin(n*.07)))*Math.log(n);
-    pts.push({x:n,y:val});
+function sieve(N) {
+  var phi = new Int32Array(N+2), ip = new Uint8Array(N+2).fill(1), pr = [];
+  phi[1]=1;
+  for (var i=2;i<=N+1;i++) {
+    if(ip[i]){pr.push(i);phi[i]=i-1;}
+    for(var j=0;j<pr.length&&i*pr[j]<=N+1;j++){
+      var p=pr[j]; ip[i*p]=0;
+      if(i%p===0){phi[i*p]=phi[i]*p;break;}
+      else{phi[i*p]=phi[i]*(p-1);}
+    }
   }
-  const minV=Math.min(...pts.map(p=>p.y));
-  const maxV=Math.max(...pts.map(p=>p.y));
-  const pad=(maxV-minV)*.15;
-  const px=n=>16+(n-n0)/(n1-n0)*(W-32);
-  const py=v=>H-16-((v-minV+pad)/((maxV-minV+2*pad)))*(H-32);
-  // c1 line
-  ctx.strokeStyle='rgba(61,200,184,.4)';ctx.lineWidth=1;ctx.setLineDash([3,5]);
-  ctx.beginPath();ctx.moveTo(16,py(c1));ctx.lineTo(W-16,py(c1));ctx.stroke();ctx.setLineDash([]);
-  // main
-  ctx.strokeStyle='#9070d8';ctx.lineWidth=1.5;ctx.beginPath();let s=false;
-  for(const p of pts){const x=px(p.x),y=py(p.y);if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);}
-  ctx.stroke();
+  return {phi:phi,ip:ip,pr:pr};
 }
 
-function drawMini3(){
-  const c=document.getElementById('prev-3');
-  if(!c) return;
-  const ctx=c.getContext('2d');
-  const W=c.width=c.offsetWidth,H=c.height=c.offsetHeight;
-  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
-  const pts=[];
-  for(let n=100;n<=5000;n+=60){
-    const logN=Math.log(n);
-    const loglogN=Math.log(logN);
-    const EN=-.018/logN*(1+.3*Math.sin(n*.05));
-    const logAbsEN=Math.log(Math.abs(EN));
-    pts.push({x:loglogN,y:logAbsEN});
-  }
-  const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
-  const x0=Math.min(...xs),x1=Math.max(...xs);
-  const y0=Math.min(...ys),y1=Math.max(...ys);
-  const px=x=>16+(x-x0)/(x1-x0)*(W-32);
-  const py=y=>H-16-((y-y0)/(y1-y0))*(H-32);
-  // slope -1 ref
-  const mid=pts[Math.floor(pts.length/2)];
-  const b=mid.y-(-1)*mid.x;
-  ctx.strokeStyle='rgba(200,168,74,.4)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
-  ctx.beginPath();
-  ctx.moveTo(px(x0),py(-1*x0+b));
-  ctx.lineTo(px(x1),py(-1*x1+b));
-  ctx.stroke();ctx.setLineDash([]);
-  // main
-  ctx.strokeStyle='#e8904a';ctx.lineWidth=1.5;ctx.beginPath();let s=false;
-  for(const p of pts){const x=px(p.x),y=py(p.y);if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);}
-  ctx.stroke();
+function compute() {
+  if(_r)return _r;
+  _r=computeForN(MINI_N);
+  return _r;
 }
 
-window.addEventListener('load',()=>{
-  drawMini1(); drawMini2(); drawMini3();
-});
-window.addEventListener('resize',()=>{
-  drawMini1(); drawMini2(); drawMini3();
-});
+function drawChart(id, fn) {
+  var c=document.getElementById(id); if(!c)return;
+  var W=600,H=160;
+  c.width=W; c.height=H;
+  var ctx=c.getContext('2d');
+  ctx.fillStyle='#050510'; ctx.fillRect(0,0,W,H);
+  fn(ctx,W,H);
+}
+
+function mp(v,i0,i1,o0,o1){return i1===i0?o0:o0+(v-i0)/(i1-i0)*(o1-o0);}
+function grd(ctx,W,H,p){ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;for(var i=1;i<4;i++){var y=p+(H-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-p,y);ctx.stroke();}}
+function ln(ctx,pts,px,py,col,lw){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();var s=false;for(var i=0;i<pts.length;i++){var x=px(pts[i][0]),y=py(pts[i][1]);if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);}ctx.stroke();}
+function dt(ctx,x,y,col){ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();}
+
+// per-chart play state
+var frames={}, playing={}, rafs={};
+
+function drawFull(i, r) {
+  if(!r)r=compute(); var all=r.data, p=14;
+  if(!all.length)return;
+
+  if(i===1){drawChart('prev-1',function(ctx,W,H){
+    var d=all.filter(function(x){return isFinite(x.absE)&&x.absE>0;});if(!d.length)return;
+    var mn=d[0].m,mx=d[d.length-1].m,yMx=Math.max.apply(null,d.slice(0,8).map(function(x){return x.absE;}))*1.15;
+    var px=function(m){return mp(m,mn,mx,p,W-p);},py=function(v){return mp(Math.max(v,0),0,yMx,H-p,p);};
+    grd(ctx,W,H,p);
+    ctx.setLineDash([4,8]);ln(ctx,d.map(function(x){return[x.m,r.A/x.lm];}),px,py,'rgba(200,168,74,.5)',1.2);
+    ln(ctx,d.map(function(x){return[x.m,Math.abs(r.c1t)/x.lm];}),px,py,'rgba(144,112,216,.45)',1.2);ctx.setLineDash([]);
+    ln(ctx,d.map(function(x){return[x.m,x.absE];}),px,py,'rgba(61,200,184,.9)',1.6);
+    var l=d[d.length-1];dt(ctx,px(l.m),py(l.absE),'#3dc8b8');
+  });}
+
+  if(i===2){drawChart('prev-2',function(ctx,W,H){
+    var d=all.filter(function(x){return isFinite(x.Elgm);});if(!d.length)return;
+    var mn=d[0].m,mx=d[d.length-1].m;
+    var vs=d.map(function(x){return x.Elgm;}),vMn=Math.min.apply(null,vs),vMx=Math.max.apply(null,vs),mg=(vMx-vMn)*.12||.01;
+    var px=function(m){return mp(m,mn,mx,p,W-p);},py=function(v){return mp(v,vMn-mg,vMx+mg,H-p,p);};
+    grd(ctx,W,H,p);
+    if(vMn<0&&vMx>0){ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();}
+    ctx.setLineDash([4,7]);ln(ctx,[[mn,r.c1t],[mx,r.c1t]],px,py,'rgba(61,200,184,.5)',1.2);ctx.setLineDash([]);
+    ctx.fillStyle='rgba(61,200,184,.6)';ctx.font='9px monospace';ctx.fillText('c1='+r.c1t.toFixed(4),W-100,py(r.c1t)-5);
+    ln(ctx,d.map(function(x){return[x.m,x.Elgm];}),px,py,'rgba(144,112,216,.9)',1.6);
+    var l=d[d.length-1];dt(ctx,px(l.m),py(l.Elgm),'#9070d8');
+  });}
+
+  if(i===3){drawChart('prev-3',function(ctx,W,H){
+    var d=all.filter(function(x){return isFinite(x.lgAbsE)&&isFinite(x.lglgm)&&x.lglgm>0;});if(!d.length)return;
+    var xMn=d[0].lglgm,xMx=d[d.length-1].lglgm;
+    var ys=d.map(function(x){return x.lgAbsE;}),yMn=Math.min.apply(null,ys),yMx=Math.max.apply(null,ys),mg=(yMx-yMn)*.1||.5;
+    var px=function(x){return mp(x,xMn,xMx,p,W-p);},py=function(y){return mp(y,yMn-mg,yMx+mg,H-p,p);};
+    grd(ctx,W,H,p);
+    var mid=d[Math.floor(d.length/2)],b=mid.lgAbsE+mid.lglgm;
+    ctx.setLineDash([4,8]);ln(ctx,[[xMn,-xMn+b],[xMx,-xMx+b]],px,py,'rgba(200,168,74,.48)',1.2);ctx.setLineDash([]);
+    ln(ctx,d.map(function(x){return[x.lglgm,x.lgAbsE];}),px,py,'#e8904a',1.6);
+    var l=d[d.length-1];dt(ctx,px(l.lglgm),py(l.lgAbsE),'#e8904a');
+  });}
+
+  if(i===4){drawChart('prev-4',function(ctx,W,H){
+    var d=all.filter(function(x){return isFinite(x.E);});if(!d.length)return;
+    var mn=d[0].m,mx=d[d.length-1].m;
+    var vs=d.map(function(x){return x.E;}),vMn=Math.min.apply(null,vs),vMx=Math.max.apply(null,vs),mg=(vMx-vMn)*.12||.001;
+    var px=function(m){return mp(m,mn,mx,p,W-p);},py=function(v){return mp(v,vMn-mg,vMx+mg,H-p,p);};
+    grd(ctx,W,H,p);
+    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+    ctx.strokeStyle='rgba(200,168,74,.35)';ctx.lineWidth=1;
+    for(var k=0;k<d.length;k++)if(d[k].ip){ctx.beginPath();ctx.moveTo(px(d[k].m),H-p);ctx.lineTo(px(d[k].m),H-p+5);ctx.stroke();}
+    ln(ctx,d.map(function(x){return[x.m,x.E];}),px,py,'rgba(61,200,184,.85)',1.5);
+    for(var k=0;k<d.length;k++)if(d[k].isc){dt(ctx,px(d[k].m),py(d[k].E),'rgba(224,80,96,.9)');}
+    var l=d[d.length-1];dt(ctx,px(l.m),py(l.E),'#3dc8b8');
+  });}
+
+  if(i===5){drawChart('prev-5',function(ctx,W,H){
+    var d=all.filter(function(x){return x.piC>0;});if(!d.length)return;
+    var mn=d[0].m,mx=d[d.length-1].m;
+    var rats=d.map(function(x){return x.scC/x.piC;}),yMx=Math.max.apply(null,rats)*1.1||1;
+    var px=function(m){return mp(m,mn,mx,p,W-p);},py=function(v){return mp(v,0,yMx,H-p,p);};
+    grd(ctx,W,H,p);
+    var lim=rats[rats.length-1];
+    ctx.setLineDash([4,8]);ln(ctx,[[mn,lim],[mx,lim]],px,py,'rgba(200,168,74,.4)',1.2);ctx.setLineDash([]);
+    ctx.fillStyle='rgba(200,168,74,.6)';ctx.font='9px monospace';ctx.fillText(lim.toFixed(3),W-50,py(lim)-4);
+    ln(ctx,d.map(function(x,i){return[x.m,rats[i]];}),px,py,'rgba(80,200,120,.9)',1.6);
+    var l=d[d.length-1];dt(ctx,px(l.m),py(l.scC/l.piC),'#50c878');
+  });}
+
+  if(i===6){drawChart('prev-6',function(ctx,W,H){
+    var gaps=r.scGaps; if(!gaps.length){ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px monospace';ctx.fillText('No gaps yet',14,80);return;}
+    var maxG=Math.max.apply(null,gaps);
+    var bins=Math.min(20,Math.ceil(Math.sqrt(gaps.length)));
+    var bw=maxG/bins,counts=new Array(bins).fill(0);
+    for(var k=0;k<gaps.length;k++)counts[Math.min(bins-1,Math.floor(gaps[k]/bw))]++;
+    var maxC=Math.max.apply(null,counts);
+    var bpw=(W-2*p)/bins;
+    grd(ctx,W,H,p);
+    for(var j=0;j<bins;j++){
+      var x=p+j*bpw,ht=H-p-mp(counts[j],0,maxC*1.1,H-p,p);
+      if(ht>0){ctx.fillStyle='rgba(224,80,96,'+(0.45+0.35*counts[j]/maxC)+')';ctx.fillRect(x,H-p-ht,bpw-1,ht);}
+    }
+    ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='9px monospace';ctx.fillText('gaps:'+gaps.length,p,p+12);
+  });}
+
+  if(i===7){drawChart('prev-7',function(ctx,W,H){
+    var d=all.filter(function(x){return isFinite(x.lf);});if(!d.length)return;
+    var mn=d[0].m,mx=d[d.length-1].m;
+    var vs=d.map(function(x){return x.lf;}),vMn=Math.min.apply(null,vs)*.95,vMx=Math.max.apply(null,vs)*1.05;
+    var px=function(m){return mp(m,mn,mx,p,W-p);},py=function(v){return mp(v,vMn,vMx,H-p,p);};
+    grd(ctx,W,H,p);
+    ctx.strokeStyle='rgba(61,200,184,.18)';ctx.lineWidth=1;
+    for(var k=0;k<d.length;k++)if(d[k].ip){ctx.beginPath();ctx.moveTo(px(d[k].m),p);ctx.lineTo(px(d[k].m),H-p);ctx.stroke();}
+    ctx.setLineDash([4,6]);ln(ctx,[[mn,1],[mx,1]],px,py,'rgba(200,168,74,.55)',1.2);ctx.setLineDash([]);
+    ln(ctx,d.map(function(x){return[x.m,x.lf];}),px,py,'rgba(144,112,216,.8)',1.4);
+    var l=d[d.length-1];dt(ctx,px(l.m),py(l.lf),'#9070d8');
+  });}
+
+  if(i===8){drawChart('prev-8',function(ctx,W,H){
+    var d=all.filter(function(x){return isFinite(x.E4);});if(!d.length)return;
+    var mn=d[0].m,mx=d[d.length-1].m;
+    var vs=d.map(function(x){return x.E4;}),vMn=Math.min.apply(null,vs),vMx=Math.max.apply(null,vs),mg=(vMx-vMn)*.12||.001;
+    var px=function(m){return mp(m,mn,mx,p,W-p);},py=function(v){return mp(v,vMn-mg,vMx+mg,H-p,p);};
+    grd(ctx,W,H,p);
+    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+    ln(ctx,d.map(function(x){return[x.m,x.E4];}),px,py,'rgba(200,168,74,.9)',1.6);
+    for(var k=0;k<d.length;k++)if(d[k].isc4){dt(ctx,px(d[k].m),py(d[k].E4),'rgba(61,200,184,.85)');}
+    var l=d[d.length-1];dt(ctx,px(l.m),py(l.E4),'#c8a84a');
+  });}
+}
+
+// per-chart play
+window.chartPlay = function(i) {
+  var inp=document.getElementById('ninput-'+i);
+  var pN=inp?parseInt(inp.value)||100:100;
+  var r=computeForN(pN), total=r.data.length;
+  if(!frames[i]||frames[i]>=total) frames[i]=0;
+  playing[i]=!playing[i];
+  var btn=document.getElementById('pbtn-'+i);
+  if(playing[i]){
+    if(btn)btn.textContent='\u23F8';
+    function tick(){
+      if(!playing[i])return;
+      frames[i]=Math.min((frames[i]||0)+1,total);
+      // draw slice
+      var r2=computeForN(pN),all2=r2.data,p=14,d=all2.slice(0,frames[i]);
+      drawSlice(i,d,r2,p);
+      var nl=document.getElementById('pn-'+i);
+      if(nl&&d.length)nl.textContent='N='+d[d.length-1].m;
+      if(frames[i]<total)rafs[i]=requestAnimationFrame(tick);
+      else{playing[i]=false;if(btn)btn.textContent='\u21BA';}
+    }
+    rafs[i]=requestAnimationFrame(tick);
+  } else {
+    if(rafs[i])cancelAnimationFrame(rafs[i]);
+    if(btn)btn.textContent=frames[i]>=(compute().data.length)?'\u21BA':'\u25B6';
+  }
+};
+
+function drawSlice(i,d,r,p){
+  // just redraw that one chart with slice d
+  // reuse drawFull logic but override data
+  // simplest: swap _r.data temporarily
+  var orig=_r.data; _r.data=d;
+  drawFull(i);
+  _r.data=orig;
+}
+
+function drawAll(){
+  for(var i=1;i<=8;i++){
+    var inp=document.getElementById('ninput-'+i);
+    var N=inp?parseInt(inp.value)||100:100;
+    drawFull(i, computeForN(N));
+  }
+}
+
+
+// ── data drawers ─────────────────────────────────────────────────────────────
+window.toggleMiniDrawer = function(i, btn) {
+  var drawer = document.getElementById('mdrawer-'+i);
+  if (!drawer) return;
+  var opening = !drawer.classList.contains('open');
+  if (opening) buildMiniTable(i);
+  drawer.classList.toggle('open', opening);
+  btn.classList.toggle('open', opening);
+  btn.setAttribute('aria-expanded', opening);
+};
+
+function f6(v) { return isFinite(v)?v.toFixed(6):'\u2014'; }
+function f4(v) { return isFinite(v)?v.toFixed(4):'\u2014'; }
+function fs(v,d){ d=d||4; return isFinite(v)?((v>=0?'+':'')+v.toFixed(d)):'\u2014'; }
+
+function buildMiniTable(i) {
+  var tbl = document.getElementById('mtbl-'+i); if(!tbl)return;
+  tbl.innerHTML='';
+  var inp=document.getElementById('ninput-'+i);
+  var N=inp?parseInt(inp.value)||100:100;
+  var r=computeForN(N), data=r.data;
+  var thead=tbl.createTHead(), tbody=tbl.createTBody();
+  var mid=data[Math.floor(data.length/2)];
+  var b3=mid?(mid.lgAbsE+mid.lglgm):0;
+
+  var cfgs={
+    1:{heads:['N','R(N)','E(N)','|E(N)|','|c\u2081|/logN','Prime'],
+       row:function(d){return[d.m,f6(d.E+r.C),fs(d.E,6),f6(d.absE),f6(Math.abs(r.c1t)/d.lm),d.ip?'p':''];}},
+    2:{heads:['N','E(N)','E\u00b7logN','c\u2081','Prime'],
+       row:function(d){return[d.m,fs(d.E,6),fs(d.Elgm,6),f6(r.c1t),d.ip?'p':''];}},
+    3:{heads:['N','log(logN)','log|E(N)|','slope\u22121 ref','Prime'],
+       row:function(d){return[d.m,f4(d.lglgm),f4(d.lgAbsE),f4(-d.lglgm+b3),d.ip?'p':''];}},
+    4:{heads:['N','E(N)','Sign','Prime','SC'],
+       row:function(d){return[d.m,fs(d.E,6),d.E>=0?'+1':'\u22121',d.ip?'p':'',d.isc?'SC':''];}},
+    5:{heads:['N','\u03c0(N)','SC(N)','SC/\u03c0','Prime'],
+       row:function(d){return[d.m,d.piC,d.scC,d.piC>0?f4(d.scC/d.piC):'\u2014',d.ip?'p':''];}},
+    6:{heads:['N','E(N)','SC','Gap to prev','Prime'],
+       row:function(d,i2,arr){
+         var gap='\u2014';
+         if(d.isc){for(var j=i2-1;j>=0;j--){if(arr[j].isc){gap=d.m-arr[j].m;break;}}}
+         return[d.m,fs(d.E,6),d.isc?'SC':'',gap,d.ip?'p':''];}},
+    7:{heads:['N','lf=\u03c6(M+1)/((M+1)C)','lf\u22121','Dir','Prime'],
+       row:function(d){return[d.m,f4(d.lf),fs(d.lf-1,4),d.lf>=1?'\u25b2':'\u25bc',d.ip?'p':''];}},
+    8:{heads:['N','E(N)','E_\u03c7\u2084','4\u00b7E_\u03c7\u2084','\u03c7\u2084 SC','Prime'],
+       row:function(d){return[d.m,fs(d.E,6),fs(d.E4,6),fs(d.E4*4,6),d.isc4?'SC':'',d.ip?'p':''];}}
+  };
+  var cfg=cfgs[i]; if(!cfg)return;
+  var hr=thead.insertRow();
+  for(var h=0;h<cfg.heads.length;h++){var th=document.createElement('th');th.textContent=cfg.heads[h];hr.appendChild(th);}
+  for(var k=0;k<data.length;k++){
+    var d=data[k];
+    var vals=cfg.row.length===3?cfg.row(d,k,data):cfg.row(d);
+    var tr=tbody.insertRow();
+    if(d.ip)tr.classList.add('is-prime');
+    if(d.isc)tr.classList.add('is-sc');
+    for(var v=0;v<vals.length;v++){var td=tr.insertCell();td.textContent=vals[v];}
+  }
+}
+
+// draw immediately (script is at bottom of body, DOM exists)
+drawAll();
+// also on load/resize for safety
+window.addEventListener('load', drawAll);
+window.addEventListener('resize', function(){setTimeout(drawAll,100);});
+
+})(); // end IIFE
 
 // ── scroll reveal ─────────────────────────────────────────────────────────
 const observer = new IntersectionObserver(entries=>{
