@@ -652,7 +652,7 @@ footer {
   <canvas id="lift-canvas"></canvas>
 
   <div class="hero-inner">
-    <div class="eyebrow">Number Theory · 2026 · W. Getachew</div>
+    <div class="eyebrow">Number Theory · 2026 · Wessen Getachew</div>
 
     <h1 class="hero-title">
       The <span class="accent">Lift Survival</span><br>
@@ -669,8 +669,7 @@ footer {
     </p>
 
     <div class="cta-row">
-      <a href="https://wessengetachew.github.io/TheError/EN_explorer-updated.html" class="cta cta-primary">Explorer + Theorems →</a>
-      <a href="https://wessengetachew.github.io/TheError/EN_explorer-1-2.html" class="cta cta-secondary">Explorer + Data Tables →</a>
+      <a href="https://wessengetachew.github.io/TheError/EN_explorer-1-2.html" class="cta cta-primary">Open Explorer →</a>
       <a href="#what" class="cta cta-ghost">Learn the Mathematics</a>
     </div>
   </div>
@@ -1386,7 +1385,7 @@ function toggleDepth(btn) {
 
 <!-- ═══════════ FOOTER ═══════════ -->
 <footer>
-  <div class="footer-left">W. Getachew · Lift Survival Function · math.NT · 2026</div>
+  <div class="footer-left">Wessen Getachew · Lift Survival Function · math.NT · 2026</div>
   <div class="footer-right">E(N) = R(N) − C = O(1/N)</div>
 </footer>
 
@@ -1828,10 +1827,14 @@ window.chartPlay = function(i) {
     if(btn)btn.textContent='\u23F8';
     function tick(){
       if(!playing[i])return;
-      frames[i]=Math.min((frames[i]||0)+1,total);
-      // draw slice
-      var r2=computeForN(pN);if(!r2)return;var all2=r2.data,p=14,d=all2.slice(0,frames[i]);
-      drawSlice(i,d,r2,p);
+      // advance 2 frames per tick for smooth visible animation
+      frames[i]=Math.min((frames[i]||0)+2,total);
+      var r2=computeForN(pN);if(!r2)return;
+      var all2=r2.data,d=all2.slice(0,frames[i]);
+      // force canvas size before drawing
+      var c=document.getElementById('prev-'+i);
+      if(c){c.width=600;c.height=160;}
+      drawSlice(i,d,r2,14);
       var nl=document.getElementById('pn-'+i);
       if(nl&&d.length)nl.textContent='N='+d[d.length-1].m;
       if(frames[i]<total)rafs[i]=requestAnimationFrame(tick);
@@ -1845,10 +1848,10 @@ window.chartPlay = function(i) {
 };
 
 function drawSlice(i,d,r,p){
-  if(!_r)return;
-  var orig=_r.data; _r.data=d;
-  drawFull(i);
-  _r.data=orig;
+  // draw chart i with data slice d, using r for constants (C, c1t etc)
+  if(!r||!d)return;
+  var fakeR={data:d,C:r.C,C4:r.C4,c1t:r.c1t,A:r.A,sc:r.sc,scGaps:r.scGaps.slice(0,d.length?d[d.length-1].scC:0),piN:r.piN,N:r.N};
+  drawFull(i, fakeR);
 }
 
 function drawAll(){
@@ -1856,7 +1859,11 @@ function drawAll(){
     var inp=document.getElementById('ninput-'+i);
     var N=inp?parseInt(inp.value)||100:100;
     var r=computeForN(N);
-    if(r) drawFull(i, r);
+    if(r){
+      var c=document.getElementById('prev-'+i);
+      if(c){c.width=600;c.height=160;}
+      drawFull(i, r);
+    }
   }
 }
 
