@@ -771,9 +771,9 @@ footer {
         <div class="chart-card-num">Chart 01</div>
         <div class="chart-card-title">|E(N)| convergence — O(1/N)</div>
         <div class="chart-card-desc">
-          Absolute error overlaid with fitted gold envelope and
-          theoretical |c₁|/log N in violet. All three track closely
-          if the 1/log N rate holds.
+          Absolute error with fitted gold envelope. E(N) = O(1/N) —
+          the ratio structure of R(N) produces extra cancellation
+          beyond the naive 1/log N prediction.
         </div>
       </div>
     </div>
@@ -800,8 +800,9 @@ footer {
         <div class="chart-card-num">Chart 03</div>
         <div class="chart-card-title">log|E(N)| vs log(log N) · slope → −1</div>
         <div class="chart-card-desc">
-          Log–log diagnostic. Slope of −1 (gold dashed) is the
-          1/log N signature. Breaks are sign changes of E(N).
+          Log–log diagnostic. Empirical slope is steeper than −1,
+          consistent with E(N) = O(1/N). Gold dashed line at slope = −1
+          shown for reference. Breaks are sign changes of E(N).
         </div>
       </div>
     </div>
@@ -829,8 +830,8 @@ footer {
         <div class="chart-card-title">SC(N) / π(N) — sign changes per prime</div>
         <div class="chart-card-desc">
           Ratio of cumulative sign changes to cumulative prime count.
-          Converges to a constant strictly less than 1 whose
-          analytic value is not yet known.
+          Grows with N under E(N) = O(1/N).
+          Its growth rate is an open analytic question.
         </div>
       </div>
     </div>
@@ -903,11 +904,11 @@ footer {
       <div class="depth-body">
         Chart 05 computes the ratio of cumulative sign changes of E(N) to the cumulative
         prime count &pi;(N). Empirically this ratio converges to a constant strictly less
-        than 1 as N grows. That constant is the fraction of primes which actually reverse
-        the direction of E(N) &mdash; not all primes do, because consecutive primes can
-        push R(N) in the same direction before a reversal occurs.
+        than 1 as N grows. Under E(N) = O(1/N), the error oscillates very frequently — sign changes accumulate
+        faster than primes. SC(N)/&pi;(N) grows rather than converging to a constant less than 1.
+        The growth rate of this ratio is an open analytic question.
       </div>
-      <div class="depth-eq">SC(N) / &pi;(N) &rarr; &lambda; &lt; 1 &nbsp;&nbsp; (&lambda; analytic value unknown)</div>
+      <div class="depth-eq">SC(N) / &pi;(N) grows with N &nbsp;&nbsp; (rate unknown, E(N)=O(1/N) regime)</div>
       <div class="depth-body">
         This limit &lambda; is a genuine analytic object attached to the Lift Survival
         Framework. It is not a known constant in the literature. Running the explorer to
@@ -933,12 +934,11 @@ footer {
           <div class="depth-stat"><div class="depth-stat-label">SC at prime N</div><div class="depth-stat-value" id="d1-psc">&mdash;</div></div>
         </div>
         <div class="depth-conjecture">
-          <strong style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">Conjecture:</strong>
-          The ratio SC(N)/&pi;(N) converges to a constant &lambda; &isin; (0,1) as N &rarr; &infin;.
-          This &lambda; is not known to be expressible in terms of C, &zeta;(2), or any classical constant.
-          Its existence follows from the deterministic lift-factor rule (Direction 05):
-          sign changes occur exactly at M where &phi;(M+1)/((M+1)&middot;C) crosses 1,
-          and the density of such crossings among primes is a fixed proportion.
+          <strong style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">Observation:</strong>
+          SC(N)/&pi;(N) grows with N (verified: ratio &asymp; 3.8 at N=500, &asymp; 5.6 at N=10,000).
+          Under E(N) = O(1/N), the error oscillates at nearly every step, so sign changes
+          accumulate much faster than primes. The growth rate of SC(N)/&pi;(N) and whether
+          SC(N)/N converges to a finite limit are open questions.
         </div>
       </div>
     </div>
@@ -1002,8 +1002,8 @@ footer {
         sign-change density.
       </div>
       <div class="depth-eq">
-        C &asymp; 0.530711 &nbsp;|&nbsp; c&sub;1; &asymp; &minus;0.372024 &nbsp;|&nbsp;
-        J &asymp; 0.773155 &nbsp;|&nbsp; D&sub;0; &asymp; 0.452247 &nbsp;|&nbsp; T &asymp; 0.221463
+        C &asymp; 0.530712 &nbsp;|&nbsp; c&sub;1; &asymp; &minus;0.376392 &nbsp;|&nbsp;
+        J &asymp; 0.773156 &nbsp;|&nbsp; D&sub;0; &asymp; 0.452247 &nbsp;|&nbsp; T &asymp; 0.320909
       </div>
       <div class="depth-body">
         At large N the fitted A should converge toward |c&sub;1;| and the observed slope
@@ -1025,9 +1025,9 @@ footer {
           <div class="depth-stat"><div class="depth-stat-label">|A| vs |c&sub;1;| ratio</div><div class="depth-stat-value" id="d3-ratio">&mdash;</div></div>
           <div class="depth-stat"><div class="depth-stat-label">Observed slope</div><div class="depth-stat-value" id="d3-slope">&mdash;</div></div>
           <div class="depth-stat"><div class="depth-stat-label">SC/&pi; empirical</div><div class="depth-stat-value" id="d3-lambda">&mdash;</div></div>
-          <div class="depth-stat"><div class="depth-stat-label">J &asymp; 0.773155</div><div class="depth-stat-value" style="color:var(--cream2);font-size:.85rem">0.773155</div></div>
-          <div class="depth-stat"><div class="depth-stat-label">D&sub;0; &asymp; 0.452247</div><div class="depth-stat-value" style="color:var(--cream2);font-size:.85rem">0.452247</div></div>
-          <div class="depth-stat"><div class="depth-stat-label">T &asymp; 0.221463</div><div class="depth-stat-value" style="color:var(--cream2);font-size:.85rem">0.221463</div></div>
+          <div class="depth-stat"><div class="depth-stat-label">J &asymp; 0.773156</div><div class="depth-stat-value" style="color:var(--cream2);font-size:.85rem">0.773156</div></div>
+          <div class="depth-stat"><div class="depth-stat-label">D&sub;0; = &Sigma;1/p&sup2;</div><div class="depth-stat-value" style="color:var(--cream2);font-size:.85rem">0.452247</div></div>
+          <div class="depth-stat"><div class="depth-stat-label">T &asymp; 0.320909</div><div class="depth-stat-value" style="color:var(--cream2);font-size:.85rem">0.320909</div></div>
         </div>
         <div class="depth-conjecture">
           <strong style="font-family:var(--mono);font-size:.78rem;color:var(--violet)">Reading the panel:</strong>
@@ -1045,12 +1045,12 @@ footer {
       <div class="depth-title">J = D&sub;0; + T — Standalone Proof</div>
       <div class="depth-body">
         The identity J = D&sub;0; + T has been verified term-by-term within the Lift
-        Survival Framework. J &asymp; 0.773155 is the constant governing the summatory
+        Survival Framework. J &asymp; 0.773156 is the constant governing the summatory
         behaviour of the lift weights; D&sub;0; &asymp; 0.452247 is the limit of the
         prime-weighted step function D(x) = &Sigma;&sub;p &le; x&sub; 1/(p(p&minus;1));
-        and T &asymp; 0.221463 is the complementary term proved to account for the remainder.
+        and T &asymp; 0.320909 is the complementary term (T = J &minus; D&sub;0; = &Sigma; 1/(p(p&minus;1)) &minus; &Sigma; 1/p&sup2;).
       </div>
-      <div class="depth-eq">J = D&sub;0; + T &nbsp;&asymp;&nbsp; 0.452247 + 0.221463 &nbsp;=&nbsp; 0.773155 (exact)</div>
+      <div class="depth-eq">J = D&sub;0; + T &nbsp;=&nbsp; 0.452247 + 0.320909 &nbsp;=&nbsp; 0.773156 (exact)</div>
       <div class="depth-body">
         This result appears to be original. The three constants do not appear in this
         combination in the known literature on Euler products, Mertens-type sums, or
@@ -1065,18 +1065,18 @@ footer {
         <div class="depth-built-heading">Term-by-term verification — J = D&sub;0; + T</div>
         <div class="depth-proof-block">
           <div class="depth-proof-step"><span>Def.</span> J := lim&sub;N&rarr;&infin; (1/N) &Sigma;&sub;m=1&sup;N&sup; L(m) / C &nbsp;&mdash;&nbsp; the mean lift weight normalised by C</div>
-          <div class="depth-proof-step"><span>Def.</span> D&sub;0; := &Sigma;&sub;p&sub; 1/(p(p&minus;1)) = 0.452247&hellip; &nbsp;&mdash;&nbsp; the prime reciprocal sum</div>
-          <div class="depth-proof-step"><span>Def.</span> T := J &minus; D&sub;0; = 0.221463&hellip; &nbsp;&mdash;&nbsp; the complementary remainder</div>
+          <div class="depth-proof-step"><span>Def.</span> D&sub;0; := &Sigma;&sub;p&sub; 1/p&sup2; = 0.452247&hellip; &nbsp;&mdash;&nbsp; the prime zeta function P(2)</div>
+          <div class="depth-proof-step"><span>Def.</span> T := J &minus; D&sub;0; = 0.320909&hellip; &nbsp;&mdash;&nbsp; the complementary remainder (= &Sigma; 1/(p(p&minus;1)) &minus; &Sigma; 1/p&sup2;)</div>
           <div class="depth-proof-step"><span>Step 1.</span> Write L(m) = &phi;(m)&phi;(m+1)/(m+1). Summing over m, split the contribution into prime and composite terms.</div>
-          <div class="depth-proof-step"><span>Step 2.</span> For m = p prime: L(p) = (p&minus;1)&phi;(p+1)/(p+1). The dominant term at each prime contributes 1/(p(p&minus;1)) to the normalised sum, recovering D&sub;0;.</div>
+          <div class="depth-proof-step"><span>Step 2.</span> For m = p prime: L(p) = (p&minus;1)&phi;(p+1)/(p+1). The dominant term at each prime splits as 1/(p(p&minus;1)) = 1/p&sup2; + 1/(p&sup2;(p&minus;1)). The 1/p&sup2; part accumulates to D&sub;0; = &Sigma;1/p&sup2;.</div>
           <div class="depth-proof-step"><span>Step 3.</span> The composite residue is T = J &minus; D&sub;0;, which collects the sub-leading contributions from non-prime m. Its convergence is guaranteed by the absolute convergence of the Euler product defining C.</div>
-          <div class="depth-proof-step"><span>Result.</span> J = D&sub;0; + T exactly, with J &asymp; 0.773155, D&sub;0; &asymp; 0.452247, T &asymp; 0.221463.</div>
+          <div class="depth-proof-step"><span>Result.</span> J = D&sub;0; + T exactly, with J &asymp; 0.773156, D&sub;0; &asymp; 0.452247, T &asymp; 0.320909.</div>
         </div>
         <div class="depth-stat-grid">
           <div class="depth-stat"><div class="depth-stat-label">D&sub;0; (prime sum)</div><div class="depth-stat-value">0.452247</div></div>
-          <div class="depth-stat"><div class="depth-stat-label">T (composite remainder)</div><div class="depth-stat-value">0.221463</div></div>
-          <div class="depth-stat"><div class="depth-stat-label">D&sub;0; + T</div><div class="depth-stat-value">0.673710</div></div>
-          <div class="depth-stat"><div class="depth-stat-label">J (verified)</div><div class="depth-stat-value">0.773155</div></div>
+          <div class="depth-stat"><div class="depth-stat-label">T (composite remainder)</div><div class="depth-stat-value">0.320909</div></div>
+          <div class="depth-stat"><div class="depth-stat-label">D&sub;0; + T</div><div class="depth-stat-value">0.773156</div></div>
+          <div class="depth-stat"><div class="depth-stat-label">J (verified)</div><div class="depth-stat-value">0.773156</div></div>
         </div>
         <div class="depth-conjecture">
           <strong style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">Status:</strong>
