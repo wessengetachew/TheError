@@ -1,8 +1,7 @@
 # TheError
 L(M) = φ(M) · φ(M+1) / (M+1)
-https://github.com/wessengetachew/TheError/
 
-# TheError
+
 ### Lift Survival Function — W. Getachew · math.NT · 2026
 
 **Live site:** https://wessengetachew.github.io/TheError/
