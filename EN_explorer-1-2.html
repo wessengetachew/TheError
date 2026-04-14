@@ -143,15 +143,25 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 .data-table tr.is-sc td:first-child::after { content: ' ·'; color: var(--coral); }
 .data-table tr:last-child td { border-bottom: none; }
 
+
+.tab-canvas{color:var(--coral)!important;}
+.tab-canvas.active{border-bottom-color:var(--coral)!important;}
+.tab-canvas .tab-dot{background:var(--coral)!important;}
+.send-canvas-btn{font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;
+  background:rgba(224,80,96,.12);border:1px solid rgba(224,80,96,.35);color:var(--coral);
+  padding:4px 10px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;
+  transition:background .2s,border-color .2s;white-space:nowrap;}
+.send-canvas-btn:hover{background:rgba(224,80,96,.25);border-color:var(--coral);}
 </style>
 </head>
 <body>
 
 <nav id="tab-nav">
-  <a href="index.html" class="back-btn"><span>◁</span> Main</a>
   <div class="tabs">
-    <a href="index.html" class="tab"><span class="tab-dot"></span> Opener</a>
-    <div class="tab active"><span class="tab-dot"></span> Explorer</div>
+    <a href="index.html" class="tab"><span class="tab-dot"></span>Opener</a>
+    <div class="tab active"><span class="tab-dot"></span>Explorer</div>
+    <a href="EN_explorer-updated.html" class="tab"><span class="tab-dot"></span>Deep Analysis</a>
+    <a href="zmmz_explorer-1.html" class="tab tab-canvas"><span class="tab-dot" style="background:var(--coral)"></span>Geometric Canvas</a>
   </div>
   <div class="nav-eq">E(N) = R(N) − C = O(1/N)</div>
 </nav>
@@ -210,7 +220,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 01</span><span class="chart-title">|E(N)| with A/log N envelope</span>
+      <span class="chart-num">Chart 01</span><a href="zmmz_explorer-1.html?preset=c_phi_density&from=Explorer+Chart+01" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">|E(N)| with A/log N envelope</span>
       <span class="chart-desc">Absolute error with fitted envelope. E(N) = O(1/N) — the ratio structure of R(N) produces cancellation beyond the naive 1/log N prediction.</span>
     </div>
     <canvas class="main-chart" id="c1"></canvas>
@@ -232,7 +242,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 02</span><span class="chart-title">E(N) &middot; N &rarr; bounded oscillation</span>
+      <span class="chart-num">Chart 02</span><a href="zmmz_explorer-1.html?preset=c_lift&from=Explorer+Chart+02" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">E(N) &middot; N &rarr; bounded oscillation</span>
       <span class="chart-desc">E(N)&middot;N is bounded and oscillating — confirming E(N) = O(1/N). The c&#x2081; line is shown for reference; E(N) decays faster than c&#x2081;/log N.</span>
     </div>
     <canvas class="main-chart" id="c2"></canvas>
@@ -253,7 +263,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 03</span><span class="chart-title">log|E(N)| vs log(log N) · slope → −1</span>
+      <span class="chart-num">Chart 03</span><a href="zmmz_explorer-1.html?preset=c_entropy&from=Explorer+Chart+03" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">log|E(N)| vs log(log N) · slope → −1</span>
       <span class="chart-desc">Log-log diagnostic. The empirical slope is steeper than &minus;1, consistent with E(N) = O(1/N) rather than O(1/log N). Breaks are sign changes of E(N).</span>
     </div>
     <canvas class="main-chart" id="c3"></canvas>
@@ -276,7 +286,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 04</span><span class="chart-title">Signed E(N) · prime markers · sign-change dots</span>
+      <span class="chart-num">Chart 04</span><a href="zmmz_explorer-1.html?preset=c_prime_ring&from=Explorer+Chart+04" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">Signed E(N) · prime markers · sign-change dots</span>
       <span class="chart-desc">Full signed oscillation of E(N). Gold ticks on the baseline mark every prime. Coral dots mark sign changes. Most sign changes fall near primes — but not every prime triggers one; consecutive primes can push in the same direction before a reversal.</span>
     </div>
     <canvas class="main-chart" id="c4"></canvas>
@@ -298,7 +308,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 05</span><span class="chart-title">SC(N) / π(N) — sign changes per prime</span>
+      <span class="chart-num">Chart 05</span><a href="zmmz_explorer-1.html?preset=c_angle&from=Explorer+Chart+05" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">SC(N) / π(N) — sign changes per prime</span>
       <span class="chart-desc">Ratio of cumulative sign changes to cumulative prime count. Under E(N) = O(1/N), this ratio grows with N — sign changes accumulate faster than primes. Its growth rate is an open analytic question.</span>
     </div>
     <canvas class="main-chart" id="c5"></canvas>
@@ -319,7 +329,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 06</span><span class="chart-title">Sign change gap distribution</span>
+      <span class="chart-num">Chart 06</span><a href="zmmz_explorer-1.html?preset=c_gap_class&from=Explorer+Chart+06" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">Sign change gap distribution</span>
       <span class="chart-desc">Histogram of gap sizes between consecutive sign changes. An approximately exponential tail is consistent with pseudo-random oscillation driven by primes. A heavy tail or periodicity would indicate structured interference.</span>
     </div>
     <canvas class="main-chart" id="c6"></canvas>
@@ -341,7 +351,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 07</span><span class="chart-title">Local lift factor φ(M+1) / [(M+1)·C]</span>
+      <span class="chart-num">Chart 07</span><a href="zmmz_explorer-1.html?preset=c_phi_density&from=Explorer+Chart+07" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">Local lift factor φ(M+1) / [(M+1)·C]</span>
       <span class="chart-desc">Each term L(M) pushes R(N) upward when this factor exceeds 1 (gold line), downward when below. At M = prime, φ(M) = M−1 is maximal — the teal vertical bands show prime positions. The sign of (factor − 1) directly predicts which way E(N) will move next.</span>
     </div>
     <canvas class="main-chart" id="c7"></canvas>
@@ -363,7 +373,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
   <div class="chart-panel">
     <div class="chart-header">
-      <span class="chart-num">Chart 08</span><span class="chart-title">χ₄-restricted E(N) · gcd(M, 4) = 1</span>
+      <span class="chart-num">Chart 08</span><a href="zmmz_explorer-1.html?preset=c_mod6&from=Explorer+Chart+08" class="send-canvas-btn" target="_blank">◈ Canvas</a><span class="chart-title">χ₄-restricted E(N) · gcd(M, 4) = 1</span>
       <span class="chart-desc">E(N) restricted to M ≡ 1 or 3 (mod 4) — the support of the Dirichlet character χ₄. Scaling by ×4 (the conductor) connects this to the Farey–χ₄ discrepancy and the zeros of L(s, χ₄). Teal dots mark sign changes in this restricted sum — these are genuine Franel–Landau probes.</span>
     </div>
     <canvas class="main-chart" id="c8"></canvas>
