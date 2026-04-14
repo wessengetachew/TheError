@@ -642,23 +642,16 @@ footer {
 </style>
 </head>
 <body>
-<nav id="top-nav" style="position:sticky;top:0;z-index:300;background:rgba(4,4,10,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 28px;height:52px;gap:0;">
-  <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,74,1);padding:6px 14px 6px 0;border-right:1px solid rgba(255,255,255,.08);margin-right:20px;white-space:nowrap;">TheError</span>
-  <div style="display:flex;flex:1;">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:0 20px;height:52px;display:flex;align-items:center;gap:8px;color:rgba(200,168,74,1);border-bottom:2px solid rgba(200,168,74,1);">
-      <span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:1;display:inline-block;"></span>Opener
-    </span>
-    <a href="EN_explorer-1-2.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;padding:0 20px;height:52px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.28);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.28)'">
-      <span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;display:inline-block;"></span>Explorer
-    </a>
-    <a href="EN_explorer-updated.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;padding:0 20px;height:52px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.28);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.28)'">
-      <span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;display:inline-block;"></span>Deep Analysis
-    </a>
+
+<nav id="tab-nav" style="position:sticky;top:0;z-index:300;background:rgba(4,4,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 28px;height:48px;">
+  <div class="tabs" style="display:flex;flex:1;">
+    <div class="tab active" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border-bottom:2px solid var(--gold);padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--gold);display:inline-block"></span>Opener</div>
+    <a href="EN_explorer-1-2.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;opacity:.5"></span>Explorer</a>
+    <a href="EN_explorer-updated.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;opacity:.5"></span>Deep Analysis</a>
+    <a href="zmmz_explorer-1.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#e05060;text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:#e05060;display:inline-block;opacity:.8"></span>Geometric Canvas</a>
   </div>
-  <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.08em;margin-left:auto;">E(N) = R(N) − C = O(1/N)</span>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.06em;">C ≈ 0.530711806246</span>
 </nav>
-
-
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 <canvas id="starfield"></canvas>
@@ -688,6 +681,7 @@ footer {
       <a href="EN_explorer-1-2.html" class="cta cta-primary">Open Explorer →</a>
       <a href="EN_explorer-updated.html" class="cta cta-secondary">Deep Analysis →</a>
       <a href="#what" class="cta cta-ghost">Learn the Mathematics</a>
+      <a href="zmmz_explorer-1.html" class="cta" style="border:1px solid rgba(224,80,96,.4);color:#e05060;background:rgba(224,80,96,.08);">Geometric Canvas ◈</a>
     </div>
   </div>
 
