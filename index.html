@@ -640,24 +640,26 @@ footer {
 .depth-card.coral .depth-conjecture { background: rgba(224,80,96,.06); border-color: rgba(224,80,96,.15); }
 
 
-.send-canvas-btn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;
-  background:rgba(224,80,96,.1);border:1px solid rgba(224,80,96,.3);color:#e05060;
-  padding:3px 9px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;
-  transition:background .2s;white-space:nowrap;margin-left:8px;vertical-align:middle;}
-.send-canvas-btn:hover{background:rgba(224,80,96,.25);}
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(4,4,10,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 24px;height:48px;}
+.tabs{display:flex;flex:1;gap:0;}
+.tab{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  text-decoration:none;padding:0 16px;height:48px;display:flex;align-items:center;gap:6px;
+  color:rgba(255,255,255,.28);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;}
+.tab:hover{color:rgba(255,255,255,.7);}
+.tab.active{color:var(--gold,#c8a84a);border-bottom-color:var(--gold,#c8a84a);}
+.tab-canvas{color:#e05060 !important;}
+.tab-canvas:hover{color:#f07080 !important;}
+.tab-canvas.active{border-bottom-color:#e05060 !important;}
+.nav-right{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);
+  letter-spacing:.06em;white-space:nowrap;margin-left:auto;}
+@media(max-width:600px){.nav-right{display:none;}.tab{padding:0 10px;font-size:8px;}}
+
 </style>
 </head>
 <body>
+<nav id="tab-nav"><div class="tabs"><div class="tab active"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Opener</div><a href="EN_explorer-1-2.html" class="tab "><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Explorer</a><a href="EN_explorer-updated.html" class="tab "><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Deep Analysis</a><a href="zmmz_explorer-1.html" class="tab tab-canvas"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Geometric Canvas</a></div><span class="nav-right">C ≈ 0.530711806246</span></nav>
 
-<nav id="tab-nav" style="position:sticky;top:0;z-index:300;background:rgba(4,4,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 28px;height:48px;">
-  <div class="tabs" style="display:flex;flex:1;">
-    <div class="tab active" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border-bottom:2px solid var(--gold);padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--gold);display:inline-block"></span>Opener</div>
-    <a href="EN_explorer-1-2.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;opacity:.5"></span>Explorer</a>
-    <a href="EN_explorer-updated.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;opacity:.5"></span>Deep Analysis</a>
-    <a href="zmmz_explorer-1.html?anim=spin&from=Opener+Nav" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#e05060;text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:#e05060;display:inline-block;opacity:.8"></span>Geometric Canvas</a>
-  </div>
-  <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.06em;">C ≈ 0.530711806246</span>
-</nav>
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 <canvas id="starfield"></canvas>
@@ -674,20 +676,19 @@ footer {
       <em>Error Term</em>
     </h1>
 
-    <div class="hero-eq">E(N) = R(N) &minus; C &nbsp;=&nbsp; O(1/N)</div>
+    <div class="hero-eq">E(N) = R(N) &minus; C &nbsp;&nbsp; <span style="font-size:.7em;opacity:.6">(conj. O(1/N))</span></div>
 
     <p class="hero-desc">
       How quickly does the empirical lift ratio converge to its limiting constant?
       This explorer reveals the convergence rate of <em>R(N)</em>, counts sign changes
       as a probe toward the Riemann Hypothesis, and measures the leading coefficient
-      of the error — confirmed convergence rate O(1/N), faster than the naive 1/log N prediction.
+      of the error — empirical rate consistent with O(1/N), faster than 1/log N. Rate is a numerical conjecture, not yet proved analytically.
     </p>
 
     <div class="cta-row">
       <a href="EN_explorer-1-2.html" class="cta cta-primary">Open Explorer →</a>
       <a href="EN_explorer-updated.html" class="cta cta-secondary">Deep Analysis →</a>
       <a href="#what" class="cta cta-ghost">Learn the Mathematics</a>
-      <a href="zmmz_explorer-1.html?preset=thm81&anim=m_grow_spin&from=Opener+Hero" class="cta" style="border:1px solid rgba(224,80,96,.4);color:#e05060;background:rgba(224,80,96,.08);">Geometric Canvas ◈</a>
     </div>
   </div>
 
@@ -739,8 +740,8 @@ footer {
     </div>
     <div class="math-card">
       <div class="math-card-lbl">Known Convergence Rate</div>
-      <div class="math-card-eq">R(N) &rarr; C with E(N) = O(1/N)</div>
-      <div class="math-card-desc">The ratio structure of R(N) = &Sigma;L(M)/&Sigma;&phi;(M) produces cancellation beyond the naive 1/log N prediction. E(N)&middot;N is bounded and oscillating — verified to N = 50,000.</div>
+      <div class="math-card-eq">R(N) &rarr; C &nbsp; (proved) &nbsp; E(N) = O(1/N) <span style="font-size:.85em;opacity:.55">(conjecture)</span></div>
+      <div class="math-card-desc">R(N) &rarr; C is proved. E(N)&middot;N is bounded and oscillating to N&nbsp;=&nbsp;50,000 — consistent with O(1/N) but this rate is a numerical conjecture. The c&#x2081;/log N comparison is a heuristic, not a proof.</div>
     </div>
     <div class="math-card">
       <div class="math-card-lbl">Leading Coefficient</div>
@@ -771,7 +772,7 @@ footer {
   <div class="section-label">The Explorer’s Panels</div>
   <h2 class="section-heading">Eight Charts, One Story</h2>
   <p class="section-body" style="max-width:640px;">
-    <strong style="font-family:var(--mono);font-size:.8rem;color:var(--gold)">Note (verified 2026):</strong> E(N) = O(1/N), not O(1/log N) as previously stated. The ratio structure of R(N) produces extra cancellation. E(N)&middot;N is bounded and oscillating to N = 50,000.
+    <strong style="font-family:var(--mono);font-size:.8rem;color:var(--gold)">Note (2026):</strong> E(N)&middot;N is bounded and oscillating to N&nbsp;=&nbsp;50,000, consistent with O(1/N). <em>Convergence of R(N)&nbsp;&rarr;&nbsp;C is proved; the O(1/N) rate is a numerical conjecture pending analytic proof.</em>
   </p>
   <p class="section-body" style="max-width:640px;">
     Each panel plots real computed values — sieve → φ(M) → L(M) → R(N) → E(N) —
@@ -786,7 +787,7 @@ footer {
       <div class="data-drawer" id="mdrawer-1"><div class="drawer-scroll"><table class="data-table" id="mtbl-1"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 01</div>
-        <div class="chart-card-title">|E(N)| convergence<a href="zmmz_explorer-1.html?preset=c_phi_density&anim=m_grow_spin&from=Opener+Chart+01" class="send-canvas-btn" target="_blank">◈</a> — O(1/N)</div>
+        <div class="chart-card-title">|E(N)| convergence — consistent with O(1/N) conjecture</div>
         <div class="chart-card-desc">
           Absolute error with fitted gold envelope. E(N) = O(1/N) —
           the ratio structure of R(N) produces extra cancellation
@@ -801,9 +802,9 @@ footer {
       <div class="data-drawer" id="mdrawer-2"><div class="drawer-scroll"><table class="data-table" id="mtbl-2"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 02</div>
-        <div class="chart-card-title">E(N) · N → bounded<a href="zmmz_explorer-1.html?preset=c_lift&anim=lift_scan&from=Opener+Chart+02" class="send-canvas-btn" target="_blank">◈</a></div>
+        <div class="chart-card-title">E(N) · N → bounded</div>
         <div class="chart-card-desc">
-          E(N)·N is bounded and oscillating — the actual rate is O(1/N),
+          E(N)·N is bounded and oscillating — the empirical rate is consistent with O(1/N) (conjecture),
           faster than the naive O(1/log N) prediction.
         </div>
       </div>
@@ -830,7 +831,7 @@ footer {
       <div class="data-drawer" id="mdrawer-4"><div class="drawer-scroll"><table class="data-table" id="mtbl-4"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 04</div>
-        <div class="chart-card-title">Signed E(N)<a href="zmmz_explorer-1.html?preset=c_prime_ring&anim=m_grow&from=Opener+Chart+04" class="send-canvas-btn" target="_blank">◈</a> · prime markers · sign-change dots</div>
+        <div class="chart-card-title">Signed E(N) · prime markers · sign-change dots</div>
         <div class="chart-card-desc">
           Full signed oscillation of E(N). Gold ticks mark every
           prime; coral dots mark sign changes of the error term.
@@ -844,10 +845,10 @@ footer {
       <div class="data-drawer" id="mdrawer-5"><div class="drawer-scroll"><table class="data-table" id="mtbl-5"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 05</div>
-        <div class="chart-card-title">SC(N) / π(N)<a href="zmmz_explorer-1.html?preset=c_angle&anim=spiral_trace&from=Opener+Chart+05" class="send-canvas-btn" target="_blank">◈</a> — sign changes per prime</div>
+        <div class="chart-card-title">SC(N) / π(N) — sign changes per prime</div>
         <div class="chart-card-desc">
           Ratio of cumulative sign changes to cumulative prime count.
-          Grows with N under E(N) = O(1/N).
+          Grows with N if O(1/N) conjecture holds.
           Its growth rate is an open analytic question.
         </div>
       </div>
@@ -859,7 +860,7 @@ footer {
       <div class="data-drawer" id="mdrawer-6"><div class="drawer-scroll"><table class="data-table" id="mtbl-6"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 06</div>
-        <div class="chart-card-title">Sign change gap distribution<a href="zmmz_explorer-1.html?preset=c_gap_class&anim=spin&from=Opener+Chart+06" class="send-canvas-btn" target="_blank">◈</a></div>
+        <div class="chart-card-title">Sign change gap distribution</div>
         <div class="chart-card-desc">
           Histogram of gaps between consecutive sign changes of E(N).
           An exponential tail is consistent with pseudo-random
@@ -889,7 +890,7 @@ footer {
       <div class="data-drawer" id="mdrawer-8"><div class="drawer-scroll"><table class="data-table" id="mtbl-8"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 08</div>
-        <div class="chart-card-title">χ₄<a href="zmmz_explorer-1.html?preset=c_mod6&anim=farey_sweep&from=Opener+Chart+08" class="send-canvas-btn" target="_blank">◈</a>-restricted E(N) · gcd(M,4) = 1</div>
+        <div class="chart-card-title">χ₄-restricted E(N) · gcd(M,4) = 1</div>
         <div class="chart-card-desc">
           E(N) restricted to M ≡ 1 or 3 (mod 4), scaled by conductor
           ×4. Connects to the Farey–χ₄ discrepancy and zeros of
@@ -921,11 +922,11 @@ footer {
       <div class="depth-body">
         Chart 05 computes the ratio of cumulative sign changes of E(N) to the cumulative
         prime count &pi;(N). Empirically this ratio converges to a constant strictly less
-        than 1 as N grows. Under E(N) = O(1/N), the error oscillates very frequently — sign changes accumulate
+        than 1 as N grows. Under the O(1/N) conjecture, the error oscillates very frequently — sign changes accumulate
         faster than primes. SC(N)/&pi;(N) grows rather than converging to a constant less than 1.
         The growth rate of this ratio is an open analytic question.
       </div>
-      <div class="depth-eq">SC(N) / &pi;(N) grows with N &nbsp;&nbsp; (rate unknown, E(N)=O(1/N) regime)</div>
+      <div class="depth-eq">SC(N) / &pi;(N) grows with N &nbsp;&nbsp; (rate unknown; O(1/N) regime is conjectured)</div>
       <div class="depth-body">
         This limit &lambda; is a genuine analytic object attached to the Lift Survival
         Framework. It is not a known constant in the literature. Running the explorer to
@@ -953,7 +954,7 @@ footer {
         <div class="depth-conjecture">
           <strong style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">Observation:</strong>
           SC(N)/&pi;(N) grows with N (verified: ratio &asymp; 3.8 at N=500, &asymp; 5.6 at N=10,000).
-          Under E(N) = O(1/N), the error oscillates at nearly every step, so sign changes
+          If E(N) = O(1/N) (conjecture), the error oscillates at nearly every step, so sign changes
           accumulate much faster than primes. The growth rate of SC(N)/&pi;(N) and whether
           SC(N)/N converges to a finite limit are open questions.
         </div>
@@ -1025,7 +1026,7 @@ footer {
       <div class="depth-body">
         At large N the fitted A should converge toward |c&sub;1;| and the observed slope
         should approach &minus;1. Displaying both alongside their theoretical targets lets
-        a reader immediately see how E(N)·N and E(N)·log N compare — O(1/N) is tighter.
+        a reader immediately see how E(N)·N and E(N)·log N compare — O(1/N) conjecture is tighter empirically.
         Any systematic deviation at large N would itself be an observation worth recording.
       </div>
       
@@ -1058,18 +1059,18 @@ footer {
     <!-- 4 -->
     <div class="depth-card gold">
       <div class="depth-num">Direction 04</div>
-      <div class="depth-tag">Formal result &mdash; short term</div>
+      <div class="depth-tag">Numerical observation &mdash; short term</div>
       <div class="depth-title">J = D&sub;0; + T — Standalone Proof</div>
       <div class="depth-body">
-        The identity J = D&sub;0; + T has been verified term-by-term within the Lift
+        The decomposition J = D&sub;0; + T has been verified numerically within the Lift
         Survival Framework. J &asymp; 0.773156 is the constant governing the summatory
         behaviour of the lift weights; D&sub;0; &asymp; 0.452247 is the limit of the
         prime-weighted step function D(x) = &Sigma;&sub;p &le; x&sub; 1/(p(p&minus;1));
         and T &asymp; 0.320909 is the complementary term (T = J &minus; D&sub;0; = &Sigma; 1/(p(p&minus;1)) &minus; &Sigma; 1/p&sup2;).
       </div>
-      <div class="depth-eq">J = D&sub;0; + T &nbsp;=&nbsp; 0.452247 + 0.320909 &nbsp;=&nbsp; 0.773156 (exact)</div>
+      <div class="depth-eq">J = D&sub;0; + T &nbsp;=&nbsp; 0.452247 + 0.320909 &nbsp;=&nbsp; 0.773156 <span style="font-size:.8em;opacity:.6">(T defined as residual J&minus;D&sub;0;; non-trivial only if T has independent characterization)</span></div>
       <div class="depth-body">
-        This result appears to be original. The three constants do not appear in this
+        The constants J and D&sub;0; are standard (prime zeta P(2)); T is defined as J&minus;D&sub;0;. The decomposition may be original in this context but is not a theorem unless T is independently defined.
         combination in the known literature on Euler products, Mertens-type sums, or
         Hardy&ndash;Littlewood constants. A standalone page presenting the clean
         statement, the term-by-term decomposition, and numerical verification to 10+
@@ -1087,7 +1088,7 @@ footer {
           <div class="depth-proof-step"><span>Step 1.</span> Write L(m) = &phi;(m)&phi;(m+1)/(m+1). Summing over m, split the contribution into prime and composite terms.</div>
           <div class="depth-proof-step"><span>Step 2.</span> For m = p prime: L(p) = (p&minus;1)&phi;(p+1)/(p+1). The dominant term at each prime splits as 1/(p(p&minus;1)) = 1/p&sup2; + 1/(p&sup2;(p&minus;1)). The 1/p&sup2; part accumulates to D&sub;0; = &Sigma;1/p&sup2;.</div>
           <div class="depth-proof-step"><span>Step 3.</span> The composite residue is T = J &minus; D&sub;0;, which collects the sub-leading contributions from non-prime m. Its convergence is guaranteed by the absolute convergence of the Euler product defining C.</div>
-          <div class="depth-proof-step"><span>Result.</span> J = D&sub;0; + T exactly, with J &asymp; 0.773156, D&sub;0; &asymp; 0.452247, T &asymp; 0.320909.</div>
+          <div class="depth-proof-step"><span>Observation.</span> J &asymp; 0.773156, D&sub;0; = P(2) &asymp; 0.452247, T := J&minus;D&sub;0; &asymp; 0.320909. Identity is definitional; novelty depends on independent characterization of T.</div>
         </div>
         <div class="depth-stat-grid">
           <div class="depth-stat"><div class="depth-stat-label">D&sub;0; (prime sum)</div><div class="depth-stat-value">0.452247</div></div>
@@ -1097,9 +1098,9 @@ footer {
         </div>
         <div class="depth-conjecture">
           <strong style="font-family:var(--mono);font-size:.78rem;color:var(--gold)">Status:</strong>
-          Verified numerically to 6 decimal places. The identity J = D&sub;0; + T does not appear
+          Verified numerically to 6 decimal places. The decomposition does not appear
           in the literature on Euler products, Mertens-type sums, or Hardy&ndash;Littlewood constants
-          in this form. The three constants appear to be original to the Lift Survival Framework.
+          in this form. D&sub;0; = P(2) is classical; J and T may be original in this context.
           Full analytic proof requires a precise asymptotic for the composite residue T.
         </div>
       </div>
@@ -1234,7 +1235,7 @@ footer {
         <div class="depth-built-heading">Precise statement — what the framework delivers toward RH</div>
         <div class="depth-proof-block">
           <div class="depth-proof-step"><span>Given.</span> E(N) = R(N) &minus; C where R(N) = &Sigma;&sub;m=1&sup;N&sup; L(m) / &Sigma;&sub;m=1&sup;N&sup; &phi;(m) and C = &prod;&sub;p&sub;(p&sup2;&minus;2)/(p&sup2;&minus;1).</div>
-          <div class="depth-proof-step"><span>Proved.</span> E(N) = O(1/N). The ratio structure of R(N) = &Sigma;L(M)/&Sigma;&phi;(M) produces cancellation beyond the c&sub;1;/log N term. Verified numerically: E(N)&middot;N is bounded for N up to 50,000. Analytically: follows from S(d,N)/B(N) &rarr; d/&prod;(p&sup2;&minus;1) via M&ouml;bius inversion.</div>
+          <div class="depth-proof-step"><span>Conjecture.</span> E(N) = O(1/N). R(N)&rarr;C is proved. The O(1/N) rate is supported by numerics to N=50,000 (max|E(N)&middot;N|&nbsp;&lt;&nbsp;0.88) and the heuristic that cancellation exceeds c&#x2081;/log N. An analytic proof has not been established.</div>
           <div class="depth-proof-step"><span>Proved.</span> sign(&Delta;E(N)) is determined exactly by the lift factor (Direction 05). The lift factor &phi;(N+1)/((N+1)C) crosses 1 infinitely often because &phi; is unboundedly variable: for M = primorial p# the factor is maximal, and for M = 2p# it is suppressed below 1.</div>
           <div class="depth-proof-step"><span>Consequence.</span> E(N) changes sign infinitely often. R(N) does not converge to C monotonically. This is a non-trivial oscillation result internal to the framework.</div>
           <div class="depth-proof-step"><span>Connection.</span> Monotone convergence of R(N) to C would imply that the Dirichlet series associated to the lift weights has no zeros on Re(s) = 1. Infinitely many sign changes is consistent with &zeta;(s) having zeros on Re(s) = 1/2 and not elsewhere — i.e., consistent with RH.</div>
@@ -1242,7 +1243,7 @@ footer {
         </div>
         <div class="depth-conjecture">
           <strong style="font-family:var(--mono);font-size:.78rem;color:var(--coral)">Honest summary:</strong>
-          The framework concretely delivers: (1) an exact convergence rate E(N) = O(1/N) — faster than previously claimed,
+          The framework concretely delivers: (1) a conjectured rate E(N) = O(1/N) supported by strong numerics,
           (2) a deterministic rule for the direction of each step, (3) a proof that sign changes
           are infinite, and (4) a connection between the oscillation structure and the mod-4
           Dirichlet environment via E&sub;&chi;&sub;4;. What it does not deliver is an explicit
@@ -1403,7 +1404,7 @@ function toggleDepth(btn) {
 <!-- ═══════════ FOOTER ═══════════ -->
 <footer>
   <div class="footer-left">Wessen Getachew · Lift Survival Function · math.NT · 2026</div>
-  <div class="footer-right">E(N) = R(N) − C = O(1/N)</div>
+  <div class="footer-right">E(N) = R(N) − C &nbsp; [O(1/N) conjectured]</div>
 </footer>
 
 <!-- ═══════════ SCRIPTS ═══════════ -->
