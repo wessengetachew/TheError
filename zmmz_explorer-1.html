@@ -144,6 +144,11 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <span class="nav-right">(ℤ/Mℤ)*</span>
 </nav>
 <div id="from-banner"></div>
+<div id="anim-indicator" style="display:none;position:fixed;top:44px;right:12px;
+  font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;
+  color:rgba(61,200,184,.9);background:rgba(4,4,10,.9);border:1px solid rgba(61,200,184,.25);
+  padding:4px 10px;z-index:301;cursor:pointer;" 
+  title="Click to stop animation" onclick="animStop();this.style.display='none'">▶ —</div>
 
 <!-- Theorem preset strip -->
 <div id="thm-strip">
@@ -164,6 +169,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <button class="thm-btn violet" onclick="applyThm('inv_primorial')">Primorial</button>
   <button class="thm-btn violet" onclick="applyThm('rot_ch2_fermat')">½ch Fermat</button>
   <button class="thm-btn" onclick="applyThm('reset')">↺ Reset</button>
+  <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'">■ Stop</button>
 </div>
 <div id="app">
 
@@ -1392,28 +1398,28 @@ document.getElementById('analysis-text').innerHTML=
 
 // ── Theorem presets (§8) ────────────────────────────────────────────────────
 const THM_PRESETS = {
-  thm81: {mmax:120,view:'concentric',color:'phi_density',lifts:true,broken:false,chain:0,invert:false,
+  thm81: {mmax:120,view:'concentric',color:'phi_density',lifts:true,broken:false,chain:0,invert:false,_anim:'m_grow_spin',
           _label:'§8.1 Lift Survival C=∏(1−1/p(p−1)) — φ/M density reveals convergence ring-by-ring',
           _analysis:'<strong>§8.1 Lift Survival</strong> — φ/M density (warm=dense, cool=sparse). Each ring M is shaded by φ(M)/M, the fraction of coprime residues. The product C = ∏(1−1/p(p−1)) ≈ 0.530711806246 is the limiting value of this density across all primorial rings.'},
-  thm82: {mmax:100,view:'concentric',color:'prime_ring',lifts:true,broken:true,chain:0,invert:false,
+  thm82: {mmax:100,view:'concentric',color:'prime_ring',lifts:true,broken:true,chain:0,invert:false,_anim:'lift_scan',
           _label:'§8.2 Jump Theorem — D(x) jumps 1/p(p−1) at each prime p',
           _analysis:'<strong>§8.2 Jump Theorem</strong> — Prime rings (violet) highlighted. D(x) = ∑_{p≤x} 1/(p(p−1)) accumulates a discrete jump at each prime. Lift lines (blue=success, red=broken) show exactly where residues survive or are blocked, corresponding to each jump increment.'},
-  thm83: {mmax:80,view:'farey',color:'angle',lifts:false,broken:false,chain:0,channel:3,invert:false,
+  thm83: {mmax:80,view:'farey',color:'angle',lifts:false,broken:false,chain:0,channel:0,invert:false,_anim:'farey_sweep',
           _label:'§8.3 Farey Sector C(n,N) ~ 3N²/π²n(n+1) — sector n=3 active',
           _analysis:'<strong>§8.3 Farey Sector Formula</strong> — Farey half-plane view with 1/3 channel active. Points cluster in the Farey sector between 1/4 and 1/3. The count C(n,N) ~ 3N²/π²n(n+1) — the ζ(2) factor π²/6 encoding the density of the coprime lattice.'},
-  thm84: {mmax:60,view:'concentric',color:'entropy',lifts:false,broken:false,chain:1,invert:false,
+  thm84: {mmax:80,view:'concentric',color:'entropy',lifts:false,broken:false,chain:0,invert:false,_anim:'chain_sweep',
           _label:'§8.4 J = D₀ + T — chain n=1 with modular entropy coloring',
           _analysis:'<strong>§8.4 J = D₀ + T identity</strong> — J ≈ 0.773155, D₀ ≈ 0.452247, T ≈ 0.221463. Chain n=1 filter shows only residues that survive one lift. Modular entropy coloring reveals the information content per ring — high-entropy rings (bright) contribute most to the D₀ component.'},
-  thm85: {mmax:210,view:'fermat',color:'primorial',lifts:true,broken:false,chain:0,invert:false,
+  thm85: {mmax:210,view:'fermat',color:'primorial',lifts:true,broken:false,chain:0,invert:false,_anim:'spin',
           _label:'§8.5 Wessen Identity — exact Hardy-Littlewood form, primorial rings on Fermat spiral',
           _analysis:'<strong>§8.5 Wessen Identity</strong> — Primorial coloring on the Fermat spiral. Primorials 2#=2, 3#=6, 5#=30, 7#=210 appear as concentric bands. The Wessen Identity expresses the exact Hardy-Littlewood singular series in terms of the primorial sieve structure visible here.'},
-  chain1: {chain:1,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,
+  chain1: {chain:1,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,_anim:'chain_spin',
            _label:'Chain n=1: residues surviving 1 consecutive lift — C(1) ≈ 0.531',
            _analysis:'<strong>Chain n=1</strong> — Only residues r/M where r mod(M+1) is also coprime to M+1. Green = lift ✓, red = broken. The surviving fraction converges to C ≈ 0.530711806246.'},
-  chain2: {chain:2,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,
+  chain2: {chain:2,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,_anim:'chain_spin',
            _label:'Chain n=2: residues surviving 2 consecutive lifts',
            _analysis:'<strong>Chain n=2</strong> — Residues surviving two consecutive lifts. Density thins geometrically; ratio approaches C².'},
-  chain3: {chain:3,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,
+  chain3: {chain:3,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,_anim:'chain_spin',
            _label:'Chain n=3: residues surviving 3 consecutive lifts',
            _analysis:'<strong>Chain n=3</strong> — Three consecutive lifts. The surviving lattice is sparse; gap structure becomes arithmetically rigid.'},
   chain4: {chain:4,color:'angle',mmax:60,view:'concentric',lifts:true,broken:false,
@@ -1435,6 +1441,7 @@ const THM_PRESETS = {
 function applyThm(name){
   const p = THM_PRESETS[name];
   if(!p) { applyPreset(name); return; }
+  animStop();
   Object.assign(S, p);
   syncUI();
   dirty = true;
@@ -1444,21 +1451,199 @@ function applyThm(name){
   if(p._label){
     document.getElementById('arr-info').textContent = p._label;
   }
+  if(p._anim){
+    setTimeout(()=>{ animStart(p._anim); }, 150);
+  }
 }
 
-// ── URL parameter receiver ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// ANIMATION SEQUENCER — triggered by URL params from other pages
+// URL format: zmmz_explorer-1.html?preset=X&anim=Y&from=Z
+//
+// Available animations (anim=):
+//   spin          — continuous rotation, slow
+//   spin_fast     — continuous rotation, fast
+//   chain_sweep   — sweeps chain n from 0→6→0, showing survival thinning
+//   lift_scan     — scans lift lines ring by ring M=2→mmax
+//   m_grow        — grows M from 2 up to mmax, revealing rings one by one
+//   spiral_trace  — traces prime spiral across rings
+//   chain_spin    — chain sweep + spin combined
+//   m_grow_spin   — m_grow then locks into spin
+//   farey_sweep   — sweeps through 1/n channels 1→6→1
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Animation state
+const ANIM = {
+  active: null,        // current animation name
+  frame: 0,
+  timers: [],
+  intervals: [],
+};
+
+function animStop(){
+  ANIM.timers.forEach(t=>clearTimeout(t));
+  ANIM.intervals.forEach(t=>clearInterval(t));
+  ANIM.timers=[]; ANIM.intervals=[];
+  ANIM.active=null;
+  S.spin=false;
+  if(document.getElementById('chk-spin')) document.getElementById('chk-spin').checked=false;
+}
+
+function animStart(name){
+  animStop();
+  ANIM.active=name;
+
+  const t=(ms,fn)=>{ const id=setTimeout(fn,ms); ANIM.timers.push(id); };
+  const iv=(ms,fn)=>{ const id=setInterval(fn,ms); ANIM.intervals.push(id); return id; };
+
+  // Update anim indicator
+  const ind=document.getElementById('anim-indicator');
+  if(ind){ ind.textContent='▶ '+name.replace(/_/g,' '); ind.style.display='block'; }
+
+  if(name==='spin'){
+    S.spin=true; dirty=true;
+    if(document.getElementById('chk-spin')) document.getElementById('chk-spin').checked=true;
+  }
+
+  else if(name==='spin_fast'){
+    S.spin=true; dirty=true;
+    if(document.getElementById('chk-spin')) document.getElementById('chk-spin').checked=true;
+    // Override the draw loop speed temporarily
+    ANIM._fastSpin=true;
+  }
+
+  else if(name==='chain_sweep'){
+    // n: 0→1→2→3→4→5→6→5→4→3→2→1→0, 1.2s per step, repeat
+    let n=0, dir=1;
+    iv(1200,()=>{
+      S.chain=n; S.color='lift'; S.lifts=true; S.broken=true;
+      document.getElementById('sl-chain').value=n;
+      document.getElementById('lbl-chain').textContent=n||'off';
+      const C_approx=[1,0.5307,0.2817,0.1496,0.0794,0.0421,0.0224];
+      document.getElementById('analysis-text').innerHTML=
+        `<strong>Chain sweep n=${n}</strong> — surviving fraction ≈ C<sup>${n}</sup> ≈ ${C_approx[n]||'—'}. `+
+        `Only residues that survive ${n} consecutive lifts shown. `+
+        (n===0?'Full coprime lattice visible.':n===6?'Extreme sparsity — C⁶ ≈ 0.022.':'');
+      dirty=true;
+      n+=dir;
+      if(n>6||n<0){ dir*=-1; n+=dir*2; }
+    });
+  }
+
+  else if(name==='lift_scan'){
+    S.liftScanActive=true; S.lifts=true; S.liftScanM=2; dirty=true;
+    iv(120,()=>{
+      S.liftScanM=S.liftScanM<S.mmax-1?S.liftScanM+1:2;
+      const M=S.liftScanM;
+      const ph=phi(M);
+      document.getElementById('analysis-text').innerHTML=
+        `<strong>Lift scan M=${M}</strong> — φ(M)=${ph}, `+
+        `φ(M+1)=${phi(M+1)}. `+
+        `L(M)=${(ph*phi(M+1)/(M+1)).toFixed(4)} lift pairs. `+
+        (isPrime(M)?'<em>Prime ring — φ(M)=M−1, maximum density.</em>':'');
+      dirty=true;
+    });
+  }
+
+  else if(name==='m_grow'){
+    const target=S.mmax;
+    S.mmax=2; dirty=true;
+    iv(80,()=>{
+      if(S.mmax>=target){ animStop(); return; }
+      S.mmax=Math.min(target,S.mmax+(S.mmax<30?1:S.mmax<100?2:4));
+      document.getElementById('sl-mmax').value=Math.min(S.mmax,500);
+      document.getElementById('num-mmax').value=S.mmax;
+      document.getElementById('analysis-text').innerHTML=
+        `<strong>Growing M → ${S.mmax}</strong> — `+
+        `${isPrime(S.mmax)?'<em>prime ring</em>':'composite ring'}, φ(${S.mmax})=${phi(S.mmax)}`;
+      dirty=true;
+    });
+  }
+
+  else if(name==='m_grow_spin'){
+    const target=S.mmax;
+    S.mmax=2; dirty=true;
+    const growId=iv(80,()=>{
+      if(S.mmax>=target){
+        clearInterval(growId);
+        S.spin=true;
+        if(document.getElementById('chk-spin')) document.getElementById('chk-spin').checked=true;
+        document.getElementById('analysis-text').innerHTML=
+          '<strong>Full lattice — spinning</strong> — all rings M=2…'+target+' coprime residues in continuous rotation.';
+        return;
+      }
+      S.mmax=Math.min(target,S.mmax+(S.mmax<30?1:S.mmax<100?2:4));
+      document.getElementById('sl-mmax').value=Math.min(S.mmax,500);
+      document.getElementById('num-mmax').value=S.mmax;
+      dirty=true;
+    });
+    ANIM.intervals.push(growId);
+  }
+
+  else if(name==='chain_spin'){
+    S.spin=true;
+    if(document.getElementById('chk-spin')) document.getElementById('chk-spin').checked=true;
+    let n=0, dir=1;
+    iv(1800,()=>{
+      S.chain=n; S.color='lift';
+      document.getElementById('sl-chain').value=n;
+      document.getElementById('lbl-chain').textContent=n||'off';
+      dirty=true;
+      n+=dir; if(n>6||n<0){ dir*=-1; n+=dir*2; }
+    });
+  }
+
+  else if(name==='farey_sweep'){
+    S.view='farey'; let ch=1; let dir=1;
+    iv(1500,()=>{
+      S.channel=ch; S.color='angle';
+      document.getElementById('num-channel').value=ch;
+      document.getElementById('analysis-text').innerHTML=
+        `<strong>Farey sector 1/${ch}</strong> — residues r/M ∈ (1/${ch+1}, 1/${ch}]. `+
+        `Count ~ 3N²/π²·${ch}·${ch+1} by §8.3.`;
+      dirty=true;
+      ch+=dir; if(ch>6||ch<=0){ dir*=-1; ch+=dir*2; }
+    });
+  }
+
+  else if(name==='spiral_trace'){
+    S.spiral=true; S.allp=false;
+    let pidx=0;
+    iv(600,()=>{
+      pidx=(pidx+1)%Math.min(20,PRIMES.length);
+      S.prime=PRIMES[pidx];
+      S.pidx=pidx;
+      if(document.getElementById('sel-prime')) document.getElementById('sel-prime').value=pidx+1;
+      document.getElementById('analysis-text').innerHTML=
+        `<strong>Prime spiral p=${S.prime}</strong> — tracing r≡0 mod ${S.prime} across all rings.`;
+      dirty=true;
+    });
+  }
+}
+
+// ── URL parameter receiver ───────────────────────────────────────────────────
 (function(){
   const params = new URLSearchParams(window.location.search);
   const preset = params.get('preset');
+  const anim   = params.get('anim');
   const from   = params.get('from');
+
   if(preset){
-    setTimeout(()=>{ applyThm(preset); }, 200);
+    setTimeout(()=>{ applyThm(preset); }, 300);
+  }
+  if(anim){
+    setTimeout(()=>{ animStart(anim); }, preset?600:300);
   }
   if(from){
     const banner = document.getElementById('from-banner');
-    banner.textContent = '◈ Received from: ' + decodeURIComponent(from);
+    const animLabel = anim ? ` · animation: ${anim.replace(/_/g,' ')}` : '';
+    banner.textContent = '◈ ' + decodeURIComponent(from) + animLabel;
     banner.style.display = 'block';
-    setTimeout(()=>{ banner.style.opacity='0'; banner.style.transition='opacity 1s'; setTimeout(()=>{ banner.style.display='none'; }, 1100); }, 4000);
+    setTimeout(()=>{
+      banner.style.opacity='0';
+      banner.style.transition='opacity 1.2s';
+      setTimeout(()=>{ banner.style.display='none'; banner.style.opacity='1'; banner.style.transition=''; }, 1300);
+    }, 5000);
   }
 })();
 
