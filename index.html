@@ -639,6 +639,12 @@ footer {
 .depth-card.violet .depth-conjecture { background: rgba(144,112,216,.06); border-color: rgba(144,112,216,.15); }
 .depth-card.coral .depth-conjecture { background: rgba(224,80,96,.06); border-color: rgba(224,80,96,.15); }
 
+
+.send-canvas-btn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;
+  background:rgba(224,80,96,.1);border:1px solid rgba(224,80,96,.3);color:#e05060;
+  padding:3px 9px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  transition:background .2s;white-space:nowrap;margin-left:8px;vertical-align:middle;}
+.send-canvas-btn:hover{background:rgba(224,80,96,.25);}
 </style>
 </head>
 <body>
@@ -648,7 +654,7 @@ footer {
     <div class="tab active" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border-bottom:2px solid var(--gold);padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--gold);display:inline-block"></span>Opener</div>
     <a href="EN_explorer-1-2.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;opacity:.5"></span>Explorer</a>
     <a href="EN_explorer-updated.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;opacity:.5"></span>Deep Analysis</a>
-    <a href="zmmz_explorer-1.html" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#e05060;text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:#e05060;display:inline-block;opacity:.8"></span>Geometric Canvas</a>
+    <a href="zmmz_explorer-1.html?anim=spin&from=Opener+Nav" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#e05060;text-decoration:none;padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;border-bottom:2px solid transparent;transition:color .2s;"><span style="width:5px;height:5px;border-radius:50%;background:#e05060;display:inline-block;opacity:.8"></span>Geometric Canvas</a>
   </div>
   <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.06em;">C ≈ 0.530711806246</span>
 </nav>
@@ -681,7 +687,7 @@ footer {
       <a href="EN_explorer-1-2.html" class="cta cta-primary">Open Explorer →</a>
       <a href="EN_explorer-updated.html" class="cta cta-secondary">Deep Analysis →</a>
       <a href="#what" class="cta cta-ghost">Learn the Mathematics</a>
-      <a href="zmmz_explorer-1.html" class="cta" style="border:1px solid rgba(224,80,96,.4);color:#e05060;background:rgba(224,80,96,.08);">Geometric Canvas ◈</a>
+      <a href="zmmz_explorer-1.html?preset=thm81&anim=m_grow_spin&from=Opener+Hero" class="cta" style="border:1px solid rgba(224,80,96,.4);color:#e05060;background:rgba(224,80,96,.08);">Geometric Canvas ◈</a>
     </div>
   </div>
 
@@ -780,7 +786,7 @@ footer {
       <div class="data-drawer" id="mdrawer-1"><div class="drawer-scroll"><table class="data-table" id="mtbl-1"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 01</div>
-        <div class="chart-card-title">|E(N)| convergence — O(1/N)</div>
+        <div class="chart-card-title">|E(N)| convergence<a href="zmmz_explorer-1.html?preset=c_phi_density&anim=m_grow_spin&from=Opener+Chart+01" class="send-canvas-btn" target="_blank">◈</a> — O(1/N)</div>
         <div class="chart-card-desc">
           Absolute error with fitted gold envelope. E(N) = O(1/N) —
           the ratio structure of R(N) produces extra cancellation
@@ -795,7 +801,7 @@ footer {
       <div class="data-drawer" id="mdrawer-2"><div class="drawer-scroll"><table class="data-table" id="mtbl-2"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 02</div>
-        <div class="chart-card-title">E(N) · N → bounded</div>
+        <div class="chart-card-title">E(N) · N → bounded<a href="zmmz_explorer-1.html?preset=c_lift&anim=lift_scan&from=Opener+Chart+02" class="send-canvas-btn" target="_blank">◈</a></div>
         <div class="chart-card-desc">
           E(N)·N is bounded and oscillating — the actual rate is O(1/N),
           faster than the naive O(1/log N) prediction.
@@ -824,7 +830,7 @@ footer {
       <div class="data-drawer" id="mdrawer-4"><div class="drawer-scroll"><table class="data-table" id="mtbl-4"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 04</div>
-        <div class="chart-card-title">Signed E(N) · prime markers · sign-change dots</div>
+        <div class="chart-card-title">Signed E(N)<a href="zmmz_explorer-1.html?preset=c_prime_ring&anim=m_grow&from=Opener+Chart+04" class="send-canvas-btn" target="_blank">◈</a> · prime markers · sign-change dots</div>
         <div class="chart-card-desc">
           Full signed oscillation of E(N). Gold ticks mark every
           prime; coral dots mark sign changes of the error term.
@@ -838,7 +844,7 @@ footer {
       <div class="data-drawer" id="mdrawer-5"><div class="drawer-scroll"><table class="data-table" id="mtbl-5"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 05</div>
-        <div class="chart-card-title">SC(N) / π(N) — sign changes per prime</div>
+        <div class="chart-card-title">SC(N) / π(N)<a href="zmmz_explorer-1.html?preset=c_angle&anim=spiral_trace&from=Opener+Chart+05" class="send-canvas-btn" target="_blank">◈</a> — sign changes per prime</div>
         <div class="chart-card-desc">
           Ratio of cumulative sign changes to cumulative prime count.
           Grows with N under E(N) = O(1/N).
@@ -853,7 +859,7 @@ footer {
       <div class="data-drawer" id="mdrawer-6"><div class="drawer-scroll"><table class="data-table" id="mtbl-6"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 06</div>
-        <div class="chart-card-title">Sign change gap distribution</div>
+        <div class="chart-card-title">Sign change gap distribution<a href="zmmz_explorer-1.html?preset=c_gap_class&anim=spin&from=Opener+Chart+06" class="send-canvas-btn" target="_blank">◈</a></div>
         <div class="chart-card-desc">
           Histogram of gaps between consecutive sign changes of E(N).
           An exponential tail is consistent with pseudo-random
@@ -883,7 +889,7 @@ footer {
       <div class="data-drawer" id="mdrawer-8"><div class="drawer-scroll"><table class="data-table" id="mtbl-8"><thead></thead><tbody></tbody></table></div></div>
       <div class="chart-card-body">
         <div class="chart-card-num">Chart 08</div>
-        <div class="chart-card-title">χ₄-restricted E(N) · gcd(M,4) = 1</div>
+        <div class="chart-card-title">χ₄<a href="zmmz_explorer-1.html?preset=c_mod6&anim=farey_sweep&from=Opener+Chart+08" class="send-canvas-btn" target="_blank">◈</a>-restricted E(N) · gcd(M,4) = 1</div>
         <div class="chart-card-desc">
           E(N) restricted to M ≡ 1 or 3 (mod 4), scaled by conductor
           ×4. Connects to the Farey–χ₄ discrepancy and zeros of
