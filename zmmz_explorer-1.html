@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>(ℤ/Mℤ)* Explorer — Lift Survival Framework</title>
+<title>Geometric Canvas — (ℤ/Mℤ)* Explorer · Wessen Getachew</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
 :root {
   --bg: #0a0a0f;
   --panel: #0f0f1a;
@@ -23,7 +24,7 @@
 html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-size: 11px; }
 
 /* ── Layout ── */
-#app { display: grid; grid-template-rows: var(--ctrl-h) 1fr var(--bottom-h); grid-template-columns: var(--left-w) 1fr var(--right-w); height: 100vh; }
+#app { display: grid; grid-template-rows: var(--ctrl-h) 1fr var(--bottom-h); grid-template-columns: var(--left-w) 1fr var(--right-w); height: calc(100vh - 44px); }
 #ctrl { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; gap: 6px; padding: 0 8px; background: var(--panel); border-bottom: 1px solid var(--border); overflow-x: auto; overflow-y: hidden; white-space: nowrap; flex-wrap: nowrap; }
 #left { grid-column: 1; grid-row: 2; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border); padding: 6px; }
 #canvas-wrap { grid-column: 2; grid-row: 2; position: relative; overflow: hidden; }
@@ -87,9 +88,83 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 
 /* ── Tooltip ── */
 #tooltip { position: fixed; background: #0f0f2a; border: 1px solid var(--accent); padding: 5px 8px; font-size: 10px; pointer-events: none; display: none; z-index: 1000; color: var(--text); line-height: 1.7; max-width: 200px; }
+
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(4,4,10,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 24px;height:44px;flex-shrink:0;}
+.tabs{display:flex;flex:1;}
+.tab{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  text-decoration:none;padding:0 16px;height:44px;display:flex;align-items:center;gap:6px;
+  color:rgba(255,255,255,.28);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
+.tab:hover{color:rgba(255,255,255,.6);}
+.tab.active{color:#e05060;border-bottom-color:#e05060;}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;flex-shrink:0;}
+.tab.active .tab-dot{opacity:1;}
+.tab-opener.active,.tab-opener:hover{color:#c8a84a!important;border-bottom-color:#c8a84a!important;}
+.tab-explorer.active,.tab-explorer:hover{color:#3dc8b8!important;border-bottom-color:#3dc8b8!important;}
+.tab-deep.active,.tab-deep:hover{color:#9070d8!important;border-bottom-color:#9070d8!important;}
+.tab-canvas{color:#e05060!important;}
+.tab-canvas.active{border-bottom-color:#e05060!important;}
+.nav-right{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.06em;white-space:nowrap;}
+
+/* Received-from banner */
+#from-banner{position:fixed;top:44px;left:50%;transform:translateX(-50%);
+  background:#0d0d1a;border:1px solid rgba(224,80,96,.4);border-top:none;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;
+  color:#e05060;padding:5px 18px;z-index:300;display:none;
+  animation:slidein .4s ease;}
+@keyframes slidein{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Theorem preset strip */
+#thm-strip{position:fixed;bottom:calc(var(--bottom-h) + 4px);left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;z-index:150;flex-wrap:wrap;justify-content:center;
+  background:rgba(4,4,10,.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.07);
+  padding:5px 10px;border-radius:3px;}
+.thm-btn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(200,168,74,.08);border:1px solid rgba(200,168,74,.2);color:rgba(200,168,74,.8);
+  padding:3px 8px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.thm-btn:hover{background:rgba(200,168,74,.2);border-color:rgba(200,168,74,.6);color:#e8d080;}
+.thm-btn.coral{background:rgba(224,80,96,.08);border-color:rgba(224,80,96,.2);color:rgba(224,80,96,.8);}
+.thm-btn.coral:hover{background:rgba(224,80,96,.2);border-color:#e05060;color:#f08090;}
+.thm-btn.teal{background:rgba(61,200,184,.08);border-color:rgba(61,200,184,.2);color:rgba(61,200,184,.8);}
+.thm-btn.teal:hover{background:rgba(61,200,184,.2);border-color:#3dc8b8;color:#5de0d0;}
+.thm-btn.violet{background:rgba(144,112,216,.08);border-color:rgba(144,112,216,.2);color:rgba(144,112,216,.8);}
+.thm-btn.violet:hover{background:rgba(144,112,216,.2);border-color:#9070d8;color:#b090f0;}
+@media(max-width:700px){#thm-strip{display:none;}}
 </style>
 </head>
 <body>
+
+<nav id="tab-nav">
+  <div class="tabs">
+    <a href="index.html" class="tab tab-opener"><span class="tab-dot"></span>Opener</a>
+    <a href="EN_explorer-1-2.html" class="tab tab-explorer"><span class="tab-dot"></span>Explorer</a>
+    <a href="EN_explorer-updated.html" class="tab tab-deep"><span class="tab-dot"></span>Deep Analysis</a>
+    <div class="tab tab-canvas active"><span class="tab-dot"></span>Geometric Canvas</div>
+  </div>
+  <span class="nav-right">(ℤ/Mℤ)*</span>
+</nav>
+<div id="from-banner"></div>
+
+<!-- Theorem preset strip -->
+<div id="thm-strip">
+  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding-right:6px;letter-spacing:.1em;">§8</span>
+  <button class="thm-btn" onclick="applyThm('thm81')" title="§8.1 Lift Survival — C = ∏(1−1/p(p−1))">§8.1 Survival</button>
+  <button class="thm-btn coral" onclick="applyThm('thm82')" title="§8.2 Jump Theorem — D(x) jumps 1/p(p−1) at each prime">§8.2 Jump</button>
+  <button class="thm-btn teal" onclick="applyThm('thm83')" title="§8.3 Farey Sector — C(n,N)~3N²/π²n(n+1)">§8.3 Farey</button>
+  <button class="thm-btn violet" onclick="applyThm('thm84')" title="§8.4 J = D₀ + T identity">§8.4 J=D₀+T</button>
+  <button class="thm-btn" onclick="applyThm('thm85')" title="§8.5 Wessen Identity — Hardy-Littlewood exact form">§8.5 Wessen</button>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding:0 6px;letter-spacing:.1em;">chain</span>
+  <button class="thm-btn teal" onclick="applyThm('chain1')">n=1</button>
+  <button class="thm-btn teal" onclick="applyThm('chain2')">n=2</button>
+  <button class="thm-btn teal" onclick="applyThm('chain3')">n=3</button>
+  <button class="thm-btn coral" onclick="applyThm('chain4')">n=4</button>
+  <button class="thm-btn coral" onclick="applyThm('chain5')">n=5</button>
+  <button class="thm-btn coral" onclick="applyThm('chain6')">n=6</button>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding:0 6px;letter-spacing:.1em;">view</span>
+  <button class="thm-btn violet" onclick="applyThm('inv_primorial')">Primorial</button>
+  <button class="thm-btn violet" onclick="applyThm('rot_ch2_fermat')">½ch Fermat</button>
+  <button class="thm-btn" onclick="applyThm('reset')">↺ Reset</button>
+</div>
 <div id="app">
 
 <!-- ══════════════ TOP CONTROL BAR ══════════════ -->
@@ -1314,6 +1389,79 @@ document.getElementById('analysis-text').innerHTML=
   `Text labels, overlays, and UI are DOM/Canvas2D. `+
   `At M max = 2000, expect ~250K+ points; performance degrades above M≈800 on integrated GPUs. `+
   `<em>Tip: reduce M max if framerate drops.</em>`;
+
+// ── Theorem presets (§8) ────────────────────────────────────────────────────
+const THM_PRESETS = {
+  thm81: {mmax:120,view:'concentric',color:'phi_density',lifts:true,broken:false,chain:0,invert:false,
+          _label:'§8.1 Lift Survival C=∏(1−1/p(p−1)) — φ/M density reveals convergence ring-by-ring',
+          _analysis:'<strong>§8.1 Lift Survival</strong> — φ/M density (warm=dense, cool=sparse). Each ring M is shaded by φ(M)/M, the fraction of coprime residues. The product C = ∏(1−1/p(p−1)) ≈ 0.530711806246 is the limiting value of this density across all primorial rings.'},
+  thm82: {mmax:100,view:'concentric',color:'prime_ring',lifts:true,broken:true,chain:0,invert:false,
+          _label:'§8.2 Jump Theorem — D(x) jumps 1/p(p−1) at each prime p',
+          _analysis:'<strong>§8.2 Jump Theorem</strong> — Prime rings (violet) highlighted. D(x) = ∑_{p≤x} 1/(p(p−1)) accumulates a discrete jump at each prime. Lift lines (blue=success, red=broken) show exactly where residues survive or are blocked, corresponding to each jump increment.'},
+  thm83: {mmax:80,view:'farey',color:'angle',lifts:false,broken:false,chain:0,channel:3,invert:false,
+          _label:'§8.3 Farey Sector C(n,N) ~ 3N²/π²n(n+1) — sector n=3 active',
+          _analysis:'<strong>§8.3 Farey Sector Formula</strong> — Farey half-plane view with 1/3 channel active. Points cluster in the Farey sector between 1/4 and 1/3. The count C(n,N) ~ 3N²/π²n(n+1) — the ζ(2) factor π²/6 encoding the density of the coprime lattice.'},
+  thm84: {mmax:60,view:'concentric',color:'entropy',lifts:false,broken:false,chain:1,invert:false,
+          _label:'§8.4 J = D₀ + T — chain n=1 with modular entropy coloring',
+          _analysis:'<strong>§8.4 J = D₀ + T identity</strong> — J ≈ 0.773155, D₀ ≈ 0.452247, T ≈ 0.221463. Chain n=1 filter shows only residues that survive one lift. Modular entropy coloring reveals the information content per ring — high-entropy rings (bright) contribute most to the D₀ component.'},
+  thm85: {mmax:210,view:'fermat',color:'primorial',lifts:true,broken:false,chain:0,invert:false,
+          _label:'§8.5 Wessen Identity — exact Hardy-Littlewood form, primorial rings on Fermat spiral',
+          _analysis:'<strong>§8.5 Wessen Identity</strong> — Primorial coloring on the Fermat spiral. Primorials 2#=2, 3#=6, 5#=30, 7#=210 appear as concentric bands. The Wessen Identity expresses the exact Hardy-Littlewood singular series in terms of the primorial sieve structure visible here.'},
+  chain1: {chain:1,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,
+           _label:'Chain n=1: residues surviving 1 consecutive lift — C(1) ≈ 0.531',
+           _analysis:'<strong>Chain n=1</strong> — Only residues r/M where r mod(M+1) is also coprime to M+1. Green = lift ✓, red = broken. The surviving fraction converges to C ≈ 0.530711806246.'},
+  chain2: {chain:2,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,
+           _label:'Chain n=2: residues surviving 2 consecutive lifts',
+           _analysis:'<strong>Chain n=2</strong> — Residues surviving two consecutive lifts. Density thins geometrically; ratio approaches C².'},
+  chain3: {chain:3,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,
+           _label:'Chain n=3: residues surviving 3 consecutive lifts',
+           _analysis:'<strong>Chain n=3</strong> — Three consecutive lifts. The surviving lattice is sparse; gap structure becomes arithmetically rigid.'},
+  chain4: {chain:4,color:'angle',mmax:60,view:'concentric',lifts:true,broken:false,
+           _label:'Chain n=4',_analysis:'<strong>Chain n=4</strong> — Four-lift survival. Angle coloring shows angular clustering around stable residue classes.'},
+  chain5: {chain:5,color:'angle',mmax:60,view:'concentric',lifts:false,broken:false,
+           _label:'Chain n=5',_analysis:'<strong>Chain n=5</strong> — Five-lift survival.'},
+  chain6: {chain:6,color:'phi_density',mmax:50,view:'concentric',lifts:false,broken:false,
+           _label:'Chain n=6',_analysis:'<strong>Chain n=6</strong> — Six-lift survival. Very few residues remain; density approaches C⁶.'},
+  // color preset shorthands from Explorer send-to buttons
+  c_phi_density: {color:'phi_density',view:'concentric',mmax:120,lifts:false,_label:'φ/M density view',_analysis:'<strong>φ/M Density</strong> — warm rings have high coprime fraction, cool rings are sparser.'},
+  c_lift:        {color:'lift',view:'concentric',mmax:100,lifts:true,broken:true,_label:'Lift ✓/✗ view',_analysis:'<strong>Lift survival</strong> — green residues lift to the next ring, red are blocked.'},
+  c_entropy:     {color:'entropy',view:'concentric',mmax:80,_label:'Modular entropy',_analysis:'<strong>Modular entropy</strong> — ΔS = −log(φ(M)/M), measures information per ring.'},
+  c_prime_ring:  {color:'prime_ring',view:'concentric',mmax:100,lifts:true,_label:'Prime ring highlight',_analysis:'<strong>Prime rings</strong> highlighted in violet — at prime M, φ(M)=M−1, maximum coprime density.'},
+  c_angle:       {color:'angle',view:'concentric',mmax:80,_label:'Angle coloring',_analysis:'<strong>Angle coloring</strong> — hue encodes angular position r/M around each ring.'},
+  c_gap_class:   {color:'gap_class',view:'concentric',mmax:80,chords:true,gapStr:'2,4,6',_label:'Gap class coloring',_analysis:'<strong>Gap class coloring</strong> — hue encodes r mod 12. Gap chords (gap 2,4,6) shown.'},
+  c_mod6:        {color:'mod6',view:'concentric',mmax:100,_label:'Residue mod 6',_analysis:'<strong>Residue mod 6</strong> — only classes 1 and 5 mod 6 can be coprime to 6#=30, structuring all larger primorial rings.'},
+};
+
+function applyThm(name){
+  const p = THM_PRESETS[name];
+  if(!p) { applyPreset(name); return; }
+  Object.assign(S, p);
+  syncUI();
+  dirty = true;
+  if(p._analysis){
+    document.getElementById('analysis-text').innerHTML = p._analysis;
+  }
+  if(p._label){
+    document.getElementById('arr-info').textContent = p._label;
+  }
+}
+
+// ── URL parameter receiver ──────────────────────────────────────────────────
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const preset = params.get('preset');
+  const from   = params.get('from');
+  if(preset){
+    setTimeout(()=>{ applyThm(preset); }, 200);
+  }
+  if(from){
+    const banner = document.getElementById('from-banner');
+    banner.textContent = '◈ Received from: ' + decodeURIComponent(from);
+    banner.style.display = 'block';
+    setTimeout(()=>{ banner.style.opacity='0'; banner.style.transition='opacity 1s'; setTimeout(()=>{ banner.style.display='none'; }, 1100); }, 4000);
+  }
+})();
+
 </script>
 </body>
 </html>
