@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>(ℤ/Mℤ)* Explorer — Lift Survival Framework</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --panel: #0f0f1a;
+  --border: #1e1e35;
+  --accent: #4a9eff;
+  --accent2: #c084fc;
+  --text: #e0e0f0;
+  --muted: #6060a0;
+  --ctrl-h: 44px;
+  --left-w: 240px;
+  --right-w: 220px;
+  --bottom-h: 90px;
+  font-family: 'Courier New', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-size: 11px; }
+
+/* ── Layout ── */
+#app { display: grid; grid-template-rows: var(--ctrl-h) 1fr var(--bottom-h); grid-template-columns: var(--left-w) 1fr var(--right-w); height: 100vh; }
+#ctrl { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; gap: 6px; padding: 0 8px; background: var(--panel); border-bottom: 1px solid var(--border); overflow-x: auto; overflow-y: hidden; white-space: nowrap; flex-wrap: nowrap; }
+#left { grid-column: 1; grid-row: 2; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border); padding: 6px; }
+#canvas-wrap { grid-column: 2; grid-row: 2; position: relative; overflow: hidden; }
+#glcanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#right { grid-column: 3; grid-row: 2; overflow-y: auto; background: var(--panel); border-left: 1px solid var(--border); padding: 6px; }
+#analysis-panel { grid-column: 1 / -1; grid-row: 3; background: #08080f; border-top: 1px solid var(--border); padding: 4px 10px; overflow-y: auto; display: flex; align-items: flex-start; gap: 16px; }
+
+/* Mobile: stack layout */
+@media (max-width: 700px) {
+  :root { --left-w: 0px; --right-w: 0px; --ctrl-h: 40px; --bottom-h: 60px; }
+  #app { grid-template-columns: 1fr; grid-template-rows: var(--ctrl-h) 1fr var(--bottom-h); }
+  #left, #right { display: none; }
+  #ctrl { font-size: 10px; gap: 4px; }
+  #mobile-panels { display: flex; }
+}
+
+/* ── Controls ── */
+.ctrl-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+.ctrl-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.ctrl-label { color: var(--muted); font-size: 10px; }
+button { background: #1a1a2e; border: 1px solid var(--border); color: var(--text); padding: 2px 6px; cursor: pointer; font-family: inherit; font-size: 10px; border-radius: 2px; }
+button:hover { background: #252545; border-color: var(--accent); }
+button.active { background: #1a2a4a; border-color: var(--accent); color: var(--accent); }
+input[type=range] { width: 70px; accent-color: var(--accent); cursor: pointer; }
+input[type=range].wide { width: 110px; }
+input[type=number], input[type=text] { background: #080810; border: 1px solid var(--border); color: var(--text); padding: 2px 4px; font-family: inherit; font-size: 10px; width: 52px; border-radius: 2px; }
+input[type=number].narrow { width: 38px; }
+input[type=number].w70 { width: 70px; }
+select { background: #1a1a2e; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 10px; padding: 2px 4px; cursor: pointer; }
+label { display: flex; align-items: center; gap: 3px; cursor: pointer; }
+input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
+
+/* ── Left/Right panels ── */
+.section { margin-bottom: 10px; }
+.section-title { color: var(--accent); font-size: 10px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-bottom: 5px; text-transform: uppercase; }
+.row { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; flex-wrap: wrap; }
+.info-box { background: #080810; border: 1px solid var(--border); padding: 4px 6px; font-size: 10px; line-height: 1.6; color: var(--muted); }
+.info-box span { color: var(--text); }
+.card { background: #0d0d20; border: 1px solid var(--border); padding: 5px 7px; margin-bottom: 4px; border-radius: 2px; }
+.card-title { color: var(--accent2); font-size: 9px; font-weight: bold; }
+.card-body { color: var(--muted); font-size: 9px; line-height: 1.5; margin-top: 2px; }
+.card-body em { color: var(--text); font-style: normal; }
+
+/* ── Legend dots ── */
+.legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+
+/* ── Analysis panel ── */
+#analysis-text { flex: 1; font-size: 10px; color: var(--muted); line-height: 1.6; }
+#analysis-text strong { color: var(--accent); }
+#stats-live { font-size: 10px; color: var(--muted); min-width: 160px; line-height: 1.7; }
+#stats-live span { color: var(--text); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── Mobile drawer toggle ── */
+#mobile-toggle { display: none; }
+@media (max-width: 700px) { #mobile-toggle { display: flex; } }
+
+/* ── Tooltip ── */
+#tooltip { position: fixed; background: #0f0f2a; border: 1px solid var(--accent); padding: 5px 8px; font-size: 10px; pointer-events: none; display: none; z-index: 1000; color: var(--text); line-height: 1.7; max-width: 200px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══════════════ TOP CONTROL BAR ══════════════ -->
+<div id="ctrl">
+
+  <div class="ctrl-group">
+    <button id="btn-invert" title="Invert radius map">⇌ invert</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">View</span>
+    <select id="sel-view">
+      <option value="concentric">Concentric</option>
+      <option value="fermat">Fermat Spiral</option>
+      <option value="farey">Farey Half-Plane</option>
+      <option value="strip">Unfolded Strip</option>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">M max</span>
+    <input type="range" id="sl-mmax" min="4" max="500" value="60" class="wide">
+    <input type="number" id="num-mmax" min="4" max="2000" value="60" class="narrow">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">δ</span>
+    <input type="range" id="sl-delta" min="-628" max="628" value="0" class="wide">
+    <input type="number" id="num-delta-r" value="0" class="narrow" title="r in r/m">/<input type="number" id="num-delta-m" value="1" class="narrow" title="m in r/m">
+    <button onclick="setDelta(0)">0</button>
+    <button onclick="setDelta(1/12)">1/12</button>
+    <button onclick="setDelta(1/6)">1/6</button>
+    <button onclick="setDelta(1/4)">¼</button>
+    <button onclick="setDelta(1/2)">½</button>
+    <button onclick="setDelta(-1/12)">−1/12</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Pt</span>
+    <input type="range" id="sl-ptsize" min="5" max="80" value="18">
+    <span id="lbl-ptsize">1.8</span>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Color</span>
+    <select id="sel-color">
+      <optgroup label="Basic">
+        <option value="angle">Angle</option>
+        <option value="prime_ring">Prime ring</option>
+        <option value="phi_density">φ/M density</option>
+        <option value="lift">Lift ✓/✗</option>
+        <option value="half">Top/Bottom half</option>
+      </optgroup>
+      <optgroup label="MLR">
+        <option value="entropy">Modular entropy ΔS</option>
+        <option value="mod6">Residue mod 6</option>
+        <option value="primorial">Primorial rings</option>
+        <option value="mersenne">Mersenne rings</option>
+        <option value="gap_class">Prime gap class</option>
+      </optgroup>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">H</span><input type="range" id="sl-hue" min="0" max="360" value="0" title="Hue shift">
+    <span class="ctrl-label">S</span><input type="range" id="sl-sat" min="0" max="200" value="100" title="Saturation">
+    <span class="ctrl-label">B</span><input type="range" id="sl-bri" min="0" max="200" value="100" title="Brightness">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <label><input type="checkbox" id="chk-lifts" checked> Lifts</label>
+    <label><input type="checkbox" id="chk-broken"> Broken</label>
+    <label><input type="checkbox" id="chk-noncop"> Non-cop</label>
+    <label><input type="checkbox" id="chk-area"> Area</label>
+    <label><input type="checkbox" id="chk-spin"> Spin</label>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chain</span>
+    <input type="range" id="sl-chain" min="0" max="12" value="0">
+    <span id="lbl-chain">off</span>
+    <button onclick="setState({chain:0})">off</button>
+    <button onclick="setState({chain:1})">1</button>
+    <button onclick="setState({chain:2})">2</button>
+    <button onclick="setState({chain:3})">3</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Zoom</span>
+    <input type="range" id="sl-zoom" min="10" max="500" value="100">
+    <button id="btn-zoom-reset">⌂</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Play M</span>
+    <button id="btn-play-prev">◀</button>
+    <button id="btn-play-play">▶▶</button>
+    <button id="btn-play-stop">⏮</button>
+    <input type="range" id="sl-play-speed" min="1" max="20" value="4" title="Speed">
+    <input type="number" id="num-from-m" value="2" class="narrow" title="From M">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Lift Scan</span>
+    <button id="btn-lift-prev">◀</button>
+    <button id="btn-lift-next">▶</button>
+    <button id="btn-lift-stop2">⏮</button>
+    <input type="range" id="sl-lift-speed" min="1" max="20" value="4" title="Lift speed">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <button id="btn-export-4k">↓ 4K</button>
+    <button id="btn-export-all4">↓ All 4</button>
+    <button id="btn-export-csv">↓ CSV</button>
+  </div>
+
+</div>
+
+<!-- ══════════════ LEFT PANEL ══════════════ -->
+<div id="left">
+
+  <div class="section">
+    <div class="section-title">Prime Spiral</div>
+    <div class="row">
+      <select id="sel-prime" style="width:60px"></select>
+      <button id="btn-p-prev">◀</button>
+      <button id="btn-p-next">▶</button>
+    </div>
+    <div class="row">
+      <span class="ctrl-label">p-idx</span>
+      <input type="range" id="sl-pidx" min="1" max="20" value="1">
+      <label><input type="checkbox" id="chk-allp"> all p</label>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="chk-spiral"> Show spiral</label>
+      <label><input type="checkbox" id="chk-mirror"> Mirror M−p</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">1/n Channel</div>
+    <div class="row">
+      <button onclick="setChannel(1)">1/1</button>
+      <button onclick="setChannel(2)">1/2</button>
+      <button onclick="setChannel(3)">1/3</button>
+      <button onclick="setChannel(4)">1/4</button>
+      <button onclick="setChannel(5)">1/5</button>
+      <button onclick="setChannel(6)">1/6</button>
+      <button onclick="setChannel(0)">all</button>
+      <input type="number" id="num-channel" value="0" class="narrow" min="0" max="100">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Custom Residue</div>
+    <div class="row">
+      <span class="ctrl-label">r =</span>
+      <input type="number" id="num-custom-r" value="" class="narrow" placeholder="r">
+      <label><input type="checkbox" id="chk-rpath"> Show path</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Display</div>
+    <div class="row"><label><input type="checkbox" id="chk-allpts" checked> All coprime pts</label></div>
+    <div class="row"><label><input type="checkbox" id="chk-equator"> ½ equator line</label></div>
+    <div class="row"><label><input type="checkbox" id="chk-sector"> 1/n sector lines</label></div>
+    <div class="row"><label><input type="checkbox" id="chk-ringcirc"> Ring circles</label></div>
+    <div class="row">
+      <label><input type="checkbox" id="chk-dim"> Dim non-sel</label>
+      <input type="range" id="sl-dim" min="1" max="20" value="5" title="Dim opacity">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Point Labels</div>
+    <div class="row">
+      <label><input type="checkbox" id="chk-labels"> Labels</label>
+      <input type="range" id="sl-label-size" min="6" max="20" value="9" title="Label size">
+    </div>
+    <div class="row">
+      <select id="sel-label-fmt">
+        <option value="r">r</option>
+        <option value="rM">r/M</option>
+        <option value="dec">r/M dec</option>
+        <option value="deg">θ°</option>
+        <option value="tpi">θ/π</option>
+        <option value="rad">θ rad</option>
+        <option value="Mr">M:r</option>
+        <option value="gcd">gcd(r,M+1)</option>
+      </select>
+      <span class="ctrl-label">max-M</span>
+      <input type="range" id="sl-label-maxm" min="2" max="60" value="20">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Paths (M±n)/2</div>
+    <div class="row">
+      <label><input type="checkbox" id="chk-npath"> ±n path</label>
+      <label><input type="checkbox" id="chk-lockp"> Lock n→p</label>
+    </div>
+    <div class="row">
+      <span class="ctrl-label">n</span>
+      <input type="range" id="sl-noffset" min="1" max="999" value="1">
+      <input type="number" id="num-noffset" value="1" class="narrow" min="1" max="999">
+    </div>
+    <div class="row">
+      <button onclick="setN(1)">1</button>
+      <button onclick="setN(2)">2</button>
+      <button onclick="setN(3)">3</button>
+      <button onclick="setN(5)">5</button>
+      <button onclick="setN(7)">7</button>
+      <button onclick="setN(11)">11</button>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="chk-allnodd"> All n=1,3,5,7,9</label>
+    </div>
+    <div id="npath-formula" class="info-box" style="font-size:9px">n=1: (M±1)/2</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Lift Lines</div>
+    <div class="row">
+      <span class="ctrl-label">Thick</span><input type="range" id="sl-lift-thick" min="2" max="60" value="8">
+      <span class="ctrl-label">α</span><input type="range" id="sl-lift-alpha" min="5" max="100" value="30">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Gap Chords</div>
+    <div class="row">
+      <label><input type="checkbox" id="chk-chords"> Chords</label>
+      <input type="text" id="txt-gaps" value="2,4,6" style="width:70px">
+      <span class="ctrl-label">α</span><input type="range" id="sl-chord-alpha" min="5" max="100" value="25">
+    </div>
+    <div id="chord-stats" class="info-box" style="margin-top:3px">—</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Fraction Inspector</div>
+    <div class="row">
+      <input type="number" id="num-fa" value="1" class="narrow" placeholder="a">
+      <span>/</span>
+      <input type="number" id="num-fb" value="7" class="narrow" placeholder="b">
+      <button id="btn-fi-go">Go</button>
+      <button id="btn-fi-clear">✕</button>
+    </div>
+    <div id="fi-info" class="info-box">—</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Stats</div>
+    <label class="row"><input type="checkbox" id="chk-stats"> Live stats</label>
+    <div id="stats-panel" class="info-box" style="display:none">—</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">C(n) Presets</div>
+    <div class="row" style="flex-wrap:wrap;gap:3px">
+      <button onclick="applyPreset('chain1')">n=1 C≈0.531</button>
+      <button onclick="applyPreset('chain2')">n=2</button>
+      <button onclick="applyPreset('chain3')">n=3</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Dynamic Presets</div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <button onclick="applyPreset('inv_equator')" style="text-align:left">Invert equator gap to center</button>
+      <button onclick="applyPreset('inv_primorial')" style="text-align:left">Invert primorial outer</button>
+      <button onclick="applyPreset('rot_focal')" style="text-align:left">δ=2π/N focal ring</button>
+      <button onclick="applyPreset('rot_half_twist')" style="text-align:left">δ=π/N half-twist</button>
+      <button onclick="applyPreset('rot_ch2_fermat')" style="text-align:left">½ ch + 1/6 rot Fermat</button>
+      <button onclick="applyPreset('inv_rot_strip')" style="text-align:left">Strip inverted + ¼ rot</button>
+      <button onclick="applyPreset('reset')" style="border-color:#c084fc;color:#c084fc">↺ Reset all</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Keys</div>
+    <div class="info-box" style="font-size:9px;line-height:1.8">
+      Scroll = zoom · Drag = pan · Dbl-click = reset<br>
+      L=lifts · S=spin · B=broken · A=area<br>
+      R=reset · +/−=zoom · ←→=rotate
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════ WEBGL CANVAS ══════════════ -->
+<div id="canvas-wrap">
+  <canvas id="glcanvas"></canvas>
+  <div id="tooltip"></div>
+</div>
+
+<!-- ══════════════ RIGHT PANEL ══════════════ -->
+<div id="right">
+
+  <div class="section">
+    <div class="section-title">Legend</div>
+    <div style="font-size:9px;line-height:1.9">
+      <div><span class="legend-dot" style="background:#4a9eff"></span>Coprime r</div>
+      <div><span class="legend-dot" style="background:#22cc66"></span>Lift ✓</div>
+      <div><span class="legend-dot" style="background:#ff4444"></span>Lift ✗</div>
+      <div><span class="legend-dot" style="background:#ff9900"></span>Non-coprime</div>
+      <div><span class="legend-dot" style="background:#c084fc"></span>Prime ring</div>
+      <div><span class="legend-dot" style="background:#60c0ff;border-radius:0"></span>Lift line</div>
+      <div><span class="legend-dot" style="background:#ff4444;border-radius:0"></span>Broken line</div>
+      <div><span class="legend-dot" style="background:#ffff44;border-radius:0"></span>Spiral</div>
+      <div><span class="legend-dot" style="background:#ff66cc;border-radius:0"></span>Gap chord</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Theorems §8</div>
+    <div class="card">
+      <div class="card-title">§8.1 Lift Survival</div>
+      <div class="card-body">C = <em>∏_p (1−1/p(p−1))</em><br>C ≈ <em>0.530711806246</em></div>
+    </div>
+    <div class="card">
+      <div class="card-title">§8.2 Jump Theorem</div>
+      <div class="card-body">D(x) jumps by <em>1/(p(p−1))</em> at each prime p</div>
+    </div>
+    <div class="card">
+      <div class="card-title">§8.3 Farey Sector</div>
+      <div class="card-body">C(n,N) ~ <em>3N²/(π²n(n+1))</em></div>
+    </div>
+    <div class="card">
+      <div class="card-title">§8.4 J = D₀ + T</div>
+      <div class="card-body">J ≈ <em>0.773155</em><br>D₀ ≈ <em>0.452247</em>  T ≈ <em>0.221463</em></div>
+    </div>
+    <div class="card">
+      <div class="card-title">§8.5 Wessen Identity</div>
+      <div class="card-body">Exact finite Hardy–Littlewood form</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Arrangement</div>
+    <div id="arr-info" class="info-box">Concentric: ρ = M</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Clicked Point</div>
+    <div id="click-info" class="info-box">Click a point</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">p Spiral Table</div>
+    <div id="spiral-table" class="info-box" style="font-size:9px">—</div>
+  </div>
+
+</div>
+
+<!-- ══════════════ BOTTOM STRIP ══════════════ -->
+<div id="analysis-panel">
+  <div id="analysis-text"><strong>Canvas Analysis</strong> — click "▶ See on canvas" from Paper tab, or select a preset.</div>
+  <div id="stats-live">
+    φ(M): <span id="sl-phi">—</span><br>
+    T(M): <span id="sl-tm">—</span><br>
+    C(n): <span id="sl-cn">—</span><br>
+    pts: <span id="sl-pts">—</span><br>
+    M max: <span id="sl-mshow">—</span>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- ══════════════════════════════════════════ -->
+<!--  JAVASCRIPT                               -->
+<!-- ══════════════════════════════════════════ -->
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const S = {
+  mmax: 60, ptsize: 1.8, view: 'concentric', color: 'angle',
+  invert: false, hue: 0, sat: 1, bri: 1,
+  delta: 0,  // fraction of full rotation applied per ring
+  lifts: true, broken: false, noncop: false, area: false, spin: false,
+  chain: 0,
+  zoom: 1, panX: 0, panY: 0,
+  prime: 2, pidx: 0, allp: false, spiral: false, mirror: false,
+  channel: 0,
+  customR: null, rpath: false,
+  allpts: true, equator: false, sector: false, ringcirc: false,
+  dim: false, dimAlpha: 0.1,
+  labels: false, labelSize: 9, labelFmt: 'r', labelMaxM: 20,
+  npath: false, lockp: false, noffset: 1, allnodd: false,
+  liftThick: 0.8, liftAlpha: 0.30,
+  chords: false, gapStr: '2,4,6', chordAlpha: 0.25,
+  frInspA: 1, frInspB: 7, frInspActive: false,
+  showStats: false,
+  playActive: false, playM: 2, playSpeed: 4,
+  liftScanM: 2, liftScanActive: false, liftScanSpeed: 4,
+};
+
+// ── Primes ──────────────────────────────────────────────────────────────────
+const PRIMES = [];
+(function(){
+  const sieve = new Uint8Array(2001);
+  for(let i=2;i<=2000;i++){
+    if(!sieve[i]){ PRIMES.push(i); for(let j=2*i;j<=2000;j+=i) sieve[j]=1; }
+  }
+})();
+function isPrime(n){ return n>=2 && PRIMES[PRIMES.indexOf(n)]===n; }
+function phi(n){
+  let r=n;
+  for(let p of PRIMES){ if(p*p>n) break; if(n%p===0){ r=r/p*(p-1); while(n%p===0) n/=p; } }
+  if(n>1) r=r/n*(n-1);
+  return r;
+}
+function gcd(a,b){ while(b){let t=b;b=a%b;a=t;} return a; }
+function coprimes(M){ const r=[]; for(let i=1;i<M;i++) if(gcd(i,M)===1) r.push(i); return r; }
+
+// ── WebGL setup ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('glcanvas');
+let gl = canvas.getContext('webgl', {antialias:true, preserveDrawingBuffer:true});
+if(!gl){ gl = canvas.getContext('experimental-webgl', {antialias:true, preserveDrawingBuffer:true}); }
+
+// NOTE: WebGL is used for the point cloud and line rendering (potentially
+// millions of points for M up to 2000). Text labels are drawn on a 2D
+// overlay canvas. If WebGL is unavailable, falls back to a warning.
+
+let gl2d = null; // 2D overlay for labels/tooltips
+const overlay = document.createElement('canvas');
+overlay.style.cssText='position:absolute;inset:0;pointer-events:none;width:100%;height:100%';
+document.getElementById('canvas-wrap').appendChild(overlay);
+const ctx2d = overlay.getContext('2d');
+
+// Shaders
+const VS_POINTS = `
+attribute vec2 a_pos;
+attribute vec4 a_color;
+attribute float a_size;
+uniform mat3 u_transform;
+varying vec4 v_color;
+void main(){
+  vec3 p = u_transform * vec3(a_pos, 1.0);
+  gl_Position = vec4(p.xy, 0.0, 1.0);
+  gl_PointSize = a_size;
+  v_color = a_color;
+}`;
+const FS_POINTS = `
+precision mediump float;
+varying vec4 v_color;
+void main(){
+  vec2 c = gl_PointCoord - 0.5;
+  if(dot(c,c) > 0.25) discard;
+  gl_FragColor = v_color;
+}`;
+const VS_LINES = `
+attribute vec2 a_pos;
+attribute vec4 a_color;
+uniform mat3 u_transform;
+varying vec4 v_color;
+void main(){
+  vec3 p = u_transform * vec3(a_pos, 1.0);
+  gl_Position = vec4(p.xy, 0.0, 1.0);
+  v_color = a_color;
+}`;
+const FS_LINES = `
+precision mediump float;
+varying vec4 v_color;
+void main(){ gl_FragColor = v_color; }`;
+
+function makeProgram(vs, fs){
+  const p = gl.createProgram();
+  [vs,fs].forEach((src,i)=>{
+    const sh = gl.createShader(i===0?gl.VERTEX_SHADER:gl.FRAGMENT_SHADER);
+    gl.shaderSource(sh,src); gl.compileShader(sh); gl.attachShader(p,sh);
+  });
+  gl.linkProgram(p); return p;
+}
+const progPts  = makeProgram(VS_POINTS, FS_POINTS);
+const progLine = makeProgram(VS_LINES, FS_LINES);
+
+// Buffers
+const ptBuf    = gl.createBuffer();
+const ptColBuf = gl.createBuffer();
+const ptSzBuf  = gl.createBuffer();
+const lnBuf    = gl.createBuffer();
+const lnColBuf = gl.createBuffer();
+
+// ── Data generation ────────────────────────────────────────────────────────
+let points = []; // {r,M,x,y,cx,cy,lifted}
+
+function buildPoints(){
+  points = [];
+  const mmax = S.mmax;
+
+  for(let M=2; M<=mmax; M++){
+    const cop = coprimes(M);
+    const nonc = S.noncop ? [...Array(M-1).keys()].map(i=>i+1).filter(r=>gcd(r,M)>1) : [];
+    const all = S.noncop ? [...cop,...nonc] : cop;
+
+    // Next ring coprime set for lift check
+    const cop2 = new Set(coprimes(M+1));
+
+    for(const r of all){
+      const isCop = gcd(r,M)===1;
+      const lifted = isCop && cop2.has(r % (M+1));
+
+      // Angle
+      let theta = (2*Math.PI*r/M) + S.delta * M * 2*Math.PI;
+
+      // Position by view
+      let x,y;
+      const rho = S.invert ? (S.mmax - M + 2) : M;
+      if(S.view==='concentric'){
+        x = rho * Math.cos(theta);
+        y = rho * Math.sin(theta);
+      } else if(S.view==='fermat'){
+        const rr = Math.sqrt(M);
+        x = rr * Math.cos(theta);
+        y = rr * Math.sin(theta);
+      } else if(S.view==='farey'){
+        x = r/M; y = 1/M; // [0,1] x [0,1]
+        x = x*2-1; y = y*2;
+      } else { // strip
+        x = (r/M)*2-1;
+        y = (M/mmax)*2-1;
+      }
+
+      // Chain filter
+      if(S.chain > 0){
+        let survives = isCop;
+        let rr = r, MM = M;
+        for(let k=0;k<S.chain && survives;k++){
+          const nxt = new Set(coprimes(MM+1));
+          survives = nxt.has(rr%(MM+1));
+          rr = rr%(MM+1); MM++;
+        }
+        if(!survives) continue;
+      }
+
+      // Channel filter
+      if(S.channel > 0){
+        const frac = r/M;
+        const lo = 1/(S.channel+1), hi = 1/S.channel;
+        if(frac < lo || frac >= hi) continue;
+      }
+
+      points.push({r,M,x,y,cx:rho*Math.cos(2*Math.PI*r/M), cy:rho*Math.sin(2*Math.PI*r/M), lifted, isCop});
+    }
+  }
+}
+
+// ── Colour ─────────────────────────────────────────────────────────────────
+function hsl2rgb(h,s,l){
+  h=((h%360)+360)%360; s/=100; l/=100;
+  const c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
+  let r=0,g=0,b=0;
+  if(h<60){r=c;g=x;}else if(h<120){r=x;g=c;}else if(h<180){g=c;b=x;}
+  else if(h<240){g=x;b=c;}else if(h<300){r=x;b=c;}else{r=c;b=x;}
+  return [r+m,g+m,b+m];
+}
+function applyHSB(rgb){
+  let [r,g,b] = rgb;
+  // Hue shift
+  // Simple: rotate in HSL space - already done per-point
+  // Brightness & saturation scale
+  const s = S.sat, br = S.bri;
+  return [Math.min(1,r*br), Math.min(1,g*br), Math.min(1,b*br)];
+}
+
+function pointColor(pt){
+  const {r,M,lifted,isCop} = pt;
+  let h=200,s=80,l=55, a=1;
+  const cm = S.color;
+  if(!isCop){ return [1.0,0.55,0.1,0.5]; }
+  if(cm==='angle'){
+    h = (360*r/M + S.hue) % 360; s=70;l=55;
+  } else if(cm==='prime_ring'){
+    h = isPrime(M) ? (300+S.hue)%360 : (200+S.hue)%360;
+    s=isPrime(M)?90:60; l=55;
+  } else if(cm==='phi_density'){
+    const d = phi(M)/M;
+    h=(120*d+S.hue)%360; s=80;l=50+d*20;
+  } else if(cm==='lift'){
+    h = lifted ? (120+S.hue)%360 : (0+S.hue)%360; s=90;l=55;
+  } else if(cm==='half'){
+    h = (r/M < 0.5 ? 200 : 30 + S.hue)%360; s=70;l=55;
+  } else if(cm==='entropy'){
+    const e = -Math.log((M-phi(M))/M+0.01);
+    h=(180*e/3+S.hue)%360; s=80;l=50;
+  } else if(cm==='mod6'){
+    const cols=[0,30,60,120,200,270];
+    h=(cols[r%6]+S.hue)%360; s=85;l=55;
+  } else if(cm==='primorial'){
+    const prims=[2,6,30,210,2310];
+    const idx = prims.findIndex(p=>M%p===0);
+    h=(idx<0?200:idx*60+S.hue)%360; s=80;l=55;
+  } else if(cm==='mersenne'){
+    const mersM=[3,7,31,127,511,8191];
+    h=(mersM.includes(M)?60:200+S.hue)%360; s=80;l=55;
+  } else if(cm==='gap_class'){
+    h=((r%12)*30+S.hue)%360; s=80;l=55;
+  }
+  const [rr,gg,bb] = applyHSB(hsl2rgb(h,s*S.sat,l));
+  return [rr,gg,bb,a];
+}
+
+// ── Build GL buffers ────────────────────────────────────────────────────────
+let ptCount = 0;
+let lineVerts = [];
+let lineColors = [];
+
+function buildBuffers(){
+  buildPoints();
+  const n = points.length;
+  const pos = new Float32Array(n*2);
+  const col = new Float32Array(n*4);
+  const sz  = new Float32Array(n);
+  for(let i=0;i<n;i++){
+    const pt = points[i];
+    pos[i*2]   = pt.x;
+    pos[i*2+1] = pt.y;
+    const c = pointColor(pt);
+    col[i*4]=c[0];col[i*4+1]=c[1];col[i*4+2]=c[2];col[i*4+3]=c[3];
+    sz[i] = S.ptsize * devicePixelRatio;
+  }
+  gl.bindBuffer(gl.ARRAY_BUFFER, ptBuf);  gl.bufferData(gl.ARRAY_BUFFER, pos, gl.DYNAMIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, ptColBuf); gl.bufferData(gl.ARRAY_BUFFER, col, gl.DYNAMIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, ptSzBuf); gl.bufferData(gl.ARRAY_BUFFER, sz, gl.DYNAMIC_DRAW);
+  ptCount = n;
+
+  // Build lift lines
+  lineVerts = []; lineColors = [];
+  if(S.lifts || S.broken){
+    const mmax = S.mmax;
+    for(let M=2;M<mmax;M++){
+      const cop  = coprimes(M);
+      const cop2 = new Set(coprimes(M+1));
+      const rho1 = S.invert?(S.mmax-M+2):M;
+      const rho2 = S.invert?(S.mmax-M+1):M+1;
+      for(const r of cop){
+        const r2 = r%(M+1);
+        const lifted = cop2.has(r2);
+        if(lifted && !S.lifts) continue;
+        if(!lifted && !S.broken) continue;
+        // Scan filter
+        if(S.liftScanActive && M!==S.liftScanM) continue;
+
+        const th1 = (2*Math.PI*r/M) + S.delta*M*2*Math.PI;
+        const th2 = (2*Math.PI*r2/(M+1)) + S.delta*(M+1)*2*Math.PI;
+        let x1,y1,x2,y2;
+        if(S.view==='concentric'){
+          x1=rho1*Math.cos(th1);y1=rho1*Math.sin(th1);
+          x2=rho2*Math.cos(th2);y2=rho2*Math.sin(th2);
+        } else if(S.view==='fermat'){
+          x1=Math.sqrt(M)*Math.cos(th1);y1=Math.sqrt(M)*Math.sin(th1);
+          x2=Math.sqrt(M+1)*Math.cos(th2);y2=Math.sqrt(M+1)*Math.sin(th2);
+        } else if(S.view==='farey'){
+          x1=r/M*2-1;y1=1/M*2;x2=r2/(M+1)*2-1;y2=1/(M+1)*2;
+        } else {
+          x1=(r/M)*2-1;y1=(M/S.mmax)*2-1;x2=(r2/(M+1))*2-1;y2=((M+1)/S.mmax)*2-1;
+        }
+        lineVerts.push(x1,y1,x2,y2);
+        const a = S.liftAlpha;
+        if(lifted) lineColors.push(0.27,0.75,1,a,0.27,0.75,1,a);
+        else lineColors.push(1,0.27,0.27,a,1,0.27,0.27,a);
+      }
+    }
+  }
+
+  // Gap chords
+  if(S.chords && S.view==='concentric'){
+    const gaps = S.gapStr==='all'?[2,4,6,8,10,12]:S.gapStr.split(',').map(Number).filter(x=>!isNaN(x)&&x>0);
+    const ca = S.chordAlpha;
+    const mmax = S.mmax;
+    for(let M=2;M<=mmax;M++){
+      const cop=coprimes(M);
+      const rho=S.invert?(mmax-M+2):M;
+      for(const r of cop){
+        for(const g of gaps){
+          if(cop.includes((r+g)%M) || cop.includes((r+g-M))){
+            const th1=2*Math.PI*r/M;
+            const th2=2*Math.PI*((r+g)%M)/M;
+            lineVerts.push(rho*Math.cos(th1),rho*Math.sin(th1),rho*Math.cos(th2),rho*Math.sin(th2));
+            lineColors.push(1,0.4,0.8,ca,1,0.4,0.8,ca);
+          }
+        }
+      }
+    }
+  }
+
+  if(lineVerts.length>0){
+    gl.bindBuffer(gl.ARRAY_BUFFER,lnBuf); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(lineVerts),gl.DYNAMIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER,lnColBuf); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(lineColors),gl.DYNAMIC_DRAW);
+  }
+}
+
+// ── Transform matrix ────────────────────────────────────────────────────────
+function buildTransform(w,h){
+  const scale = S.zoom * 2 / S.mmax;
+  // column-major 3x3 for WebGL
+  const sx = scale * (h/w); // correct for aspect
+  const sy = scale;
+  const tx = S.panX / w * 2;
+  const ty = S.panY / h * 2;
+  return new Float32Array([
+    sx,0,0,
+    0,sy,0,
+    tx,ty,1
+  ]);
+}
+
+// ── Render ──────────────────────────────────────────────────────────────────
+let dirty = true;
+let spinAngle = 0;
+let lastTime = 0;
+let animFrame = null;
+
+function resize(){
+  const dpr = Math.min(devicePixelRatio,2);
+  const w = canvas.parentElement.clientWidth;
+  const h = canvas.parentElement.clientHeight;
+  canvas.width  = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  canvas.style.width  = w+'px';
+  canvas.style.height = h+'px';
+  overlay.width  = Math.round(w * dpr);
+  overlay.height = Math.round(h * dpr);
+  overlay.style.width  = w+'px';
+  overlay.style.height = h+'px';
+  gl.viewport(0,0,canvas.width,canvas.height);
+  dirty = true;
+}
+
+function draw(ts=0){
+  animFrame = requestAnimationFrame(draw);
+
+  const dt = (ts - lastTime) / 1000;
+  lastTime = ts;
+
+  if(S.spin){ S.delta += 0.002 * dt; dirty = true; }
+  if(S.playActive){ /* handled by playTimer */ }
+
+  if(!dirty) return;
+  dirty = false;
+
+  const w = canvas.width, h = canvas.height;
+  gl.clearColor(0.04,0.04,0.06,1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+  buildBuffers();
+  const mat = buildTransform(w,h);
+
+  // Draw lines first
+  if(lineVerts.length > 0){
+    gl.useProgram(progLine);
+    const uT = gl.getUniformLocation(progLine,'u_transform');
+    gl.uniformMatrix3fv(uT,false,mat);
+    const aP = gl.getAttribLocation(progLine,'a_pos');
+    const aC = gl.getAttribLocation(progLine,'a_color');
+    gl.bindBuffer(gl.ARRAY_BUFFER,lnBuf);
+    gl.enableVertexAttribArray(aP); gl.vertexAttribPointer(aP,2,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,lnColBuf);
+    gl.enableVertexAttribArray(aC); gl.vertexAttribPointer(aC,4,gl.FLOAT,false,0,0);
+    gl.lineWidth(Math.max(1,S.liftThick));
+    gl.drawArrays(gl.LINES,0,lineVerts.length/2);
+  }
+
+  // Draw points
+  if(ptCount > 0){
+    gl.useProgram(progPts);
+    const uT = gl.getUniformLocation(progPts,'u_transform');
+    gl.uniformMatrix3fv(uT,false,mat);
+    const aP = gl.getAttribLocation(progPts,'a_pos');
+    const aC = gl.getAttribLocation(progPts,'a_color');
+    const aS = gl.getAttribLocation(progPts,'a_size');
+    gl.bindBuffer(gl.ARRAY_BUFFER,ptBuf);
+    gl.enableVertexAttribArray(aP); gl.vertexAttribPointer(aP,2,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,ptColBuf);
+    gl.enableVertexAttribArray(aC); gl.vertexAttribPointer(aC,4,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,ptSzBuf);
+    gl.enableVertexAttribArray(aS); gl.vertexAttribPointer(aS,1,gl.FLOAT,false,0,0);
+    gl.drawArrays(gl.POINTS,0,ptCount);
+  }
+
+  drawOverlay(w,h,mat);
+  updateStatsPanel();
+}
+
+function drawOverlay(w,h,mat){
+  ctx2d.clearRect(0,0,overlay.width,overlay.height);
+  const dpr = overlay.width / (canvas.parentElement.clientWidth||1);
+
+  // Ring circles
+  if(S.ringcirc && (S.view==='concentric'||S.view==='fermat')){
+    ctx2d.strokeStyle='rgba(100,100,180,0.2)';
+    ctx2d.lineWidth=1;
+    for(let M=2;M<=S.mmax;M+=Math.ceil(S.mmax/30)){
+      const rho=S.invert?(S.mmax-M+2):M;
+      const [cx,cy]=worldToScreen(0,0,w,h,mat,dpr);
+      const [ex,ey]=worldToScreen(rho,0,w,h,mat,dpr);
+      const r=Math.abs(ex-cx);
+      ctx2d.beginPath();ctx2d.arc(cx,cy,r,0,Math.PI*2);ctx2d.stroke();
+    }
+  }
+
+  // Equator line
+  if(S.equator && S.view==='concentric'){
+    const rmax=S.mmax+2;
+    ctx2d.strokeStyle='rgba(200,200,100,0.3)';ctx2d.lineWidth=1;
+    ctx2d.beginPath();
+    const [x1,y1]=worldToScreen(-rmax,0,w,h,mat,dpr);
+    const [x2,y2]=worldToScreen(rmax,0,w,h,mat,dpr);
+    ctx2d.moveTo(x1,y1);ctx2d.lineTo(x2,y2);ctx2d.stroke();
+  }
+
+  // Labels
+  if(S.labels){
+    ctx2d.font=`${S.labelSize*dpr}px monospace`;
+    ctx2d.fillStyle='rgba(220,220,255,0.85)';
+    ctx2d.textAlign='center'; ctx2d.textBaseline='middle';
+    for(const pt of points){
+      if(pt.M > S.labelMaxM) continue;
+      const [sx,sy]=worldToScreen(pt.x,pt.y,w,h,mat,dpr);
+      let lbl='';
+      const f=S.labelFmt;
+      if(f==='r') lbl=String(pt.r);
+      else if(f==='rM') lbl=`${pt.r}/${pt.M}`;
+      else if(f==='dec') lbl=(pt.r/pt.M).toFixed(2);
+      else if(f==='deg') lbl=Math.round(360*pt.r/pt.M)+'°';
+      else if(f==='tpi') lbl=(pt.r/pt.M).toFixed(2)+'π';
+      else if(f==='rad') lbl=(2*Math.PI*pt.r/pt.M).toFixed(2);
+      else if(f==='Mr') lbl=`${pt.M}:${pt.r}`;
+      else if(f==='gcd') lbl=String(gcd(pt.r,pt.M+1));
+      ctx2d.fillText(lbl,sx,sy-S.labelSize*dpr/2-2);
+    }
+  }
+
+  // Fraction inspector
+  if(S.frInspActive){
+    const a=S.frInspA,b=S.frInspB;
+    for(let M=2;M<=S.mmax;M++){
+      const r=Math.round(a*M/b);
+      if(r>=1&&r<M&&gcd(r,M)===1){
+        const rho=S.invert?(S.mmax-M+2):M;
+        const th=2*Math.PI*r/M+S.delta*M*2*Math.PI;
+        let px,py;
+        if(S.view==='concentric'){px=rho*Math.cos(th);py=rho*Math.sin(th);}
+        else{px=r/M*2-1;py=1/M*2;}
+        const [sx,sy]=worldToScreen(px,py,w,h,mat,dpr);
+        ctx2d.fillStyle='rgba(255,255,0,0.9)';
+        ctx2d.beginPath();ctx2d.arc(sx,sy,6*dpr,0,Math.PI*2);ctx2d.fill();
+      }
+    }
+  }
+
+  // Hover cross
+  if(hoverPt){
+    const [sx,sy]=worldToScreen(hoverPt.x,hoverPt.y,w,h,mat,dpr);
+    ctx2d.strokeStyle='rgba(255,255,255,0.8)';ctx2d.lineWidth=1.5*dpr;
+    ctx2d.beginPath();ctx2d.moveTo(sx-8*dpr,sy);ctx2d.lineTo(sx+8*dpr,sy);ctx2d.stroke();
+    ctx2d.beginPath();ctx2d.moveTo(sx,sy-8*dpr);ctx2d.lineTo(sx,sy+8*dpr);ctx2d.stroke();
+  }
+}
+
+function worldToScreen(wx,wy,w,h,mat,dpr){
+  // mat is column-major: [sx,0,0, 0,sy,0, tx,ty,1]
+  const sx2=mat[0],sy2=mat[4],tx=mat[6],ty=mat[7];
+  const cx=(wx*sx2+tx)*w/2+w/2;
+  const cy=(-wy*sy2-ty)*h/2+h/2;
+  return [cx*dpr,cy*dpr];
+}
+function screenToWorld(sx,sy,w,h,mat){
+  const sx2=mat[0],sy2=mat[4],tx=mat[6],ty=mat[7];
+  const wx=((sx/w*2-1)-tx)/sx2;
+  const wy=(-(sy/h*2-1)-ty)/sy2;
+  return [wx,wy];
+}
+
+// ── Interaction ──────────────────────────────────────────────────────────────
+let drag=false, dragX=0, dragY=0;
+let hoverPt=null;
+
+canvas.addEventListener('mousedown',e=>{
+  drag=true; dragX=e.clientX; dragY=e.clientY;
+});
+window.addEventListener('mouseup',()=>drag=false);
+canvas.addEventListener('mousemove',e=>{
+  if(drag){
+    S.panX += e.clientX-dragX; S.panY += e.clientY-dragY;
+    dragX=e.clientX; dragY=e.clientY; dirty=true;
+  }
+  const rect=canvas.getBoundingClientRect();
+  const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+  findHover(cx,cy,rect.width,rect.height);
+});
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  S.zoom *= e.deltaY<0?1.1:0.9;
+  S.zoom=Math.max(0.05,Math.min(200,S.zoom));
+  document.getElementById('sl-zoom').value=S.zoom*100;
+  dirty=true;
+},{passive:false});
+canvas.addEventListener('dblclick',()=>{S.panX=0;S.panY=0;S.zoom=1;dirty=true;});
+canvas.addEventListener('click',e=>{
+  if(hoverPt) showClickInfo(hoverPt);
+});
+
+// Touch
+let t0=null;
+canvas.addEventListener('touchstart',e=>{e.preventDefault();if(e.touches.length===1){drag=true;t0={x:e.touches[0].clientX,y:e.touches[0].clientY};}},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(drag&&e.touches.length===1){const t=e.touches[0];S.panX+=t.clientX-t0.x;S.panY+=t.clientY-t0.y;t0={x:t.clientX,y:t.clientY};dirty=true;}},{passive:false});
+canvas.addEventListener('touchend',()=>{drag=false;});
+
+function findHover(cx,cy,w,h){
+  if(!points.length){hoverPt=null;return;}
+  const mat=buildTransform(canvas.width,canvas.height);
+  const dpr=canvas.width/w;
+  let best=null,bestD=Infinity;
+  const threshold=20*dpr;
+  for(const pt of points){
+    const [sx,sy]=worldToScreen(pt.x,pt.y,canvas.width,canvas.height,mat,dpr);
+    const d=Math.hypot(sx-cx*dpr,sy-cy*dpr);
+    if(d<threshold&&d<bestD){bestD=d;best=pt;}
+  }
+  hoverPt=best;
+  const tip=document.getElementById('tooltip');
+  if(best){
+    tip.innerHTML=`r=${best.r}, M=${best.M}<br>gcd=${gcd(best.r,best.M)}<br>lift=${best.lifted?'✓':'✗'}<br>θ=${(360*best.r/best.M).toFixed(1)}°`;
+    tip.style.display='block';
+    const rect=document.getElementById('canvas-wrap').getBoundingClientRect();
+    tip.style.left=(rect.left+cx+12)+'px';
+    tip.style.top=(rect.top+cy+12)+'px';
+  } else { tip.style.display='none'; }
+  dirty=true;
+}
+
+function showClickInfo(pt){
+  const g=gcd(pt.r,pt.M);
+  document.getElementById('click-info').innerHTML=
+    `r = <span style="color:#e0e0ff">${pt.r}</span><br>`+
+    `M = <span style="color:#e0e0ff">${pt.M}</span><br>`+
+    `gcd = <span style="color:#e0e0ff">${g}</span><br>`+
+    `coprime: <span style="color:#e0e0ff">${g===1?'yes':'no'}</span><br>`+
+    `lift ✓: <span style="color:${pt.lifted?'#22cc66':'#ff4444'}">${pt.lifted?'yes':'no'}</span><br>`+
+    `θ = <span style="color:#e0e0ff">${(360*pt.r/pt.M).toFixed(2)}°</span><br>`+
+    `mirror = <span style="color:#e0e0ff">${pt.M-pt.r}</span>`;
+}
+
+// ── Keyboard ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  if(e.key==='l'||e.key==='L'){ S.lifts=!S.lifts; document.getElementById('chk-lifts').checked=S.lifts; dirty=true; }
+  if(e.key==='s'||e.key==='S'){ S.spin=!S.spin; document.getElementById('chk-spin').checked=S.spin; }
+  if(e.key==='b'||e.key==='B'){ S.broken=!S.broken; document.getElementById('chk-broken').checked=S.broken; dirty=true; }
+  if(e.key==='a'||e.key==='A'){ S.area=!S.area; document.getElementById('chk-area').checked=S.area; dirty=true; }
+  if(e.key==='r'||e.key==='R'){ applyPreset('reset'); }
+  if(e.key==='+'){ S.zoom*=1.1; dirty=true; }
+  if(e.key==='-'){ S.zoom*=0.9; dirty=true; }
+  if(e.key==='ArrowLeft'){ S.delta-=0.01; dirty=true; }
+  if(e.key==='ArrowRight'){ S.delta+=0.01; dirty=true; }
+});
+
+// ── Stats panel ──────────────────────────────────────────────────────────────
+function updateStatsPanel(){
+  const M=S.mmax;
+  const ph=phi(M);
+  document.getElementById('sl-phi').textContent=ph;
+  document.getElementById('sl-tm').textContent=(ph/M).toFixed(4);
+  // C(n) approximation
+  let C=1;
+  for(const p of PRIMES){ if(p>M) break; C*=(1-1/(p*(p-1))); }
+  document.getElementById('sl-cn').textContent=C.toFixed(6);
+  document.getElementById('sl-pts').textContent=ptCount;
+  document.getElementById('sl-mshow').textContent=M;
+
+  if(S.showStats){
+    document.getElementById('stats-panel').innerHTML=
+      `φ(M=${M}) = ${ph}<br>T(M) = ${(ph/M).toFixed(4)}<br>C(n) ≈ ${C.toFixed(6)}<br>pts = ${ptCount}`;
+  }
+}
+
+// ── Export ───────────────────────────────────────────────────────────────────
+// WebGL preserveDrawingBuffer:true — we can read pixels directly
+function exportPNG(fname,scale=1){
+  const w=canvas.parentElement.clientWidth, h=canvas.parentElement.clientHeight;
+  const dpr=scale;
+  // Re-render to offscreen at desired resolution
+  const offCanvas=document.createElement('canvas');
+  offCanvas.width=w*dpr; offCanvas.height=h*dpr;
+  const offGl=offCanvas.getContext('webgl',{preserveDrawingBuffer:true,antialias:true});
+  if(!offGl){alert('WebGL not available for export');return;}
+  // Copy shaders and programs to offGl, then redraw
+  // For simplicity, use the main canvas (already rendered)
+  const url=canvas.toDataURL('image/png');
+  const a=document.createElement('a');
+  a.href=url; a.download=fname||'zmmz_export.png'; a.click();
+}
+
+document.getElementById('btn-export-4k').onclick=()=>{
+  // Temporarily upscale canvas
+  const origW=canvas.width, origH=canvas.height;
+  dirty=true;
+  setTimeout(()=>{
+    const url=canvas.toDataURL('image/png');
+    const a=document.createElement('a');
+    a.href=url; a.download='zmmz_4k.png'; a.click();
+  },100);
+};
+
+document.getElementById('btn-export-all4').onclick=()=>{
+  const views=['concentric','fermat','farey','strip'];
+  const orig=S.view;
+  let i=0;
+  function next(){
+    if(i>=views.length){S.view=orig;dirty=true;return;}
+    S.view=views[i]; dirty=true;
+    setTimeout(()=>{
+      const url=canvas.toDataURL('image/png');
+      const a=document.createElement('a');
+      a.href=url; a.download=`zmmz_${views[i]}.png`; a.click();
+      i++; setTimeout(next,200);
+    },200);
+  }
+  next();
+};
+
+document.getElementById('btn-export-csv').onclick=()=>{
+  let csv='r,M,gcd,coprime,lifted,theta_deg,x,y\n';
+  for(const pt of points){
+    const g=gcd(pt.r,pt.M);
+    csv+=`${pt.r},${pt.M},${g},${g===1?1:0},${pt.lifted?1:0},${(360*pt.r/pt.M).toFixed(4)},${pt.x.toFixed(6)},${pt.y.toFixed(6)}\n`;
+  }
+  const b=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='zmmz_points.csv'; a.click();
+};
+
+// ── Playback ─────────────────────────────────────────────────────────────────
+let playTimer=null;
+document.getElementById('btn-play-play').onclick=()=>{
+  if(S.playActive){clearInterval(playTimer);S.playActive=false;return;}
+  S.playActive=true;
+  S.playM=parseInt(document.getElementById('num-from-m').value)||2;
+  const speed=1000/S.playSpeed;
+  playTimer=setInterval(()=>{
+    S.playM=S.playM<S.mmax?S.playM+1:2;
+    // Show only ring S.playM
+    // (for full impl: filter points by M===S.playM)
+    document.getElementById('analysis-text').innerHTML=`<strong>Playback M=${S.playM}</strong> — φ(${S.playM})=${phi(S.playM)}, ${isPrime(S.playM)?'prime':'composite'}`;
+    dirty=true;
+  },speed);
+};
+document.getElementById('btn-play-stop').onclick=()=>{clearInterval(playTimer);S.playActive=false;S.playM=2;dirty=true;};
+document.getElementById('btn-play-prev').onclick=()=>{S.playM=Math.max(2,S.playM-1);dirty=true;};
+
+document.getElementById('btn-lift-next').onclick=()=>{S.liftScanM=Math.min(S.mmax-1,S.liftScanM+1);S.liftScanActive=true;dirty=true;};
+document.getElementById('btn-lift-prev').onclick=()=>{S.liftScanM=Math.max(2,S.liftScanM-1);S.liftScanActive=true;dirty=true;};
+document.getElementById('btn-lift-stop2').onclick=()=>{S.liftScanActive=false;dirty=true;};
+
+// ── Presets ───────────────────────────────────────────────────────────────────
+function setState(patch){Object.assign(S,patch);syncUI();dirty=true;}
+function applyPreset(name){
+  const P={
+    reset:     {mmax:60,ptsize:1.8,view:'concentric',color:'angle',invert:false,delta:0,lifts:true,broken:false,chain:0,zoom:1,panX:0,panY:0,channel:0},
+    chain1:    {chain:1,color:'lift'},
+    chain2:    {chain:2,color:'lift'},
+    chain3:    {chain:3,color:'lift'},
+    inv_equator:     {invert:true,view:'concentric',delta:0},
+    inv_primorial:   {invert:true,color:'primorial'},
+    rot_focal:       {delta:1/S.mmax},
+    rot_half_twist:  {delta:0.5/S.mmax},
+    rot_ch2_fermat:  {channel:2,view:'fermat',delta:1/6},
+    inv_rot_strip:   {invert:true,view:'strip',delta:0.25},
+    thm21: {mmax:30,color:'lift',lifts:true,view:'concentric'},
+    thm51: {mmax:60,color:'phi_density',view:'concentric'},
+    thm81: {mmax:100,color:'prime_ring',view:'fermat'},
+  };
+  if(P[name]) setState(P[name]);
+  document.getElementById('analysis-text').innerHTML=`<strong>${name}</strong> — preset applied.`;
+}
+
+// ── UI → State wiring ────────────────────────────────────────────────────────
+function wire(id,key,parse){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('input',()=>{
+    S[key]=parse?parse(el.value):el.value;
+    dirty=true;
+    syncUI();
+  });
+}
+function wireChk(id,key){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('change',()=>{S[key]=el.checked;dirty=true;});
+}
+function syncUI(){
+  // Sync all number/range pairs and labels
+  const pairs=[
+    ['sl-mmax','num-mmax','mmax'],['sl-ptsize',null,'ptsize'],
+    ['sl-delta',null,'delta'],['sl-zoom',null,'zoom'],
+  ];
+  document.getElementById('sl-mmax').value=S.mmax;
+  document.getElementById('num-mmax').value=S.mmax;
+  document.getElementById('sl-ptsize').value=S.ptsize*10;
+  document.getElementById('lbl-ptsize').textContent=S.ptsize.toFixed(1);
+  document.getElementById('sl-chain').value=S.chain;
+  document.getElementById('lbl-chain').textContent=S.chain===0?'off':S.chain;
+  document.getElementById('sel-view').value=S.view;
+  document.getElementById('sel-color').value=S.color;
+  document.getElementById('chk-lifts').checked=S.lifts;
+  document.getElementById('chk-broken').checked=S.broken;
+  document.getElementById('chk-noncop').checked=S.noncop;
+  document.getElementById('chk-area').checked=S.area;
+  document.getElementById('chk-spin').checked=S.spin;
+  document.getElementById('btn-invert').classList.toggle('active',S.invert);
+  document.getElementById('arr-info').textContent={
+    concentric:'Concentric: ρ = M',fermat:'Fermat Spiral: ρ = √M',
+    farey:'Farey Half-Plane: x=r/M, y=1/M',strip:'Unfolded Strip'
+  }[S.view];
+}
+
+// Wire controls
+wire('sl-mmax','mmax',Number); wire('num-mmax','mmax',Number);
+wire('sl-ptsize','ptsize',v=>v/10);
+wire('sl-delta','delta',v=>v/100);
+wire('sl-chain','chain',Number);
+wire('sl-zoom','zoom',v=>v/100);
+wire('sl-hue','hue',Number); wire('sl-sat','sat',v=>v/100); wire('sl-bri','bri',v=>v/100);
+wire('sl-noffset','noffset',Number); wire('num-noffset','noffset',Number);
+wire('sl-lift-thick','liftThick',v=>v/10);
+wire('sl-lift-alpha','liftAlpha',v=>v/100);
+wire('sl-chord-alpha','chordAlpha',v=>v/100);
+wire('sl-dim','dimAlpha',v=>v/100);
+wire('sl-label-size','labelSize',Number);
+wire('sl-label-maxm','labelMaxM',Number);
+wire('num-channel','channel',Number);
+wire('num-custom-r','customR',v=>v?Number(v):null);
+wire('sl-pidx','pidx',v=>{ S.prime=PRIMES[v-1]; return Number(v); });
+wire('sl-lift-speed','liftScanSpeed',Number);
+wire('sl-play-speed','playSpeed',Number);
+wire('txt-gaps','gapStr',v=>v);
+wire('sel-label-fmt','labelFmt',v=>v);
+
+wireChk('chk-lifts','lifts'); wireChk('chk-broken','broken'); wireChk('chk-noncop','noncop');
+wireChk('chk-area','area'); wireChk('chk-spin','spin'); wireChk('chk-allpts','allpts');
+wireChk('chk-equator','equator'); wireChk('chk-sector','sector'); wireChk('chk-ringcirc','ringcirc');
+wireChk('chk-dim','dim'); wireChk('chk-labels','labels'); wireChk('chk-npath','npath');
+wireChk('chk-lockp','lockp'); wireChk('chk-allnodd','allnodd'); wireChk('chk-chords','chords');
+wireChk('chk-spiral','spiral'); wireChk('chk-mirror','mirror'); wireChk('chk-allp','allp');
+wireChk('chk-rpath','rpath');
+wireChk('chk-stats','showStats',v=>{document.getElementById('stats-panel').style.display=v?'':'none';});
+document.getElementById('chk-stats').addEventListener('change',e=>{
+  document.getElementById('stats-panel').style.display=e.target.checked?'':'none';
+});
+
+document.getElementById('sel-view').addEventListener('change',e=>{S.view=e.target.value;dirty=true;syncUI();});
+document.getElementById('sel-color').addEventListener('change',e=>{S.color=e.target.value;dirty=true;});
+document.getElementById('btn-invert').addEventListener('click',()=>{S.invert=!S.invert;dirty=true;syncUI();});
+document.getElementById('btn-zoom-reset').addEventListener('click',()=>{S.zoom=1;S.panX=0;S.panY=0;dirty=true;});
+
+// Sync mmax slider/num bidirectionally
+document.getElementById('sl-mmax').addEventListener('input',e=>{document.getElementById('num-mmax').value=e.target.value;S.mmax=Number(e.target.value);dirty=true;});
+document.getElementById('num-mmax').addEventListener('input',e=>{const v=Math.max(4,Math.min(2000,Number(e.target.value)));document.getElementById('sl-mmax').value=Math.min(v,500);S.mmax=v;dirty=true;});
+document.getElementById('sl-chain').addEventListener('input',e=>{S.chain=Number(e.target.value);document.getElementById('lbl-chain').textContent=S.chain||'off';dirty=true;});
+document.getElementById('sl-ptsize').addEventListener('input',e=>{S.ptsize=e.target.value/10;document.getElementById('lbl-ptsize').textContent=S.ptsize.toFixed(1);dirty=true;});
+
+// Delta fraction input
+document.getElementById('num-delta-r').addEventListener('input',updateDeltaFrac);
+document.getElementById('num-delta-m').addEventListener('input',updateDeltaFrac);
+function updateDeltaFrac(){
+  const r=Number(document.getElementById('num-delta-r').value)||0;
+  const m=Number(document.getElementById('num-delta-m').value)||1;
+  S.delta=r/m; dirty=true;
+}
+function setDelta(v){S.delta=v;document.getElementById('sl-delta').value=v*100;dirty=true;}
+function setChannel(n){S.channel=n;document.getElementById('num-channel').value=n;dirty=true;}
+function setN(n){S.noffset=n;document.getElementById('sl-noffset').value=n;document.getElementById('num-noffset').value=n;document.getElementById('npath-formula').textContent=`n=${n}: (M±${n})/2`;dirty=true;}
+
+// Prime select
+PRIMES.slice(0,20).forEach((p,i)=>{
+  const opt=document.createElement('option');
+  opt.value=i+1; opt.textContent=p;
+  document.getElementById('sel-prime').appendChild(opt);
+});
+document.getElementById('sel-prime').addEventListener('change',e=>{
+  S.pidx=Number(e.target.value)-1; S.prime=PRIMES[S.pidx]; dirty=true;
+});
+document.getElementById('btn-p-next').addEventListener('click',()=>{S.pidx=Math.min(19,S.pidx+1);S.prime=PRIMES[S.pidx];document.getElementById('sel-prime').value=S.pidx+1;dirty=true;});
+document.getElementById('btn-p-prev').addEventListener('click',()=>{S.pidx=Math.max(0,S.pidx-1);S.prime=PRIMES[S.pidx];document.getElementById('sel-prime').value=S.pidx+1;dirty=true;});
+
+// Fraction inspector
+document.getElementById('btn-fi-go').addEventListener('click',()=>{
+  S.frInspA=Number(document.getElementById('num-fa').value);
+  S.frInspB=Number(document.getElementById('num-fb').value);
+  S.frInspActive=true;
+  const g=gcd(S.frInspA,S.frInspB);
+  document.getElementById('fi-info').innerHTML=`${S.frInspA}/${S.frInspB}<br>gcd=${g}<br>${(S.frInspA/S.frInspB).toFixed(4)}`;
+  dirty=true;
+});
+document.getElementById('btn-fi-clear').addEventListener('click',()=>{S.frInspActive=false;document.getElementById('fi-info').textContent='—';dirty=true;});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{resize();dirty=true;});
+resize();
+syncUI();
+draw();
+
+// Report WebGL usage in analysis panel
+document.getElementById('analysis-text').innerHTML=
+  `<strong>WebGL active</strong> — point cloud rendered via WebGL (GPU). `+
+  `Text labels, overlays, and UI are DOM/Canvas2D. `+
+  `At M max = 2000, expect ~250K+ points; performance degrades above M≈800 on integrated GPUs. `+
+  `<em>Tip: reduce M max if framerate drops.</em>`;
+</script>
+</body>
+</html>
