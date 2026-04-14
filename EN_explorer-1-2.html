@@ -105,6 +105,14 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 .drawer-toggle:hover { color: var(--gold2); }
 .drawer-arrow { font-size: 10px; transition: transform .25s; display: inline-block; }
 .drawer-toggle.open .drawer-arrow { transform: rotate(180deg); }
+.exp-btn {
+  display: inline-flex; align-items: center;
+  font-family: var(--mono); font-size: 8px; letter-spacing: .14em; text-transform: uppercase;
+  background: transparent; border: 1px solid rgba(200,168,74,.35); color: rgba(200,168,74,.7);
+  padding: 4px 12px; cursor: pointer; transition: all .2s; float: right; margin: 6px 0 0 8px;
+  border-radius: 2px;
+}
+.exp-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(200,168,74,.06); }
 .data-drawer {
   display: none; overflow-x: auto;
   border-top: 1px solid rgba(255,255,255,.04);
@@ -142,9 +150,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 <nav id="tab-nav">
   <a href="index.html" class="back-btn"><span>◁</span> Main</a>
   <div class="tabs">
-    <a href="index.html" class="tab"><span class="tab-dot"></span>Opener</a>
-    <div class="tab active"><span class="tab-dot"></span>Explorer</div>
-    <a href="EN_explorer-updated.html" class="tab"><span class="tab-dot"></span>Deep Analysis</a>
+    <a href="index.html" class="tab"><span class="tab-dot"></span> Opener</a>
+    <div class="tab active"><span class="tab-dot"></span> Explorer</div>
   </div>
   <div class="nav-eq">E(N) = R(N) − C = O(1/N)</div>
 </nav>
@@ -215,7 +222,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c1',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 01 — |E(N)|
     </button>
-    <div class="data-drawer" id="drawer-c1">
+    <button class="exp-btn" onclick="exportChart('c1')" title="Export Chart 01 — |E(N)| as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c1">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c1"><thead></thead><tbody></tbody></table>
       </div>
@@ -235,7 +243,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c2',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 02 — E(N)·log N
     </button>
-    <div class="data-drawer" id="drawer-c2">
+    <button class="exp-btn" onclick="exportChart('c2')" title="Export Chart 02 — E(N)·N as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c2">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c2"><thead></thead><tbody></tbody></table>
       </div>
@@ -255,7 +264,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c3',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 03 — log|E| vs log(log N)
     </button>
-    <div class="data-drawer" id="drawer-c3">
+    <button class="exp-btn" onclick="exportChart('c3')" title="Export Chart 03 — log|E| vs log(log N) as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c3">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c3"><thead></thead><tbody></tbody></table>
       </div>
@@ -278,7 +288,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c4',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 04 — Signed E(N)
     </button>
-    <div class="data-drawer" id="drawer-c4">
+    <button class="exp-btn" onclick="exportChart('c4')" title="Export Chart 04 — Signed E(N) as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c4">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c4"><thead></thead><tbody></tbody></table>
       </div>
@@ -298,7 +309,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c5',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 05 — SC/π(N)
     </button>
-    <div class="data-drawer" id="drawer-c5">
+    <button class="exp-btn" onclick="exportChart('c5')" title="Export Chart 05 — SC over pi(N) as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c5">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c5"><thead></thead><tbody></tbody></table>
       </div>
@@ -317,7 +329,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c6',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 06 — Gap hist
     </button>
-    <div class="data-drawer" id="drawer-c6">
+    <button class="exp-btn" onclick="exportChart('c6')" title="Export Chart 06 — Gap histogram as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c6">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c6"><thead></thead><tbody></tbody></table>
       </div>
@@ -340,7 +353,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c7',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 07 — Lift factor
     </button>
-    <div class="data-drawer" id="drawer-c7">
+    <button class="exp-btn" onclick="exportChart('c7')" title="Export Chart 07 — Lift factor as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c7">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c7"><thead></thead><tbody></tbody></table>
       </div>
@@ -360,7 +374,8 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     <button class="drawer-toggle" onclick="toggleDrawer('c8',this)" aria-expanded="false">
       <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 08 — χ₄-restricted
     </button>
-    <div class="data-drawer" id="drawer-c8">
+    <button class="exp-btn" onclick="exportChart('c8')" title="Export Chart 08 — chi4-restricted as PNG">↓ PNG</button>
+<div class="data-drawer" id="drawer-c8">
       <div class="drawer-scroll">
         <table class="data-table" id="tbl-c8"><thead></thead><tbody></tbody></table>
       </div>
@@ -785,14 +800,126 @@ function buildTable(cid, r) {
   const hr = thead.insertRow();
   for (const h of cfg.heads) { const th=document.createElement('th'); th.textContent=h; hr.appendChild(th); }
 
-  for (let i=0; i<data.length; i++) {
+  // First 10 rows + last row
+  const SHOW = 10;
+  const indices = [];
+  for (let i=0; i<Math.min(SHOW, data.length); i++) indices.push(i);
+  if (data.length > SHOW) indices.push(-1); // sentinel for ellipsis
+  if (data.length > SHOW) indices.push(data.length - 1);
+
+  for (const idx of indices) {
+    if (idx === -1) {
+      const tr = tbody.insertRow();
+      const td = tr.insertCell();
+      td.colSpan = cfg.heads.length;
+      td.style.cssText = 'text-align:center;color:rgba(255,255,255,.18);font-size:9px;padding:4px;letter-spacing:.12em;';
+      td.textContent = '· · · ' + (data.length - SHOW - 1) + ' rows hidden · · ·';
+      continue;
+    }
+    const i = idx;
     const d = data[i];
     const vals = cfg.row.length === 3 ? cfg.row(d,i,data) : cfg.row(d);
     const tr = tbody.insertRow();
+    if (i === data.length-1) tr.style.borderTop = '1px solid rgba(200,168,74,.2)';
     if (d.ip) tr.classList.add('is-prime');
     if (d.isc) tr.classList.add('is-sc');
     for (const v of vals) { const td=tr.insertCell(); td.textContent=v; }
   }
+}
+
+// ── PNG export ────────────────────────────────────────────────────────────
+function exportChart(cid) {
+  const canvas = document.getElementById(cid);
+  if (!canvas) return;
+  // Build a high-res export canvas with title + chart + first 10 data rows
+  const srcW = canvas.width, srcH = canvas.height;
+  const tableRows = [];
+  if (result) {
+    const r = result;
+    const data = r.data;
+    const mid3 = data[Math.floor(data.length/2)];
+    const b3 = mid3.lgAbsE - (-1)*mid3.lglgm;
+    const cfgs = {
+      c1:{heads:['N','R(N)','E(N)','|E(N)|','|c₁|/logN','P'],row:d=>[d.m,f6(d.E+r.C),fs(d.E,6),f6(d.absE),f6(Math.abs(r.c1t)/d.lm),d.ip?'p':'']},
+      c2:{heads:['N','E(N)','E·logN','c₁','P'],row:d=>[d.m,fs(d.E,6),fs(d.Elgm,6),f6(r.c1t),d.ip?'p':'']},
+      c3:{heads:['N','log(logN)','log|E|','slope−1','P'],row:d=>[d.m,f4(d.lglgm),f4(d.lgAbsE),f4(-d.lglgm+b3),d.ip?'p':'']},
+      c4:{heads:['N','E(N)','Sign','P','SC'],row:d=>[d.m,fs(d.E,6),d.E>=0?'+1':'−1',d.ip?'p':'',d.isc?'SC':'']},
+      c5:{heads:['N','π(N)','SC(N)','SC/π','P'],row:d=>[d.m,d.piC,d.scC,d.piC>0?f4(d.scC/d.piC):'—',d.ip?'p':'']},
+      c6:{heads:['N','E(N)','SC','Gap','P'],row:(d,i,arr)=>{let g='—';if(d.isc)for(let j=i-1;j>=0;j--)if(arr[j].isc){g=d.m-arr[j].m;break;}return[d.m,fs(d.E,6),d.isc?'SC':'',g,d.ip?'p':''];}},
+      c7:{heads:['N','φ/(M·C)','F−1','Dir','P'],row:d=>[d.m,f4(d.lf),fs(d.lf-1,4),d.lf>=1?'▲':'▼',d.ip?'p':'']},
+      c8:{heads:['N','E(N)','E_χ₄','4·E_χ₄','χ₄SC','P'],row:d=>[d.m,fs(d.E,6),fs(d.E4,6),fs(d.E4*4,6),d.isc4?'SC':'',d.ip?'p':'']}
+    };
+    const cfg = cfgs[cid];
+    if (cfg) {
+      tableRows.push(cfg.heads);
+      const show = Math.min(10, data.length);
+      for (let i=0; i<show; i++) {
+        const d = data[i];
+        tableRows.push(cfg.row.length===3 ? cfg.row(d,i,data) : cfg.row(d));
+      }
+      // last row
+      if (data.length > show) {
+        tableRows.push(Array(cfg.heads.length).fill('···'));
+        const d = data[data.length-1];
+        tableRows.push(cfg.row.length===3 ? cfg.row(d,data.length-1,data) : cfg.row(d));
+      }
+    }
+  }
+
+  const ROW_H = 18, HEADER_H = 36, PAD = 16;
+  const COL_W = 100;
+  const tableH = tableRows.length > 0 ? (tableRows.length * ROW_H + PAD*2 + 4) : 0;
+  const EXP_H = HEADER_H + srcH + tableH + PAD*2;
+  const EXP_W = Math.max(srcW, tableRows[0] ? tableRows[0].length * COL_W + PAD*2 : srcW);
+
+  const ec = document.createElement('canvas');
+  ec.width = EXP_W; ec.height = EXP_H;
+  const ctx = ec.getContext('2d');
+
+  // background
+  ctx.fillStyle = '#04040a';
+  ctx.fillRect(0, 0, EXP_W, EXP_H);
+
+  // header bar
+  ctx.fillStyle = '#0d0d1a';
+  ctx.fillRect(0, 0, EXP_W, HEADER_H);
+  ctx.fillStyle = 'rgba(200,168,74,.9)';
+  ctx.font = '11px JetBrains Mono, monospace';
+  ctx.textBaseline = 'middle';
+  const titles = {c1:'Chart 01 — |E(N)| convergence · O(1/N)',c2:'Chart 02 — E(N)·N → bounded',c3:'Chart 03 — log|E(N)| vs log(log N)',c4:'Chart 04 — Signed E(N)',c5:'Chart 05 — SC(N)/π(N)',c6:'Chart 06 — Sign-change gap distribution',c7:'Chart 07 — Local lift factor φ(M)/(M·C)',c8:'Chart 08 — χ₄-restricted E(N)'};
+  ctx.fillText(titles[cid] || cid, PAD, HEADER_H/2);
+  ctx.fillStyle = 'rgba(255,255,255,.25)';
+  ctx.font = '9px JetBrains Mono, monospace';
+  ctx.fillText('E(N) = R(N) − C = O(1/N) · Wessen Getachew · 2026', EXP_W - 360, HEADER_H/2);
+
+  // chart
+  ctx.drawImage(canvas, 0, 0, srcW, srcH, 0, HEADER_H, EXP_W, srcH);
+
+  // table
+  if (tableRows.length > 0) {
+    const tY = HEADER_H + srcH + PAD;
+    ctx.fillStyle = 'rgba(255,255,255,.04)';
+    ctx.fillRect(PAD, tY - 4, EXP_W - PAD*2, tableRows.length * ROW_H + 8);
+    const cols = tableRows[0].length;
+    const cw = Math.floor((EXP_W - PAD*2) / cols);
+    for (let ri=0; ri<tableRows.length; ri++) {
+      const y = tY + ri * ROW_H + ROW_H/2;
+      const isHead = ri === 0;
+      const isLast = ri === tableRows.length - 1 && tableRows.length > 2;
+      ctx.fillStyle = isHead ? 'rgba(200,168,74,.9)' : isLast ? 'rgba(61,200,184,.7)' : 'rgba(255,255,255,.45)';
+      ctx.font = (isHead ? 'bold ' : '') + '9px JetBrains Mono, monospace';
+      ctx.textBaseline = 'middle';
+      for (let ci=0; ci<tableRows[ri].length; ci++) {
+        const x = PAD + ci * cw + (ci===0 ? 0 : 4);
+        ctx.fillText(String(tableRows[ri][ci]).slice(0,14), x, y);
+      }
+    }
+  }
+
+  const a = document.createElement('a');
+  a.download = cid + '_EN_explorer.png';
+  a.href = ec.toDataURL('image/png');
+  a.click();
 }
 
 </script>
