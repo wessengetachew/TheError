@@ -168,30 +168,16 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;margin-top:6
   #page-header,.analysis-area,.section-divider{padding-left:18px;padding-right:18px;}
   #tab-nav{padding:0 14px;}
 }
-
-.tab-canvas{color:var(--coral)!important;}
-.tab-canvas .tab-dot{background:var(--coral)!important;}
-.send-canvas-btn{font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;
-  background:rgba(224,80,96,.12);border:1px solid rgba(224,80,96,.35);color:var(--coral);
-  padding:4px 10px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;
-  transition:background .2s,border-color .2s;white-space:nowrap;margin-left:auto;}
-.send-canvas-btn:hover{background:rgba(224,80,96,.25);border-color:var(--coral);}
 </style>
 </head>
 <body>
+<nav id="tab-nav"><div class="tabs"><a href="index.html" class="tab "><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Opener</a><a href="EN_explorer-1-2.html" class="tab "><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Explorer</a><div class="tab active"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Deep Analysis</div><a href="zmmz_explorer-1.html" class="tab tab-canvas"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Geometric Canvas</a></div><span class="nav-right">C ≈ 0.530711806246</span></nav>
 
-<nav id="tab-nav">
-  <div class="tabs">
-    <a href="index.html" class="tab"><span class="tab-dot"></span>Opener</a>
-    <a href="EN_explorer-1-2.html" class="tab"><span class="tab-dot"></span>Explorer</a>
-    <div class="tab active"><span class="tab-dot"></span>Deep Analysis</div>
-    <a href="zmmz_explorer-1.html" class="tab tab-canvas"><span class="tab-dot" style="background:var(--coral)"></span>Geometric Canvas</a>
-  </div>
-</nav>
+
 
 <div id="page-header">
   <div class="header-label">Advanced Diagnostics · Wessen Getachew · 2026</div>
-  <h1 class="header-title">Jump Theorem — <em>Critical Nuances</em></h1>
+  <h1 class="header-title">Jump Theorem &amp; Error Term — <em>Critical Nuances</em></h1>
   <p class="header-sub">Four visualizations probing the framework's limits: lift-constant friction, ghost prime residues in the primorial sieve, logarithmic sign-change rarity at scale, and the parity obstruction that prevents standard sieve methods from counting twin primes exactly.</p>
 </div>
 
@@ -207,7 +193,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;margin-top:6
     <div class="panel-header">
       <span class="panel-ref">ref · Chart 07</span>
       <span class="panel-num">01</span>
-      <span class="panel-title">Lift Friction Map — local factor φ(M+1)/[(M+1)·C] deviation</span><a href="zmmz_explorer-1.html?preset=c_phi_density&anim=m_grow_spin&from=Deep+Analysis+—+Friction+Map" class="send-canvas-btn" target="_blank">◈ Canvas</a>
+      <span class="panel-title">Lift Friction Map — local factor φ(M+1)/[(M+1)·C] deviation</span>
       <p class="panel-desc">Each integer M contributes a local lift factor L(M) = φ(M+1)/(M+1). The theoretical constant C ≈ 0.5307 is the limit R(N) converges to. <em>Friction</em> measures the signed relative deviation: f(M) = L(M)/C − 1. Smooth numbers (products of small primes) create deep negative friction; primes spike sharply positive. The histogram shows the full deviation distribution — a fat-tailed landscape that reveals where the convergence R(N) → C is most turbulent, and where potential counter-examples to the density claims would most naturally hide.</p>
     </div>
     <div class="panel-controls">
@@ -242,7 +228,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;margin-top:6
     <div class="panel-header">
       <span class="panel-ref">ref · Opener Ring</span>
       <span class="panel-num">02</span>
-      <span class="panel-title">Ghost Residues — Stable vs Transient Primes in the Primorial Sieve</span><a href="zmmz_explorer-1.html?preset=c_prime_ring&anim=lift_scan&from=Deep+Analysis+—+Ghost+Residues" class="send-canvas-btn" target="_blank">◈ Canvas</a>
+      <span class="panel-title">Ghost Residues — Stable vs Transient Primes in the Primorial Sieve</span>
       <p class="panel-desc">At primorial level M = p₁·…·pₖ, most coprime residues r in [1, M) are genuine primes — but some are composites of primes &gt; pₖ that only appear prime-like. These are the <em>ghost composites</em>: they pass the gcd(r, M) = 1 test but will be eliminated when M advances to M·p_{k+1}. The <em>transient</em> residues are those that fail the very next sieve step. Twin-prime pair candidates where at least one member is a ghost are the "composite interference paths" — pairs that look like twin primes at this level but are not.</p>
     </div>
     <div class="panel-controls">
@@ -320,12 +306,12 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;margin-top:6
     <div class="panel-header">
       <span class="panel-ref">ref · Chart 06</span>
       <span class="panel-num">03</span>
-      <span class="panel-title">Sign-Change Waiting Time — log-scale gap distribution &amp; Skewes context</span><a href="zmmz_explorer-1.html?preset=c_angle&anim=chain_sweep&from=Deep+Analysis+—+Sign+Change" class="send-canvas-btn" target="_blank">◈ Canvas</a>
+      <span class="panel-title">Sign-Change Waiting Time — log-scale gap distribution &amp; Skewes context</span>
       <p class="panel-desc">Chart 06 shows the raw gap between consecutive sign changes of E(N). Here the gaps are plotted on a <em>logarithmic</em> scale — log₁₀(gap_k) vs sign-change index k — exposing any long-term growth trend in waiting time. A rising OLS regression line indicates sign changes grow rarer at larger N, connecting the small-N behaviour of E(N) to Littlewood's theorem about π(x) − li(x): the changes must occur infinitely often, but with astronomically increasing spacing as N → ∞.</p>
     </div>
     <div class="infobox" style="margin-top:14px;">
       <div class="infobox-title">Skewes Number Context</div>
-      <div class="infobox-text">Skewes (1933) proved under RH that π(x) first exceeds li(x) before x = 10<sup>10<sup>10<sup>34</sup></sup></sup>. Computational evidence places the first crossing near e<sup>727.95…</sup> ≈ 1.40 × 10<sup>316</sup>. Our E(N) = R(N) − C differs from π(x) − li(x), but its sign changes also exhibit growing inter-event gaps. The log-scale scatter makes this rarity visible even over the small-N range accessible to a browser — a window into a structure that only becomes fully dramatic at astronomical scale.</div>
+      <div class="infobox-text">Skewes (1933) proved under RH that π(x) first exceeds li(x) before x = 10<sup>10<sup>10<sup>34</sup></sup></sup>. Computational evidence places the first crossing near e<sup>727.95…</sup> ≈ 1.40 × 10<sup>316</sup>. Our E(N) = R(N) − C differs from π(x) − li(x); its sign changes also exhibit growing gaps, though no analytic rate has been established for E(N). The log-scale scatter makes this rarity visible even over the small-N range accessible to a browser — a window into a structure that only becomes fully dramatic at astronomical scale.</div>
     </div>
     <div class="panel-controls" style="margin-top:2px;">
       <span class="ctrl-label">N</span>
@@ -366,7 +352,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;margin-top:6
     <div class="panel-header">
       <span class="panel-ref">ref · Opener / Sieve</span>
       <span class="panel-num">04</span>
-      <span class="panel-title">Parity Interference — Liouville function &amp; prime-factor parity balance</span><a href="zmmz_explorer-1.html?preset=c_mod6&anim=farey_sweep&from=Deep+Analysis+—+Parity" class="send-canvas-btn" target="_blank">◈ Canvas</a>
+      <span class="panel-title">Parity Interference — Liouville function &amp; prime-factor parity balance</span>
       <p class="panel-desc">The <em>parity problem</em> in sieve theory: standard multiplicative sieves cannot distinguish integers with an even number of prime factors (Liouville λ = +1) from those with an odd number (λ = −1). The top chart shows L(N) = Σ λ(n) — the cumulative Liouville sum — whose smallness relative to N reflects near-perfect parity balance. The bottom chart tracks, in real time, the fraction of coprimes to M = 30 with odd Ω. If this fraction deviated detectably from ½, a sieve could exploit the imbalance to count twin primes exactly. It does not — and the chart shows why.</p>
     </div>
     <div class="panel-controls">
