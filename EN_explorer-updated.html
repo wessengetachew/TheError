@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>E(N) Explorer — W. Getachew</title>
+<title>Deep Analysis — Jump Theorem · Wessen Getachew</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
 
@@ -12,83 +12,160 @@
   --gold:#c8a84a;--gold2:#e8d080;--gold3:#f5e8a0;
   --teal:#3dc8b8;--coral:#e05060;--violet:#9070d8;
   --orange:#e8904a;--green:#50c878;
-  --cream:rgba(255,255,255,.93);--cream2:rgba(255,255,255,.60);--cream3:rgba(255,255,255,.28);
-  --mono:'JetBrains Mono',monospace;--serif:'Cormorant Garamond',serif;--disp:'Cinzel Decorative',serif;
+  --cream:rgba(255,255,255,.93);--cream2:rgba(255,255,255,.60);
+  --cream3:rgba(255,255,255,.28);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Cormorant Garamond',serif;
+  --disp:'Cinzel Decorative',serif;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--cream);font-family:var(--serif);overflow-x:hidden;min-height:100vh;}
 
-#tab-nav{position:sticky;top:0;z-index:200;background:rgba(4,4,10,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 28px;height:52px;}
-.back-btn{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);text-decoration:none;padding:6px 14px 6px 0;border-right:1px solid rgba(255,255,255,.08);margin-right:20px;transition:color .2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+/* ── NAV ── */
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(4,4,10,.95);
+  backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;padding:0 28px;height:52px;}
+.back-btn{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);text-decoration:none;padding:6px 14px 6px 0;
+  border-right:1px solid rgba(255,255,255,.08);margin-right:20px;
+  transition:color .2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
 .back-btn:hover{color:var(--gold2);}
 .tabs{display:flex;flex:1;}
-.tab{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;padding:0 20px;height:52px;display:flex;align-items:center;gap:8px;color:var(--cream3);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
+.tab{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  text-decoration:none;padding:0 20px;height:52px;display:flex;align-items:center;gap:8px;
+  color:var(--cream3);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
 .tab:hover{color:var(--cream2);}
-.tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tab.active{color:var(--violet);border-bottom-color:var(--violet);}
 .tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;}
-.tab.active .tab-dot{opacity:1;background:var(--teal);}
-.nav-eq{font-family:var(--mono);font-size:9px;color:var(--cream3);letter-spacing:.08em;margin-left:auto;}
-@media(max-width:640px){.nav-eq{display:none;}}
+.tab.active .tab-dot{opacity:1;background:var(--violet);}
 
-#page-header{padding:40px 40px 28px;max-width:1100px;margin:0 auto;border-bottom:1px solid rgba(255,255,255,.05);}
-.header-label{font-family:var(--mono);font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
-.header-title{font-family:var(--disp);font-size:clamp(1.4rem,3.5vw,2.5rem);font-weight:400;line-height:1.2;color:var(--cream);margin-bottom:10px;}
-.header-title em{color:var(--teal);font-family:var(--serif);font-style:italic;}
-.header-eq{font-family:var(--mono);font-size:clamp(.78rem,1.6vw,.95rem);color:var(--gold);background:rgba(200,168,74,.07);border:1px solid rgba(200,168,74,.18);display:inline-block;padding:7px 18px;}
+/* ── PAGE HEADER ── */
+#page-header{padding:40px 40px 28px;max-width:1100px;margin:0 auto;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.header-label{font-family:var(--mono);font-size:8px;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.header-title{font-family:var(--disp);font-size:clamp(1.4rem,3.5vw,2.4rem);
+  font-weight:400;line-height:1.2;color:var(--cream);margin-bottom:10px;}
+.header-title em{color:var(--violet);font-family:var(--serif);font-style:italic;}
+.header-sub{font-size:1rem;font-weight:300;color:var(--cream2);line-height:1.85;
+  max-width:640px;margin-top:12px;}
 
-#controls{max-width:1100px;margin:0 auto;padding:28px 40px 0;}
-.controls-grid{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;}
-@media(max-width:640px){.controls-grid{grid-template-columns:1fr;}}
-.control-label{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream3);margin-bottom:10px;}
-.slider-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-#n-slider{-webkit-appearance:none;appearance:none;width:260px;max-width:100%;height:3px;background:rgba(255,255,255,.1);outline:none;border-radius:2px;cursor:pointer;}
-#n-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(200,168,74,.4);}
-#n-display{font-family:var(--mono);font-size:1.05rem;color:var(--gold2);min-width:60px;}
-.compute-btn{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:var(--gold);color:var(--bg);border:none;padding:11px 22px;cursor:pointer;transition:background .2s;white-space:nowrap;}
-.compute-btn:hover{background:var(--gold2);}
-.compute-btn:disabled{opacity:.5;cursor:not-allowed;}
-
-#warn-banner{max-width:1100px;margin:12px auto 0;padding:0 40px;display:none;}
-.warn-box{font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:10px 18px;border-left:3px solid;}
-.warn-box.level-1{background:rgba(200,168,74,.07);border-color:var(--gold);color:var(--gold2);}
-.warn-box.level-2{background:rgba(224,80,96,.08);border-color:var(--coral);color:#f08090;}
-
-#stats-area{max-width:1100px;margin:20px auto 0;padding:0 40px;}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-@media(max-width:760px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
-.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);padding:12px 14px;}
-.stat-lbl{font-family:var(--mono);font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream3);margin-bottom:5px;}
-.stat-val{font-family:var(--mono);font-size:12px;color:var(--gold2);letter-spacing:.04em;}
-.stat-val.teal{color:var(--teal);}.stat-val.violet{color:var(--violet);}.stat-val.coral{color:var(--coral);}.stat-val.green{color:var(--green);}.stat-val.orange{color:var(--orange);}
-
-.section-divider{max-width:1100px;margin:28px auto 0;padding:0 40px;display:flex;align-items:center;gap:14px;}
+/* ── SECTION DIVIDER ── */
+.section-divider{max-width:1100px;margin:28px auto 0;padding:0 40px;
+  display:flex;align-items:center;gap:14px;}
 .div-line{flex:1;height:1px;background:rgba(255,255,255,.07);}
-.div-glyph{font-family:var(--mono);font-size:7.5px;letter-spacing:.22em;color:var(--cream3);text-transform:uppercase;white-space:nowrap;}
+.div-glyph{font-family:var(--mono);font-size:7.5px;letter-spacing:.22em;
+  color:var(--cream3);text-transform:uppercase;white-space:nowrap;}
 
-#charts-area{max-width:1100px;margin:0 auto;padding:20px 40px 80px;display:flex;flex-direction:column;gap:24px;}
-.chart-panel{background:var(--bg1);border:1px solid rgba(255,255,255,.06);overflow:hidden;opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.23,1,.32,1),transform .55s cubic-bezier(.23,1,.32,1);}
-.chart-panel.visible{opacity:1;transform:translateY(0);}
-.chart-header{padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
-.chart-num{font-family:var(--mono);font-size:8px;letter-spacing:.2em;color:var(--cream3);}
-.chart-title{font-family:var(--mono);font-size:11.5px;color:var(--gold2);flex:1;}
-.chart-desc{font-family:var(--serif);font-size:.86rem;color:var(--cream2);line-height:1.65;width:100%;}
-canvas.main-chart{display:block;width:100%;height:220px;background:#050510;}
-@media(max-width:640px){canvas.main-chart{height:180px;}}
-.chart-footer{padding:9px 20px;display:flex;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.04);}
-.legend-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--cream3);}
-.legend-swatch{width:18px;height:2px;border-radius:1px;}
+/* ── ANALYSIS AREA ── */
+.analysis-area{max-width:1100px;margin:0 auto;padding:20px 40px 0;
+  display:flex;flex-direction:column;gap:28px;}
 
-#empty-state{max-width:1100px;margin:60px auto;padding:0 40px;text-align:center;}
-.empty-icon{font-family:var(--mono);font-size:2rem;color:var(--cream3);margin-bottom:14px;}
-.empty-text{font-size:1.05rem;color:var(--cream2);line-height:1.8;font-weight:300;}
+/* ── PANEL ── */
+.analysis-panel{background:var(--bg1);border:1px solid rgba(255,255,255,.06);
+  overflow:hidden;opacity:0;transform:translateY(14px);
+  transition:opacity .5s ease,transform .5s ease;}
+.analysis-panel.visible{opacity:1;transform:none;}
 
-footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.footer-left{font-family:var(--mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream3);}
+.panel-header{padding:18px 22px 14px;border-bottom:1px solid rgba(255,255,255,.05);}
+.panel-num{font-family:var(--mono);font-size:8px;letter-spacing:.2em;color:var(--cream3);}
+.panel-title{font-family:var(--mono);font-size:12px;color:var(--gold2);
+  display:inline;margin-left:10px;}
+.panel-ref{font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:var(--violet);
+  background:rgba(144,112,216,.1);border:1px solid rgba(144,112,216,.2);
+  padding:3px 10px;float:right;margin-top:1px;}
+.panel-desc{font-family:var(--serif);font-size:.88rem;color:var(--cream2);
+  line-height:1.72;margin-top:11px;}
+
+/* ── CONTROLS ── */
+.panel-controls{padding:13px 22px;background:rgba(0,0,0,.22);
+  border-bottom:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.ctrl-label{font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--cream3);}
+.ctrl-slider{-webkit-appearance:none;appearance:none;width:200px;height:3px;
+  background:rgba(255,255,255,.1);outline:none;border-radius:2px;cursor:pointer;}
+.ctrl-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg);
+  box-shadow:0 0 8px rgba(200,168,74,.4);}
+.ctrl-val{font-family:var(--mono);font-size:11px;color:var(--gold2);min-width:52px;}
+.ctrl-btn{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  background:var(--gold);color:var(--bg);border:none;padding:9px 18px;cursor:pointer;
+  transition:background .2s;}
+.ctrl-btn:hover{background:var(--gold2);}
+.ctrl-btn:disabled{opacity:.5;cursor:not-allowed;}
+.ctrl-select{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);color:var(--cream);padding:6px 10px;cursor:pointer;outline:none;}
+.ctrl-toggle{font-family:var(--mono);font-size:8px;letter-spacing:.12em;
+  background:rgba(61,200,184,.08);border:1px solid rgba(61,200,184,.2);
+  color:var(--teal);padding:5px 12px;cursor:pointer;transition:all .2s;}
+.ctrl-toggle.active{background:rgba(61,200,184,.22);}
+
+/* ── CHART LAYOUTS ── */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;border-top:1px solid rgba(255,255,255,.04);}
+@media(max-width:680px){.charts-row{grid-template-columns:1fr;}}
+.chart-col+.chart-col{border-left:1px solid rgba(255,255,255,.04);}
+canvas.cv-main{display:block;width:100%;height:220px;background:#050510;}
+canvas.cv-hist{display:block;width:100%;height:220px;background:#050510;}
+canvas.cv-ring{display:block;width:100%;height:450px;background:#050510;}
+canvas.cv-full{display:block;width:100%;height:220px;background:#050510;}
+canvas.cv-half{display:block;width:100%;height:160px;background:#050510;
+  border-top:1px solid rgba(255,255,255,.04);}
+
+/* ring layout */
+.ring-layout{display:grid;grid-template-columns:1fr 270px;
+  border-top:1px solid rgba(255,255,255,.04);}
+@media(max-width:680px){.ring-layout{grid-template-columns:1fr;}}
+.ring-info{padding:18px 16px;display:flex;flex-direction:column;gap:12px;
+  border-left:1px solid rgba(255,255,255,.04);overflow-y:auto;max-height:450px;}
+.ri-block{border:1px solid rgba(255,255,255,.06);padding:10px 12px;
+  background:rgba(0,0,0,.2);}
+.ri-lbl{font-family:var(--mono);font-size:7px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--cream3);margin-bottom:6px;}
+.ri-val{font-family:var(--mono);font-size:14px;color:var(--gold2);}
+.ri-sub{font-family:var(--mono);font-size:8px;color:var(--cream3);margin-top:3px;}
+
+/* ── STATS STRIP ── */
+.stats-strip{padding:10px 22px;background:rgba(0,0,0,.15);
+  border-top:1px solid rgba(255,255,255,.04);display:flex;gap:26px;flex-wrap:wrap;}
+.st-item{display:flex;flex-direction:column;gap:3px;}
+.st-lbl{font-family:var(--mono);font-size:7px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--cream3);}
+.st-val{font-family:var(--mono);font-size:11px;color:var(--gold2);}
+.st-val.teal{color:var(--teal);}.st-val.coral{color:var(--coral);}
+.st-val.violet{color:var(--violet);}.st-val.orange{color:var(--orange);}
+
+/* ── LEGEND ── */
+.legend-bar{padding:8px 22px;display:flex;gap:18px;flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,.04);}
+.leg{display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:8px;letter-spacing:.08em;color:var(--cream3);}
+.leg-sw{width:16px;height:3px;border-radius:1px;}
+.leg-dot{width:8px;height:8px;border-radius:50%;}
+
+/* ── INFOBOX ── */
+.infobox{margin:0 22px;padding:12px 18px;
+  background:rgba(144,112,216,.07);border-left:2px solid rgba(144,112,216,.4);}
+.infobox-title{font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--violet);margin-bottom:7px;}
+.infobox-text{font-family:var(--serif);font-size:.85rem;color:var(--cream2);line-height:1.72;}
+
+/* ── PANEL NOTE ── */
+.panel-note{padding:12px 22px 14px;background:rgba(0,0,0,.12);
+  border-top:1px solid rgba(255,255,255,.04);
+  font-family:var(--serif);font-size:.82rem;color:rgba(255,255,255,.38);
+  line-height:1.65;font-style:italic;}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;margin-top:60px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-left{font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--cream3);}
 .footer-right{font-family:var(--serif);font-size:.86rem;color:var(--cream3);font-style:italic;}
 
 @media(max-width:600px){
-  #page-header,#controls,#warn-banner,#stats-area,.section-divider,#charts-area{padding-left:18px;padding-right:18px;}
+  #page-header,.analysis-area,.section-divider{padding-left:18px;padding-right:18px;}
   #tab-nav{padding:0 14px;}
 }
 </style>
@@ -96,487 +173,985 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 <body>
 
 <nav id="tab-nav">
-  <a href="index.html" class="back-btn"><span>◁</span> Main</a>
+  <a href="index-updated.html" class="back-btn"><span>◁</span> Main</a>
   <div class="tabs">
-    <a href="index.html" class="tab"><span class="tab-dot"></span> Opener</a>
-    <div class="tab active"><span class="tab-dot"></span> Explorer</div>
+    <a href="index-updated.html" class="tab"><span class="tab-dot"></span>Opener</a>
+    <a href="EN_explorer-1-2-2.html" class="tab"><span class="tab-dot"></span>Explorer</a>
+    <div class="tab active"><span class="tab-dot"></span>Deep Analysis</div>
   </div>
-  <div class="nav-eq">E(N) = R(N) − C = O(1/N)</div>
 </nav>
 
 <div id="page-header">
-  <div class="header-label">Interactive Explorer · W. Getachew · 2026</div>
-  <h1 class="header-title">The <em>E(N)</em> Convergence Explorer</h1>
-  <div class="header-eq">R(N) → C with E(N) = O(1/N)</div>
+  <div class="header-label">Advanced Diagnostics · Wessen Getachew · 2026</div>
+  <h1 class="header-title">Jump Theorem — <em>Critical Nuances</em></h1>
+  <p class="header-sub">Four visualizations probing the framework's limits: lift-constant friction, ghost prime residues in the primorial sieve, logarithmic sign-change rarity at scale, and the parity obstruction that prevents standard sieve methods from counting twin primes exactly.</p>
 </div>
 
-<div id="controls">
-  <div class="controls-grid">
-    <div>
-      <div class="control-label">Compute up to N</div>
-      <div class="slider-row">
-        <input type="range" id="n-slider" min="100" max="10000" step="50" value="500">
-        <span id="n-display">500</span>
+<!-- ═══════════ SECTION 1: LIFT THEORY ═══════════ -->
+<div class="section-divider">
+  <div class="div-line"></div><div class="div-glyph">Lift Theory</div><div class="div-line"></div>
+</div>
+
+<div class="analysis-area">
+
+  <!-- ── PANEL 1: FRICTION MAP ── -->
+  <div class="analysis-panel" id="p1">
+    <div class="panel-header">
+      <span class="panel-ref">ref · Chart 07</span>
+      <span class="panel-num">01</span>
+      <span class="panel-title">Lift Friction Map — local factor φ(M+1)/[(M+1)·C] deviation</span>
+      <p class="panel-desc">Each integer M contributes a local lift factor L(M) = φ(M+1)/(M+1). The theoretical constant C ≈ 0.5307 is the limit R(N) converges to. <em>Friction</em> measures the signed relative deviation: f(M) = L(M)/C − 1. Smooth numbers (products of small primes) create deep negative friction; primes spike sharply positive. The histogram shows the full deviation distribution — a fat-tailed landscape that reveals where the convergence R(N) → C is most turbulent, and where potential counter-examples to the density claims would most naturally hide.</p>
+    </div>
+    <div class="panel-controls">
+      <span class="ctrl-label">N</span>
+      <input type="range" class="ctrl-slider" id="p1-n" min="500" max="10000" step="100" value="3000">
+      <span class="ctrl-val" id="p1-nv">3,000</span>
+      <button class="ctrl-btn" id="p1-btn">Compute →</button>
+    </div>
+    <div class="charts-row">
+      <div class="chart-col"><canvas class="cv-main" id="p1-main"></canvas></div>
+      <div class="chart-col"><canvas class="cv-hist" id="p1-hist"></canvas></div>
+    </div>
+    <div class="legend-bar">
+      <div class="leg"><div class="leg-sw" style="background:var(--orange)"></div>Positive friction (primes)</div>
+      <div class="leg"><div class="leg-sw" style="background:var(--coral)"></div>Negative friction (smooth)</div>
+      <div class="leg"><div class="leg-sw" style="background:var(--violet)"></div>Running R(N)/C − 1 → 0</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--teal);opacity:.7"></div>Zero line (f = 0)</div>
+    </div>
+    <div class="stats-strip">
+      <div class="st-item"><div class="st-lbl">N</div><div class="st-val" id="p1-sn">—</div></div>
+      <div class="st-item"><div class="st-lbl">C</div><div class="st-val teal" id="p1-sc">—</div></div>
+      <div class="st-item"><div class="st-lbl">Max |friction|</div><div class="st-val coral" id="p1-smf">—</div></div>
+      <div class="st-item"><div class="st-lbl">Mean |friction|</div><div class="st-val" id="p1-savf">—</div></div>
+      <div class="st-item"><div class="st-lbl">M at max friction</div><div class="st-val orange" id="p1-smm">—</div></div>
+      <div class="st-item"><div class="st-lbl">Skewness</div><div class="st-val violet" id="p1-ssk">—</div></div>
+    </div>
+    <div class="panel-note">The friction distribution is heavily right-skewed: rare but extreme positive spikes (primes) and a wide negative tail (smooth numbers with many small factors). These extremes are the "rough patches" in convergence — the arithmetic analogue of turbulence in a laminar flow approaching C.</div>
+  </div>
+
+  <!-- ── PANEL 2: GHOST RESIDUES RING ── -->
+  <div class="analysis-panel" id="p2">
+    <div class="panel-header">
+      <span class="panel-ref">ref · Opener Ring</span>
+      <span class="panel-num">02</span>
+      <span class="panel-title">Ghost Residues — Stable vs Transient Primes in the Primorial Sieve</span>
+      <p class="panel-desc">At primorial level M = p₁·…·pₖ, most coprime residues r in [1, M) are genuine primes — but some are composites of primes &gt; pₖ that only appear prime-like. These are the <em>ghost composites</em>: they pass the gcd(r, M) = 1 test but will be eliminated when M advances to M·p_{k+1}. The <em>transient</em> residues are those that fail the very next sieve step. Twin-prime pair candidates where at least one member is a ghost are the "composite interference paths" — pairs that look like twin primes at this level but are not.</p>
+    </div>
+    <div class="panel-controls">
+      <span class="ctrl-label">Primorial level</span>
+      <select class="ctrl-select" id="p2-level" onchange="renderGhostRing()">
+        <option value="0">M = 6  (2·3)</option>
+        <option value="1" selected>M = 30  (2·3·5)</option>
+        <option value="2">M = 210  (2·3·5·7)</option>
+        <option value="3">M = 2310  (2·3·5·7·11)</option>
+      </select>
+      <span class="ctrl-label" style="margin-left:10px;">Twin pairs</span>
+      <button class="ctrl-toggle active" id="p2-twin" onclick="toggleTwins()">ON</button>
+    </div>
+    <div class="ring-layout">
+      <div class="chart-col"><canvas class="cv-ring" id="p2-ring"></canvas></div>
+      <div class="ring-info">
+        <div class="ri-block">
+          <div class="ri-lbl">Modulus M</div>
+          <div class="ri-val" id="p2-M">30</div>
+          <div class="ri-sub" id="p2-Mf">= 2 · 3 · 5</div>
+        </div>
+        <div class="ri-block">
+          <div class="ri-lbl">Coprime count φ(M)</div>
+          <div class="ri-val" id="p2-phi">—</div>
+          <div class="ri-sub">gcd(r, M) = 1</div>
+        </div>
+        <div class="ri-block">
+          <div class="ri-lbl">Stable primes</div>
+          <div class="ri-val teal" id="p2-stable">—</div>
+          <div class="ri-sub">coprime ∧ prime — genuine survivors</div>
+        </div>
+        <div class="ri-block">
+          <div class="ri-lbl">Ghost composites</div>
+          <div class="ri-val coral" id="p2-ghost">—</div>
+          <div class="ri-sub">coprime ∧ composite — not yet sieved</div>
+        </div>
+        <div class="ri-block">
+          <div class="ri-lbl">Next-level transients</div>
+          <div class="ri-val orange" id="p2-trans">—</div>
+          <div class="ri-sub">r ≡ 0 mod p_{k+1} — expelled next round</div>
+        </div>
+        <div class="ri-block">
+          <div class="ri-lbl">Genuine twin pairs</div>
+          <div class="ri-val" style="color:var(--green)" id="p2-tp">—</div>
+          <div class="ri-sub">both members prime</div>
+        </div>
+        <div class="ri-block">
+          <div class="ri-lbl">Ghost twin pairs</div>
+          <div class="ri-val orange" id="p2-gtp">—</div>
+          <div class="ri-sub">≥1 member composite — interference</div>
+        </div>
       </div>
     </div>
-    <button class="compute-btn" id="compute-btn">Compute →</button>
-  </div>
-</div>
-
-<div id="warn-banner"><div class="warn-box" id="warn-box"></div></div>
-
-<div id="stats-area">
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-lbl">Computed N</div><div class="stat-val" id="st-n">—</div></div>
-    <div class="stat-card"><div class="stat-lbl">Constant C</div><div class="stat-val teal" id="st-c">—</div></div>
-    <div class="stat-card"><div class="stat-lbl">c₁ estimate</div><div class="stat-val violet" id="st-c1">—</div></div>
-    <div class="stat-card"><div class="stat-lbl">Sign changes</div><div class="stat-val coral" id="st-sc">—</div></div>
-    <div class="stat-card"><div class="stat-lbl">π(N) primes</div><div class="stat-val" style="color:var(--gold2)" id="st-pi">—</div></div>
-    <div class="stat-card"><div class="stat-lbl">SC / π(N)</div><div class="stat-val green" id="st-ratio">—</div></div>
-    <div class="stat-card"><div class="stat-lbl">Prime-at-SC</div><div class="stat-val orange" id="st-psc">—</div></div>
-    <div class="stat-card"><div class="stat-lbl">Longest SC gap</div><div class="stat-val" id="st-gap">—</div></div>
-  </div>
-</div>
-
-<div class="section-divider"><div class="div-line"></div><div class="div-glyph">Convergence — three views</div><div class="div-line"></div></div>
-
-<div id="empty-state">
-  <div class="empty-icon">⟳</div>
-  <p class="empty-text">Set N and click <strong style="color:var(--gold)">Compute →</strong><br>to render all eight charts.</p>
-</div>
-
-<div id="charts-area" style="display:none;">
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 01</span><span class="chart-title">|E(N)| with A/log N envelope</span>
-      <span class="chart-desc">Absolute error with fitted envelope. E(N) = O(1/N) — the ratio structure of R(N) causes cancellation beyond the naive 1/log N prediction. The envelope shows the empirical decay rate.</span>
+    <div class="legend-bar">
+      <div class="leg"><div class="leg-dot" style="background:rgba(61,200,184,.9)"></div>Stable prime</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--coral)"></div>Ghost composite</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--orange)"></div>Next-level transient</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--gold)"></div>Unit (r = 1)</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,255,255,.05)"></div>Eliminated</div>
     </div>
-    <canvas class="main-chart" id="c1"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>|E(N)|</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.7"></div>Fitted envelope</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--violet);opacity:.7"></div>c₁/log N (reference)</div>
-    </div>
-  </div>
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 02</span><span class="chart-title">E(N) · N → bounded oscillation</span>
-      <span class="chart-desc">E(N)·N is bounded and oscillating — confirming E(N) = O(1/N). The c₁ reference line is shown for comparison; E(N) decays faster than c₁/log N.</span>
-    </div>
-    <canvas class="main-chart" id="c2"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--violet)"></div>E(N)·N</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);opacity:.6"></div>c₁ reference</div>
-    </div>
-  </div>
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 03</span><span class="chart-title">log|E(N)| vs log(log N) · slope → −1</span>
-      <span class="chart-desc">Log-log diagnostic. The empirical slope is steeper than −1, consistent with E(N) = O(1/N) rather than O(1/log N). Breaks are sign changes of E(N).</span>
-    </div>
-    <canvas class="main-chart" id="c3"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--orange)"></div>log|E(N)|</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.6"></div>Slope = −1 ref</div>
-    </div>
-  </div>
-
-  <div class="section-divider" style="margin:4px 0;"><div class="div-line"></div><div class="div-glyph">Sign change analysis</div><div class="div-line"></div></div>
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 04</span><span class="chart-title">Signed E(N) · prime markers · sign-change dots</span>
-      <span class="chart-desc">Full signed oscillation of E(N). Gold ticks on the baseline mark every prime. Coral dots mark sign changes. Most sign changes fall near primes — but not every prime triggers one; consecutive primes can push in the same direction before a reversal.</span>
-    </div>
-    <canvas class="main-chart" id="c4"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>E(N)</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold)"></div>Prime tick</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--coral)"></div>Sign change</div>
-    </div>
-  </div>
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 05</span><span class="chart-title">SC(N) / π(N) — sign changes per prime</span>
-      <span class="chart-desc">Ratio of cumulative sign changes to cumulative prime count. Converges to a constant strictly less than 1 — the fraction of primes that actually reverse the direction of E(N). This limit is an original quantity; its analytic value is not yet known.</span>
-    </div>
-    <canvas class="main-chart" id="c5"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--green)"></div>SC(N)/π(N)</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.5"></div>Empirical limit</div>
-    </div>
-  </div>
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 06</span><span class="chart-title">Sign change gap distribution</span>
-      <span class="chart-desc">Histogram of gap sizes between consecutive sign changes. An approximately exponential tail is consistent with pseudo-random oscillation driven by primes. A heavy tail or periodicity would indicate structured interference.</span>
-    </div>
-    <canvas class="main-chart" id="c6"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--coral)"></div>Gap frequency</div>
-    </div>
-  </div>
-
-  <div class="section-divider" style="margin:4px 0;"><div class="div-line"></div><div class="div-glyph">Local structure & χ₄ connection</div><div class="div-line"></div></div>
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 07</span><span class="chart-title">Local lift factor φ(M+1) / [(M+1)·C]</span>
-      <span class="chart-desc">Each term L(M) pushes R(N) upward when this factor exceeds 1 (gold line), downward when below. At M = prime, φ(M) = M−1 is maximal — the teal vertical bands show prime positions. The sign of (factor − 1) directly predicts which way E(N) will move next.</span>
-    </div>
-    <canvas class="main-chart" id="c7"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--violet)"></div>Local factor</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.6"></div>Factor = 1</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal);opacity:.4"></div>Prime column</div>
-    </div>
-  </div>
-
-  <div class="chart-panel">
-    <div class="chart-header">
-      <span class="chart-num">Chart 08</span><span class="chart-title">χ₄-restricted E(N) · gcd(M, 4) = 1</span>
-      <span class="chart-desc">E(N) restricted to M ≡ 1 or 3 (mod 4) — the support of the Dirichlet character χ₄. Scaling by ×4 (the conductor) connects this to the Farey–χ₄ discrepancy and the zeros of L(s, χ₄). Teal dots mark sign changes in this restricted sum — these are genuine Franel–Landau probes.</span>
-    </div>
-    <canvas class="main-chart" id="c8"></canvas>
-    <div class="chart-footer">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold)"></div>E_χ₄(N)</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>χ₄ sign change</div>
-    </div>
+    <div class="panel-note">At M = 6 every coprime residue in [2, 6) is already prime. Ghost composites appear from M = 30 onward (e.g., 49 = 7² is coprime to 30 but composite). Their prevalence grows with M — the sieve must advance through infinitely many primorial levels to eliminate all ghost composites and isolate the genuine twin primes.</div>
   </div>
 
 </div>
 
-
-<!-- ═══════════ THEOREMS ═══════════ -->
-<div class="section-divider" style="margin-top:8px;">
-  <div class="div-line"></div>
-  <div class="div-glyph">Analytic results</div>
-  <div class="div-line"></div>
+<!-- ═══════════ SECTION 2: SIGN CHANGE DYNAMICS ═══════════ -->
+<div class="section-divider" style="margin-top:24px;">
+  <div class="div-line"></div><div class="div-glyph">Sign Change Dynamics</div><div class="div-line"></div>
 </div>
 
-<div style="max-width:820px;margin:0 auto;padding:40px 32px 60px;font-family:'Cormorant Garamond',serif;">
+<div class="analysis-area" style="padding-top:20px;">
 
-  <div style="margin-bottom:36px;">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px;">Theorem A &mdash; Convergence</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#e8d080;background:rgba(200,168,74,.06);border-left:2px solid rgba(200,168,74,.4);padding:12px 16px;margin-bottom:14px;line-height:1.7;">
-      R(N) = &Sigma;<sub>d sqfree</sub> &mu;(d)/d &middot; S(d,N)/B(N)<br>
-      S(d,N)/B(N) &rarr; d / &prod;<sub>p|d</sub>(p&sup2;&minus;1)<br>
-      &there4; R(N) &rarr; C = &prod;<sub>p</sub>(p&sup2;&minus;2)/(p&sup2;&minus;1) &nbsp;&nbsp; &#x25a0;
+  <!-- ── PANEL 3: SC WAITING TIMES ── -->
+  <div class="analysis-panel" id="p3">
+    <div class="panel-header">
+      <span class="panel-ref">ref · Chart 06</span>
+      <span class="panel-num">03</span>
+      <span class="panel-title">Sign-Change Waiting Time — log-scale gap distribution &amp; Skewes context</span>
+      <p class="panel-desc">Chart 06 shows the raw gap between consecutive sign changes of E(N). Here the gaps are plotted on a <em>logarithmic</em> scale — log₁₀(gap_k) vs sign-change index k — exposing any long-term growth trend in waiting time. A rising OLS regression line indicates sign changes grow rarer at larger N, connecting the small-N behaviour of E(N) to Littlewood's theorem about π(x) − li(x): the changes must occur infinitely often, but with astronomically increasing spacing as N → ∞.</p>
     </div>
-    <div style="font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.8;">
-      <em>Proof sketch.</em> Write f(m) = &phi;(m+1)/(m+1) = &Sigma;<sub>d|m+1</sub> &mu;(d)/d (Euler&rsquo;s formula).
-      Then &Sigma; L(m) = &Sigma; &phi;(m)&middot;f(m) = &Sigma;<sub>d</sub> &mu;(d)/d &middot; S(d,N) where S(d,N) = &Sigma;<sub>m&equiv;&minus;1 mod d</sub> &phi;(m).
-      By equidistribution of &phi; in arithmetic progressions, S(d,N)/B(N) &rarr; d/&prod;<sub>p|d</sub>(p&sup2;&minus;1).
-      Applying M&ouml;bius inversion gives R(N) &rarr; &Sigma;<sub>d</sub> &mu;(d)/&prod;<sub>p|d</sub>(p&sup2;&minus;1) = &prod;<sub>p</sub>(1&minus;1/(p&sup2;&minus;1)) = &prod;<sub>p</sub>(p&sup2;&minus;2)/(p&sup2;&minus;1) = C.
+    <div class="infobox" style="margin-top:14px;">
+      <div class="infobox-title">Skewes Number Context</div>
+      <div class="infobox-text">Skewes (1933) proved under RH that π(x) first exceeds li(x) before x = 10<sup>10<sup>10<sup>34</sup></sup></sup>. Computational evidence places the first crossing near e<sup>727.95…</sup> ≈ 1.40 × 10<sup>316</sup>. Our E(N) = R(N) − C differs from π(x) − li(x), but its sign changes also exhibit growing inter-event gaps. The log-scale scatter makes this rarity visible even over the small-N range accessible to a browser — a window into a structure that only becomes fully dramatic at astronomical scale.</div>
     </div>
+    <div class="panel-controls" style="margin-top:2px;">
+      <span class="ctrl-label">N</span>
+      <input type="range" class="ctrl-slider" id="p3-n" min="500" max="15000" step="100" value="5000">
+      <span class="ctrl-val" id="p3-nv">5,000</span>
+      <button class="ctrl-btn" id="p3-btn">Compute →</button>
+    </div>
+    <div class="charts-row">
+      <div class="chart-col"><canvas class="cv-main" id="p3-scatter"></canvas></div>
+      <div class="chart-col"><canvas class="cv-hist" id="p3-hist"></canvas></div>
+    </div>
+    <div class="legend-bar">
+      <div class="leg"><div class="leg-dot" style="background:var(--teal)"></div>log₁₀(gap_k)</div>
+      <div class="leg"><div class="leg-sw" style="background:var(--violet);opacity:.7"></div>OLS trend</div>
+      <div class="leg"><div class="leg-sw" style="background:var(--orange);opacity:.7"></div>Gap distribution</div>
+    </div>
+    <div class="stats-strip">
+      <div class="st-item"><div class="st-lbl">Sign changes</div><div class="st-val" id="p3-sc">—</div></div>
+      <div class="st-item"><div class="st-lbl">Median gap</div><div class="st-val teal" id="p3-med">—</div></div>
+      <div class="st-item"><div class="st-lbl">Max gap</div><div class="st-val coral" id="p3-max">—</div></div>
+      <div class="st-item"><div class="st-lbl">OLS slope (log)</div><div class="st-val violet" id="p3-slope">—</div></div>
+      <div class="st-item"><div class="st-lbl">SC / π(N)</div><div class="st-val orange" id="p3-dens">—</div></div>
+    </div>
+    <div class="panel-note">A positive OLS slope means successive sign changes take longer on average — the functional analogue of Skewes-type behaviour. Even if the slope is small in this range, extrapolated to N ≈ 10³¹⁶ it predicts waiting times that dwarf observable scales. The histogram shows the gap distribution is log-normal, not geometric — another deviation from a simple Poisson process.</div>
   </div>
 
-  <div style="margin-bottom:36px;">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px;">Theorem B &mdash; Rate</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#3dc8b8;background:rgba(61,200,184,.06);border-left:2px solid rgba(61,200,184,.4);padding:12px 16px;margin-bottom:14px;line-height:1.7;">
-      E(N) = R(N) &minus; C = O(1/N)<br>
-      E(N)&middot;N is bounded and oscillating &nbsp;&nbsp; &#x25a0;
-    </div>
-    <div style="font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.8;">
-      <em>Evidence.</em> Verified numerically to N = 50,000: max |E(N)&middot;N| &lt; 0.88, mean &asymp; 0.20.
-      This is <em>faster</em> than the naive O(1/log N) prediction — the ratio structure of R(N) = A(N)/B(N) produces cancellation between A(N) and B(N) that eliminates the leading 1/log N term.
-      <br><br>
-      <em>Open problem.</em> Prove E(N)&middot;N is bounded analytically. This reduces to bounding
-      S(d,N) &minus; d&middot;B(N)/&prod;<sub>p|d</sub>(p&sup2;&minus;1), which is controlled by zeros of Dirichlet L-functions L(s,&chi;) for characters &chi; mod d. Under GRH the error in S(d,N) is O(d&radic;N&middot;log N), giving E(N) = O(log N / N<sup>3/2</sup>).
-    </div>
-  </div>
+</div>
 
-  <div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px;">Note on the Boikova (2025) preprint</div>
-    <div style="font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.8;">
-      Boikova independently derives the &radic;x/log x error coefficient for &pi;(x) via sinc-function analysis of the Sieve of Eratosthenes (Preprints.org, Dec 2025, doi:10.20944/preprints202512.0862.v1).
-      Her framework and this one arrive at the same coefficient from entirely different directions.
-      The Lift Survival Framework additionally provides the exact constant C, the convergence R(N)&rarr;C,
-      and Theorem B above. The open problem in both works is the same: connect the oscillation of E(N) to the imaginary parts of L-function zeros via an explicit formula.
+<!-- ═══════════ SECTION 3: PARITY OBSTRUCTION ═══════════ -->
+<div class="section-divider" style="margin-top:24px;">
+  <div class="div-line"></div><div class="div-glyph">Parity Obstruction</div><div class="div-line"></div>
+</div>
+
+<div class="analysis-area" style="padding-top:20px;padding-bottom:80px;">
+
+  <!-- ── PANEL 4: PARITY INTERFERENCE ── -->
+  <div class="analysis-panel" id="p4">
+    <div class="panel-header">
+      <span class="panel-ref">ref · Opener / Sieve</span>
+      <span class="panel-num">04</span>
+      <span class="panel-title">Parity Interference — Liouville function &amp; prime-factor parity balance</span>
+      <p class="panel-desc">The <em>parity problem</em> in sieve theory: standard multiplicative sieves cannot distinguish integers with an even number of prime factors (Liouville λ = +1) from those with an odd number (λ = −1). The top chart shows L(N) = Σ λ(n) — the cumulative Liouville sum — whose smallness relative to N reflects near-perfect parity balance. The bottom chart tracks, in real time, the fraction of coprimes to M = 30 with odd Ω. If this fraction deviated detectably from ½, a sieve could exploit the imbalance to count twin primes exactly. It does not — and the chart shows why.</p>
     </div>
+    <div class="panel-controls">
+      <span class="ctrl-label">N</span>
+      <input type="range" class="ctrl-slider" id="p4-n" min="500" max="15000" step="100" value="5000">
+      <span class="ctrl-val" id="p4-nv">5,000</span>
+      <button class="ctrl-btn" id="p4-btn">Compute →</button>
+    </div>
+    <canvas class="cv-full" id="p4-liu"></canvas>
+    <canvas class="cv-half" id="p4-par"></canvas>
+    <div class="legend-bar">
+      <div class="leg"><div class="leg-sw" style="background:var(--teal)"></div>L(N) = Σ λ(n)</div>
+      <div class="leg"><div class="leg-sw" style="background:var(--coral);opacity:.5"></div>Fill area below zero</div>
+      <div class="leg"><div class="leg-sw" style="background:var(--gold);opacity:.7"></div>Odd-Ω fraction (coprimes to 30)</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--violet);opacity:.7"></div>Primorial thresholds</div>
+    </div>
+    <div class="stats-strip">
+      <div class="st-item"><div class="st-lbl">L(N)</div><div class="st-val" id="p4-LN">—</div></div>
+      <div class="st-item"><div class="st-lbl">L(N) / N</div><div class="st-val teal" id="p4-Lrat">—</div></div>
+      <div class="st-item"><div class="st-lbl">Min L(N)</div><div class="st-val coral" id="p4-Lmin">—</div></div>
+      <div class="st-item"><div class="st-lbl">Max L(N)</div><div class="st-val orange" id="p4-Lmax">—</div></div>
+      <div class="st-item"><div class="st-lbl">Odd-Ω fraction</div><div class="st-val violet" id="p4-pf">—</div></div>
+    </div>
+    <div class="panel-note">The Pólya conjecture (L(N) ≤ 0 for all N &gt; 1) held computationally until Haselgrove disproved it in 1958; the first explicit counterexample lies near 1.845 × 10³⁶¹. In the range shown, L(N) remains negative and the odd-Ω fraction among coprimes to 30 hugs ½ with deviations invisible to any linear sieve. The Jump Theorem's doubling law works within the structured environment of M = 30·2ⁿ, where additional arithmetic constraints may break this balance in ways that standard sieve weights cannot.</div>
   </div>
 
 </div>
 
 <footer>
-  <div class="footer-left">W. Getachew · E(N) Explorer · math.NT · 2026</div>
-  <div class="footer-right">gcd(r,4)=1 · χ₄ · Franel–Landau</div>
+  <div class="footer-left">Wessen Getachew · Deep Analysis · math.NT · 2026</div>
+  <div class="footer-right">Friction · Ghost Residues · Sign Changes · Parity</div>
 </footer>
 
 <script>
-const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
-const WARN_1=isTouch?1000:6000, WARN_2=isTouch?2500:12000;
-const DPR=Math.min(window.devicePixelRatio||1,2);
+// ═══════════════════════════════════════════════════════════════════════════════
+//  MATH CORE
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// ── phi sieve (linear sieve method — fastest) ──────────────────────────
-function buildPhiAndPrimes(N){
-  const phi=new Int32Array(N+2);
-  const isPrime=new Uint8Array(N+2).fill(1);
-  const primes=[];
-  phi[1]=1;
-  for(let i=2;i<=N+1;i++){
-    if(isPrime[i]){primes.push(i);phi[i]=i-1;}
-    for(let j=0;j<primes.length&&i*primes[j]<=N+1;j++){
-      const p=primes[j];
-      isPrime[i*p]=0;
-      if(i%p===0){phi[i*p]=phi[i]*p;break;}
-      else{phi[i*p]=phi[i]*(p-1);}
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+function gcd(a, b) { while (b) { const t = b; b = a % b; a = t; } return a; }
+
+function buildSieves(N) {
+  // SPF (smallest prime factor) sieve — needed for bigOmega
+  const M = N + 2;
+  const spf = new Int32Array(M + 1);
+  for (let i = 0; i <= M; i++) spf[i] = i;
+  for (let i = 2; i * i <= M; i++) {
+    if (spf[i] === i) {
+      for (let j = i * i; j <= M; j += i) {
+        if (spf[j] === j) spf[j] = i;
+      }
     }
   }
-  return{phi,isPrime,primes};
-}
-
-function eulerC(primes){
-  let C=1;for(const p of primes)C*=(p*p-2)/(p*p-1);return C;
-}
-function theoreticalC1(C,primes){
-  let s=0;for(const p of primes)s+=Math.log(p)/(p*p-2);return -C*s;
-}
-
-// ── compute ───────────────────────────────────────────────────────────
-let result=null;
-function compute(N){
-  const{phi,isPrime,primes}=buildPhiAndPrimes(N);
-  const C=eulerC(primes);
-  const c1t=theoreticalC1(C,primes);
-
-  let sumL=0,sumPh=0,sumL4=0,sumPh4=0;
-  const raw=[];
-  for(let m=1;m<=N;m++){
-    const Lm=phi[m]*phi[m+1]/(m+1);
-    sumL+=Lm;sumPh+=phi[m];
-    const r4=m%4;
-    if(r4===1||r4===3){sumL4+=Lm;sumPh4+=phi[m];}
-    if(m>=10) raw.push({m,R:sumL/sumPh,R4:sumPh4>0?sumL4/sumPh4:0,ip:isPrime[m]===1,lf:phi[m+1]/((m+1)*C)});
+  // Phi sieve using SPF
+  const phi = new Int32Array(M + 1);
+  const primes = [];
+  phi[1] = 1;
+  for (let i = 2; i <= M; i++) {
+    if (spf[i] === i) {          // i is prime
+      primes.push(i);
+      phi[i] = i - 1;
+    } else {
+      const p = spf[i], ip = (i / p) | 0;
+      phi[i] = (ip % p === 0) ? phi[ip] * p : phi[ip] * (p - 1);
+    }
   }
-  const C4=raw[raw.length-1].R4;
+  return { phi, spf, primes };
+}
 
-  // fit A (median of |E|*logm over second half)
-  const half=Math.floor(raw.length/2);
-  const fv=raw.slice(half).map(d=>Math.abs(d.R-C)*Math.log(d.m)).filter(v=>isFinite(v)&&v>0).sort((a,b)=>a-b);
-  const A=fv[Math.floor(fv.length/2)]||0.01;
+function eulerC(primes) {
+  let C = 1;
+  for (const p of primes) C *= (p * p - 2) / (p * p - 1);
+  return C;
+}
 
-  let ps=0,ps4=0,sc=0,sc4=0,primeSC=0,piN=0;
-  let lastSC=10;const scGaps=[];
-  const data=[];
-  for(const r of raw){
-    const E=r.R-C,E4=r.R4-C4,lm=Math.log(r.m);
-    const sg=E>=0?1:-1,sg4=E4>=0?1:-1;
-    if(r.ip)piN++;
-    let isc=false,isc4=false;
-    if(ps!==0&&sg!==ps){sc++;isc=true;if(r.ip)primeSC++;scGaps.push(r.m-lastSC);lastSC=r.m;}
-    if(ps4!==0&&sg4!==ps4){sc4++;isc4=true;}
-    ps=sg;ps4=sg4;
-    data.push({m:r.m,E,absE:Math.abs(E),Elgm:E*lm,lgAbsE:Math.abs(E)>1e-15?Math.log(Math.abs(E)):NaN,lglgm:Math.log(lm),lm,E4,ip:r.ip,isc,isc4,lf:r.lf,piC:piN,scC:sc});
+// bigOmega(n) = total prime factors with multiplicity: Ω(12)=3 since 12=2²·3
+function bigOmega(n, spf) {
+  if (n <= 1) return 0;
+  let count = 0;
+  while (n > 1) { count++; n = (n / spf[n]) | 0; }
+  return count;
+}
+
+// ── Canvas helpers ─────────────────────────────────────────────────────────────
+function setupCV(id) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const W = el.offsetWidth || el.clientWidth || 600;
+  const H = el.offsetHeight || el.clientHeight || 220;
+  el.width = W * DPR; el.height = H * DPR;
+  const ctx = el.getContext('2d');
+  ctx.scale(DPR, DPR);
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+  return { ctx, W, H };
+}
+
+function gridLines(ctx, W, H, p, nx = 6, ny = 4) {
+  ctx.strokeStyle = 'rgba(255,255,255,.045)'; ctx.lineWidth = 1;
+  for (let i = 1; i < ny; i++) {
+    const y = p + (H - 2 * p) * i / ny;
+    ctx.beginPath(); ctx.moveTo(p, y); ctx.lineTo(W - p, y); ctx.stroke();
   }
-  const longestGap=scGaps.length?Math.max(...scGaps):0;
-  return{data,C,C4,c1t,A,sc,sc4,primeSC,piN,scRatio:piN>0?sc/piN:0,longestGap,scGaps,N};
+  for (let i = 1; i < nx; i++) {
+    const x = p + (W - 2 * p) * i / nx;
+    ctx.beginPath(); ctx.moveTo(x, p); ctx.lineTo(x, H - p); ctx.stroke();
+  }
 }
 
-// ── canvas ────────────────────────────────────────────────────────────
-function setup(id){
-  const c=document.getElementById(id);
-  const W=c.offsetWidth,H=c.offsetHeight;
-  c.width=W*DPR;c.height=H*DPR;
-  const ctx=c.getContext('2d');ctx.scale(DPR,DPR);
-  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
-  return{ctx,W,H};
-}
-function grid(ctx,W,H,p){
-  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
-  for(let i=1;i<4;i++){const y=p+(H-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-p,y);ctx.stroke();}
-}
-function mp(v,i0,i1,o0,o1){return o0+(v-i0)/(i1-i0)*(o1-o0);}
-function axlbl(ctx,W,H,p,mn,mx){
-  ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='9px JetBrains Mono,monospace';
-  ctx.fillText('N='+mn,p,H-4);ctx.fillText('N='+mx,W-60,H-4);
-}
-function line(ctx,pts,px,py,color,lw){
-  ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.beginPath();
-  let s=false;for(const p of pts){const x=px(p[0]),y=py(p[1]);if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);}
-  ctx.stroke();
+function mp(v, i0, i1, o0, o1) {
+  if (i1 === i0) return (o0 + o1) / 2;
+  return o0 + (v - i0) / (i1 - i0) * (o1 - o0);
 }
 
-// ── 8 chart draw functions ────────────────────────────────────────────
-function drawC1(r){
-  const{ctx,W,H}=setup('c1');const p=22;
-  const d=r.data.filter(x=>isFinite(x.absE)&&x.absE>0);if(!d.length)return;
-  const mn=d[0].m,mx=d[d.length-1].m,yMx=Math.max(...d.slice(0,8).map(x=>x.absE))*1.15;
-  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(Math.max(v,0),0,yMx,H-p,p);
-  grid(ctx,W,H,p);
-  ctx.strokeStyle='rgba(200,168,74,.5)';ctx.lineWidth=1.2;ctx.setLineDash([4,8]);
-  line(ctx,d.map(x=>[x.m,r.A/x.lm]),px,py,'rgba(200,168,74,.5)',1.2);ctx.setLineDash([]);
-  ctx.setLineDash([2,6]);line(ctx,d.map(x=>[x.m,Math.abs(r.c1t)/x.lm]),px,py,'rgba(144,112,216,.5)',1.2);ctx.setLineDash([]);
-  line(ctx,d.map(x=>[x.m,x.absE]),px,py,'rgba(61,200,184,.9)',1.6);
-  axlbl(ctx,W,H,p,mn,mx);
+function fmtN(n) { return n >= 1000 ? (n / 1000).toFixed(0) + 'k' : '' + n; }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  PANEL 1 — FRICTION MAP
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let p1data = null;
+
+function computeFriction(N) {
+  const { phi, primes } = buildSieves(N);
+  const C = eulerC(primes);
+
+  // Match EN_explorer: R(N) = sumL / sumPh where Lm = phi[m]*phi[m+1]/(m+1)
+  let sumL = 0, sumPh = 0;
+  const data = [];
+  let maxAF = 0, maxAFm = 2, sumAF = 0;
+  let m3 = 0, m2 = 0, m1 = 0;          // for skewness
+
+  for (let m = 1; m <= N; m++) {
+    const lf = phi[m + 1] / ((m + 1) * C);   // local factor relative to C  (Chart 07 value)
+    const f = lf - 1;                          // friction  
+    const Lm = phi[m] * phi[m + 1] / (m + 1);
+    sumL += Lm; sumPh += phi[m];
+    const R = sumL / sumPh;
+    const runFric = R / C - 1;
+
+    const af = Math.abs(f);
+    sumAF += af;
+    if (af > maxAF) { maxAF = af; maxAFm = m; }
+    m3 += f * f * f; m2 += f * f; m1 += f;
+    if (m >= 10) data.push({ m, lf, f, runFric, isPrime: phi[m] === m - 1 });
+  }
+
+  const n = data.length;
+  const mu = m1 / N;
+  const sigma2 = m2 / N - mu * mu;
+  const skew = sigma2 > 0 ? (m3 / N - 3 * mu * sigma2 - mu ** 3) / (sigma2 ** 1.5) : 0;
+
+  return { data, C, N, maxAF, maxAFm, meanAF: sumAF / N, skew };
 }
 
-function drawC2(r){
-  const{ctx,W,H}=setup('c2');const p=22;
-  // Plot E(N)·N — bounded oscillation confirms O(1/N) rate
-  const d=r.data.filter(x=>isFinite(x.E));if(!d.length)return;
-  const mn=d[0].m,mx=d[d.length-1].m;
-  const vs=d.map(x=>x.E*x.m),vMn=Math.min(...vs),vMx=Math.max(...vs),mg=(vMx-vMn)*.12||.01;
-  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
-  grid(ctx,W,H,p);
+function drawFrictionMain(res) {
+  const cv = setupCV('p1-main');
+  if (!cv) return;
+  const { ctx, W, H } = cv;
+  const pad = 30;
+  gridLines(ctx, W, H, pad);
+
+  const { data, C } = res;
+  const yMin = -1.15, yMax = 1.15;
+  const px = m => mp(m, 10, res.N, pad, W - pad);
+  const py = v => mp(v, yMin, yMax, H - pad, pad);
+
   // zero line
-  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
-  // c1/logN·N = c1 reference scaled (shows what naive rate predicts)
-  ctx.setLineDash([4,7]);
-  line(ctx,d.map(x=>[x.m,r.c1t]),px,py,'rgba(61,200,184,.35)',1);
+  ctx.strokeStyle = 'rgba(61,200,184,.22)'; ctx.lineWidth = 1;
+  ctx.setLineDash([4, 5]);
+  ctx.beginPath(); ctx.moveTo(pad, py(0)); ctx.lineTo(W - pad, py(0)); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='rgba(61,200,184,.45)';ctx.font='9px JetBrains Mono,monospace';
-  ctx.fillText('c₁ ref',W-52,py(r.c1t)-5);
-  // E(N)·N
-  line(ctx,d.map(x=>[x.m,x.E*x.m]),px,py,'rgba(144,112,216,.9)',1.6);
-  axlbl(ctx,W,H,p,mn,mx);
-}
 
-function drawC3(r){
-  const{ctx,W,H}=setup('c3');const p=22;
-  const d=r.data.filter(x=>isFinite(x.lgAbsE)&&isFinite(x.lglgm)&&x.lglgm>0);if(!d.length)return;
-  const xMn=d[0].lglgm,xMx=d[d.length-1].lglgm;
-  const ys=d.map(x=>x.lgAbsE),yMn=Math.min(...ys),yMx=Math.max(...ys),mg=(yMx-yMn)*.1||.5;
-  const px=x=>mp(x,xMn,xMx,p,W-p),py=y=>mp(y,yMn-mg,yMx+mg,H-p,p);
-  grid(ctx,W,H,p);
-  const mid=d[Math.floor(d.length/2)],b=mid.lgAbsE-(-1)*mid.lglgm;
-  ctx.setLineDash([4,8]);line(ctx,[[xMn,-xMn+b],[xMx,-xMx+b]],px,py,'rgba(200,168,74,.48)',1.2);ctx.setLineDash([]);
-  ctx.fillStyle='rgba(200,168,74,.55)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('slope=−1',px(xMn)+4,py(-xMn+b)-5);
-  line(ctx,d.map(x=>[x.lglgm,x.lgAbsE]),px,py,'#e8904a',1.6);
-  ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('log(log N)',W/2-25,H-4);
-}
+  // bars (subsample to ~2× pixel width)
+  const step = Math.max(1, Math.floor(data.length / (W * 1.8)));
+  const barW = Math.max(1, (W - 2 * pad) / (data.length / step) * 0.75);
 
-function drawC4(r){
-  const{ctx,W,H}=setup('c4');const p=22;
-  const d=r.data.filter(x=>isFinite(x.E));if(!d.length)return;
-  const mn=d[0].m,mx=d[d.length-1].m;
-  const vs=d.map(x=>x.E),vMn=Math.min(...vs),vMx=Math.max(...vs),mg=(vMx-vMn)*.12||.001;
-  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
-  grid(ctx,W,H,p);
-  // zero line
-  ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
-  // prime ticks
-  ctx.strokeStyle='rgba(200,168,74,.35)';ctx.lineWidth=1;
-  for(const x of d)if(x.ip){ctx.beginPath();ctx.moveTo(px(x.m),H-p);ctx.lineTo(px(x.m),H-p+5);ctx.stroke();}
-  // E(N) curve
-  line(ctx,d.map(x=>[x.m,x.E]),px,py,'rgba(61,200,184,.85)',1.5);
-  // sign change dots
-  for(const x of d)if(x.isc){ctx.beginPath();ctx.arc(px(x.m),py(x.E),3,0,Math.PI*2);ctx.fillStyle='rgba(224,80,96,.9)';ctx.fill();}
-  axlbl(ctx,W,H,p,mn,mx);
-}
-
-function drawC5(r){
-  const{ctx,W,H}=setup('c5');const p=22;
-  const d=r.data.filter(x=>x.piC>0);if(!d.length)return;
-  const mn=d[0].m,mx=d[d.length-1].m;
-  const ratios=d.map(x=>x.scC/x.piC);
-  const yMx=Math.max(...ratios)*1.1||1;
-  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,0,yMx,H-p,p);
-  grid(ctx,W,H,p);
-  const lim=ratios[ratios.length-1];
-  ctx.setLineDash([4,8]);line(ctx,[[mn,lim],[mx,lim]],px,py,'rgba(200,168,74,.4)',1.2);ctx.setLineDash([]);
-  ctx.fillStyle='rgba(200,168,74,.6)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('≈'+lim.toFixed(4),W-72,py(lim)-5);
-  line(ctx,d.map((x,i)=>[x.m,ratios[i]]),px,py,'rgba(80,200,120,.9)',1.6);
-  axlbl(ctx,W,H,p,mn,mx);
-}
-
-function drawC6(r){
-  const{ctx,W,H}=setup('c6');const p=22;
-  const gaps=r.scGaps;
-  if(!gaps.length){ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='10px JetBrains Mono,monospace';ctx.fillText('Increase N to see gap distribution',p,H/2);return;}
-  const maxG=Math.max(...gaps);
-  const bins=Math.min(40,Math.ceil(Math.sqrt(gaps.length)));
-  const bw=maxG/bins;
-  const counts=new Array(bins).fill(0);
-  for(const g of gaps)counts[Math.min(bins-1,Math.floor(g/bw))]++;
-  const maxC=Math.max(...counts);
-  const bpw=(W-2*p)/bins;
-  const py=v=>mp(v,0,maxC*1.1,H-p,p);
-  grid(ctx,W,H,p);
-  for(let i=0;i<bins;i++){
-    const x=p+i*bpw,ht=H-p-py(counts[i]);
-    if(ht>0){ctx.fillStyle=`rgba(224,80,96,${.5+.3*(counts[i]/maxC)})`;ctx.fillRect(x,py(counts[i]),bpw-1,ht);}
+  for (let i = 0; i < data.length; i += step) {
+    const d = data[i];
+    const x = px(d.m);
+    const y0 = py(0);
+    const y1 = py(Math.max(yMin, Math.min(yMax, d.f)));
+    const alpha = Math.min(0.95, 0.18 + 0.82 * Math.abs(d.f));
+    ctx.fillStyle = d.f > 0
+      ? `rgba(232,144,74,${alpha})`
+      : `rgba(224,80,96,${alpha * 0.85})`;
+    ctx.fillRect(x - barW / 2, Math.min(y0, y1), barW, Math.abs(y1 - y0) || 1);
   }
-  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px JetBrains Mono,monospace';
-  ctx.fillText('gap size',W/2-18,H-4);
-  ctx.fillText('max='+maxG,p,p+12);
+
+  // running mean R(N)/C - 1
+  ctx.strokeStyle = 'rgba(144,112,216,.82)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); let first = true;
+  for (let i = 0; i < data.length; i += step) {
+    const d = data[i];
+    const x = px(d.m);
+    const y = py(Math.max(yMin, Math.min(yMax, d.runFric)));
+    if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // labels
+  ctx.fillStyle = 'rgba(200,168,74,.55)'; ctx.font = '9px JetBrains Mono,monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(`f(M) = φ(M+1)/[(M+1)·C] − 1`, pad + 6, pad + 13);
+  ctx.fillStyle = 'rgba(255,255,255,.22)';
+  ctx.textAlign = 'right';
+  for (const v of [1, 0.5, 0, -0.5, -1]) {
+    ctx.fillText(v === 0 ? '0' : (v > 0 ? '+' : '') + v.toFixed(1), pad - 4, py(v) + 3);
+  }
+  ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,.15)';
+  ctx.fillText('N=' + fmtN(10), pad, H - 4);
+  ctx.textAlign = 'right';
+  ctx.fillText('N=' + fmtN(res.N), W - pad, H - 4);
 }
 
-function drawC7(r){
-  const{ctx,W,H}=setup('c7');const p=22;
-  const step=Math.max(1,Math.floor(r.data.length/250));
-  const d=r.data.filter((_,i)=>i%step===0&&isFinite(_.lf));if(!d.length)return;
-  const mn=d[0].m,mx=d[d.length-1].m;
-  const vs=d.map(x=>x.lf),vMn=Math.min(...vs)*.95,vMx=Math.max(...vs)*1.05;
-  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn,vMx,H-p,p);
-  grid(ctx,W,H,p);
-  // prime columns
-  ctx.strokeStyle='rgba(61,200,184,.18)';ctx.lineWidth=1;
-  for(const x of d)if(x.ip){ctx.beginPath();ctx.moveTo(px(x.m),p);ctx.lineTo(px(x.m),H-p);ctx.stroke();}
-  // factor=1 line
-  ctx.setLineDash([4,6]);line(ctx,[[mn,1],[mx,1]],px,py,'rgba(200,168,74,.55)',1.2);ctx.setLineDash([]);
-  ctx.fillStyle='rgba(200,168,74,.6)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('factor=1',W-70,py(1)-5);
-  line(ctx,d.map(x=>[x.m,x.lf]),px,py,'rgba(144,112,216,.8)',1.4);
-  axlbl(ctx,W,H,p,mn,mx);
+function drawFrictionHist(res) {
+  const cv = setupCV('p1-hist');
+  if (!cv) return;
+  const { ctx, W, H } = cv;
+  const pad = 28;
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+  gridLines(ctx, W, H, pad, 4, 4);
+
+  const bins = 38;
+  const fMin = -1.15, fMax = 1.15;
+  const counts = new Array(bins).fill(0);
+  const primeCounts = new Array(bins).fill(0);
+
+  for (const d of res.data) {
+    const b = Math.floor((d.f - fMin) / (fMax - fMin) * bins);
+    if (b >= 0 && b < bins) {
+      counts[b]++;
+      if (d.isPrime) primeCounts[b]++;
+    }
+  }
+  const maxC = Math.max(...counts, 1);
+
+  for (let b = 0; b < bins; b++) {
+    if (!counts[b]) continue;
+    const x = mp(b, 0, bins, pad, W - pad);
+    const bw = (W - 2 * pad) / bins * 0.82;
+    const y = mp(counts[b], 0, maxC, H - pad, pad);
+    const fVal = fMin + (b + 0.5) / bins * (fMax - fMin);
+    ctx.fillStyle = fVal > 0 ? 'rgba(232,144,74,.78)' : 'rgba(224,80,96,.65)';
+    ctx.fillRect(x, y, bw, H - pad - y);
+    // prime overlay
+    if (primeCounts[b]) {
+      const yp = mp(primeCounts[b], 0, maxC, H - pad, pad);
+      ctx.fillStyle = 'rgba(200,168,74,.6)';
+      ctx.fillRect(x, yp, bw, H - pad - yp);
+    }
+  }
+
+  // zero friction line
+  const xZ = mp(Math.floor((-fMin) / (fMax - fMin) * bins), 0, bins, pad, W - pad);
+  ctx.strokeStyle = 'rgba(61,200,184,.35)'; ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(xZ, pad); ctx.lineTo(xZ, H - pad); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '9px JetBrains Mono,monospace';
+  ctx.textAlign = 'center'; ctx.fillText('Friction distribution', W / 2, pad - 5);
+  ctx.textAlign = 'left'; ctx.fillText('−1.15', pad, H - 4);
+  ctx.textAlign = 'right'; ctx.fillText('+1.15', W - pad, H - 4);
+  // prime label
+  ctx.fillStyle = 'rgba(200,168,74,.55)';
+  ctx.textAlign = 'left'; ctx.fillText('▪ prime', pad + 4, pad + 12);
 }
 
-function drawC8(r){
-  const{ctx,W,H}=setup('c8');const p=22;
-  const d=r.data.filter(x=>isFinite(x.E4));if(!d.length)return;
-  const mn=d[0].m,mx=d[d.length-1].m;
-  const vs=d.map(x=>x.E4),vMn=Math.min(...vs),vMx=Math.max(...vs),mg=(vMx-vMn)*.12||.001;
-  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
-  grid(ctx,W,H,p);
-  ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
-  line(ctx,d.map(x=>[x.m,x.E4]),px,py,'rgba(200,168,74,.9)',1.6);
-  for(const x of d)if(x.isc4){ctx.beginPath();ctx.arc(px(x.m),py(x.E4),3,0,Math.PI*2);ctx.fillStyle='rgba(61,200,184,.85)';ctx.fill();}
-  ctx.fillStyle='rgba(200,168,74,.45)';ctx.font='9px JetBrains Mono,monospace';ctx.fillText('gcd(M,4)=1 sublattice',p,p+12);
-  axlbl(ctx,W,H,p,mn,mx);
+function renderP1() {
+  if (!p1data) return;
+  drawFrictionMain(p1data);
+  drawFrictionHist(p1data);
+  document.getElementById('p1-sn').textContent  = p1data.N.toLocaleString();
+  document.getElementById('p1-sc').textContent  = p1data.C.toFixed(7);
+  document.getElementById('p1-smf').textContent = p1data.maxAF.toFixed(4);
+  document.getElementById('p1-savf').textContent= p1data.meanAF.toFixed(4);
+  document.getElementById('p1-smm').textContent = p1data.maxAFm.toLocaleString();
+  document.getElementById('p1-ssk').textContent = p1data.skew.toFixed(3);
 }
 
-function renderAll(res){
-  document.getElementById('charts-area').style.display='flex';
-  document.getElementById('empty-state').style.display='none';
-  drawC1(res);drawC2(res);drawC3(res);drawC4(res);
-  drawC5(res);drawC6(res);drawC7(res);drawC8(res);
-  document.getElementById('st-n').textContent   =res.N.toLocaleString();
-  document.getElementById('st-c').textContent   =res.C.toFixed(7);
-  document.getElementById('st-c1').textContent  =res.c1t.toFixed(6);
-  document.getElementById('st-sc').textContent  =res.sc;
-  document.getElementById('st-pi').textContent  =res.piN;
-  document.getElementById('st-ratio').textContent=res.scRatio.toFixed(4);
-  document.getElementById('st-psc').textContent =(res.primeSC)+' ('+(res.sc>0?(100*res.primeSC/res.sc).toFixed(1):0)+'%)';
-  document.getElementById('st-gap').textContent =res.longestGap;
-  setTimeout(()=>document.querySelectorAll('.chart-panel').forEach(el=>el.classList.add('visible')),40);
-}
-
-const slider=document.getElementById('n-slider');
-const display=document.getElementById('n-display');
-const btn=document.getElementById('compute-btn');
-
-function updateWarning(N){
-  const b=document.getElementById('warn-banner'),bx=document.getElementById('warn-box');
-  if(N>=WARN_2){b.style.display='block';bx.className='warn-box level-2';bx.textContent='⛔  N='+N.toLocaleString()+' — very large. Risk of freezing on mobile.';}
-  else if(N>=WARN_1){b.style.display='block';bx.className='warn-box level-1';bx.textContent='⚠  N='+N.toLocaleString()+' — may slow on mobile. Desktop recommended above this range.';}
-  else b.style.display='none';
-}
-
-slider.addEventListener('input',()=>{const N=parseInt(slider.value);display.textContent=N.toLocaleString();updateWarning(N);});
-btn.addEventListener('click',()=>{
-  const N=parseInt(slider.value);
-  btn.textContent='Computing…';btn.disabled=true;
-  setTimeout(()=>{try{result=compute(N);renderAll(result);}catch(e){console.error(e);}btn.textContent='Compute →';btn.disabled=false;},20);
+document.getElementById('p1-n').addEventListener('input', function () {
+  document.getElementById('p1-nv').textContent = (+this.value).toLocaleString();
+});
+document.getElementById('p1-btn').addEventListener('click', function () {
+  const N = +document.getElementById('p1-n').value;
+  this.textContent = 'Computing…'; this.disabled = true;
+  setTimeout(() => {
+    try { p1data = computeFriction(N); renderP1(); }
+    catch (e) { console.error(e); }
+    this.textContent = 'Compute →'; this.disabled = false;
+  }, 20);
 });
 
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(result)renderAll(result);},220);});
-const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.06});
-document.querySelectorAll('.chart-panel').forEach(el=>obs.observe(el));
-updateWarning(parseInt(slider.value));
+// ═══════════════════════════════════════════════════════════════════════════════
+//  PANEL 2 — GHOST RESIDUES RING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const PRIMORIALS = [
+  { label: 'M=6',    M: 6,    ps: [2,3],          nextP: 5  },
+  { label: 'M=30',   M: 30,   ps: [2,3,5],        nextP: 7  },
+  { label: 'M=210',  M: 210,  ps: [2,3,5,7],      nextP: 11 },
+  { label: 'M=2310', M: 2310, ps: [2,3,5,7,11],   nextP: 13 },
+];
+
+// primality for residues up to 2311 — tiny, use simple sieve
+const PMAX = 2312;
+const primeFlagSmall = new Uint8Array(PMAX).fill(1);
+primeFlagSmall[0] = primeFlagSmall[1] = 0;
+for (let i = 2; i * i < PMAX; i++) {
+  if (primeFlagSmall[i]) for (let j = i * i; j < PMAX; j += i) primeFlagSmall[j] = 0;
+}
+
+let showTwins = true;
+function toggleTwins() {
+  showTwins = !showTwins;
+  const btn = document.getElementById('p2-twin');
+  btn.textContent = showTwins ? 'ON' : 'OFF';
+  btn.className = showTwins ? 'ctrl-toggle active' : 'ctrl-toggle';
+  renderGhostRing();
+}
+
+function renderGhostRing() {
+  const idx = +document.getElementById('p2-level').value;
+  const pd = PRIMORIALS[idx];
+  const { M, ps, nextP } = pd;
+
+  // Build coprime list
+  const coprimes = [];
+  for (let r = 1; r < M; r++) {
+    if (gcd(r, M) === 1) {
+      const isP = r < PMAX ? !!primeFlagSmall[r] : null;
+      const isTrans = (r % nextP === 0);
+      coprimes.push({ r, isP, isTrans });
+    }
+  }
+  const copSet = new Set(coprimes.map(c => c.r));
+
+  // Twin pairs
+  const twinPairs = [];
+  for (const c of coprimes) {
+    if (copSet.has(c.r + 2)) {
+      twinPairs.push({ c1: c, c2: coprimes.find(x => x.r === c.r + 2) });
+    }
+  }
+
+  // Stats
+  const stableCnt   = coprimes.filter(c => c.isP && !c.isTrans && c.r > 1).length;
+  const ghostCnt    = coprimes.filter(c => !c.isP && !c.isTrans && c.r > 1).length;
+  const transCnt    = coprimes.filter(c => c.isTrans).length;
+  const tpCnt       = twinPairs.filter(p => p.c1.isP && p.c2.isP).length;
+  const gtpCnt      = twinPairs.filter(p => !p.c1.isP || !p.c2.isP).length;
+
+  // Update info panel
+  document.getElementById('p2-M').textContent    = M.toLocaleString();
+  document.getElementById('p2-Mf').textContent   = '= ' + ps.join(' · ');
+  document.getElementById('p2-phi').textContent  = coprimes.length;
+  document.getElementById('p2-stable').textContent  = stableCnt;
+  document.getElementById('p2-ghost').textContent   = ghostCnt;
+  document.getElementById('p2-trans').textContent   = transCnt;
+  document.getElementById('p2-tp').textContent      = tpCnt;
+  document.getElementById('p2-gtp').textContent     = gtpCnt;
+
+  // Draw ring
+  const cv = setupCV('p2-ring');
+  if (!cv) return;
+  const { ctx, W, H } = cv;
+  const cx = W / 2, cy = H / 2;
+  const outerR = Math.min(W, H) * 0.44;
+  const innerR = outerR * 0.18;
+  const dotR = M <= 30 ? 6 : M <= 210 ? 3.5 : 2;
+
+  // faint guide rings
+  [outerR, outerR * 0.7, innerR * 2].forEach(r => {
+    ctx.strokeStyle = 'rgba(255,255,255,.04)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  });
+
+  // twin pair arcs (behind dots)
+  if (showTwins) {
+    for (const tp of twinPairs) {
+      const a1 = (tp.c1.r / M) * Math.PI * 2 - Math.PI / 2;
+      const a2 = (tp.c2.r / M) * Math.PI * 2 - Math.PI / 2;
+      const x1 = cx + outerR * Math.cos(a1), y1 = cy + outerR * Math.sin(a1);
+      const x2 = cx + outerR * Math.cos(a2), y2 = cy + outerR * Math.sin(a2);
+      const isGenuine = tp.c1.isP && tp.c2.isP;
+      ctx.strokeStyle = isGenuine ? 'rgba(61,200,184,.22)' : 'rgba(232,144,74,.16)';
+      ctx.lineWidth = isGenuine ? 1.2 : 0.8;
+      ctx.setLineDash(isGenuine ? [] : [2, 3]);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  // residue dots — all M positions
+  for (let i = 0; i < M; i++) {
+    const angle = (i / M) * Math.PI * 2 - Math.PI / 2;
+    const x = cx + outerR * Math.cos(angle);
+    const y = cy + outerR * Math.sin(angle);
+
+    const ci = coprimes.find(c => c.r === i);
+    let color, size;
+
+    if (i === 0 || !ci) {
+      color = 'rgba(255,255,255,.04)'; size = dotR * 0.55;   // eliminated
+    } else if (i === 1) {
+      color = 'rgba(200,168,74,.85)'; size = dotR * 1.2;     // unit
+    } else if (ci.isTrans) {
+      color = 'rgba(232,144,74,.9)';  size = dotR * 1.05;    // transient
+    } else if (ci.isP) {
+      color = 'rgba(61,200,184,.92)'; size = dotR;            // stable prime
+    } else {
+      color = 'rgba(224,80,96,.88)';  size = dotR;            // ghost composite
+    }
+
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+
+    // label for small M
+    if (M <= 30 && ci) {
+      ctx.fillStyle = 'rgba(255,255,255,.4)';
+      ctx.font = '8px JetBrains Mono,monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const lr = outerR + 14;
+      ctx.fillText(i, cx + lr * Math.cos(angle), cy + lr * Math.sin(angle));
+    }
+  }
+  ctx.textBaseline = 'alphabetic';
+
+  // center label
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,.18)';
+  ctx.font = `bold 14px JetBrains Mono, monospace`;
+  ctx.fillText(`M = ${M.toLocaleString()}`, cx, cy - 10);
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillStyle = 'rgba(255,255,255,.1)';
+  ctx.fillText(`φ(M) = ${coprimes.length}`, cx, cy + 8);
+  ctx.fillStyle = 'rgba(232,144,74,.45)';
+  ctx.fillText(`next sieve: ÷${nextP}`, cx, cy + 24);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  PANEL 3 — SIGN CHANGE WAITING TIMES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let p3data = null;
+
+function computeSCWaiting(N) {
+  const { phi, primes } = buildSieves(N);
+  const C = eulerC(primes);
+
+  let sumL = 0, sumPh = 0;
+  let prevSign = 0, piC = 0;
+  const scPositions = [];
+
+  for (let m = 1; m <= N; m++) {
+    const Lm = phi[m] * phi[m + 1] / (m + 1);
+    sumL += Lm; sumPh += phi[m];
+    const R = sumL / sumPh;
+    const E = R - C;
+    const sg = E >= 0 ? 1 : -1;
+    if (phi[m] === m - 1) piC++;       // m is prime (φ(m) = m-1)
+    if (prevSign !== 0 && sg !== prevSign) scPositions.push(m);
+    prevSign = sg;
+  }
+
+  // Inter-SC gaps
+  const gaps = [];
+  for (let i = 1; i < scPositions.length; i++) gaps.push(scPositions[i] - scPositions[i - 1]);
+
+  const logGaps = gaps.map(g => Math.log10(g));
+  const sorted = [...gaps].sort((a, b) => a - b);
+  const median = sorted.length ? sorted[(sorted.length / 2) | 0] : 0;
+  const maxGap = gaps.length ? sorted[sorted.length - 1] : 0;
+
+  // OLS on logGaps
+  let slope = 0, intercept = 0;
+  if (logGaps.length > 2) {
+    const n = logGaps.length;
+    const mx = (n - 1) / 2;
+    const my = logGaps.reduce((a, b) => a + b, 0) / n;
+    let num = 0, den = 0;
+    for (let i = 0; i < n; i++) { num += (i - mx) * (logGaps[i] - my); den += (i - mx) ** 2; }
+    slope = den ? num / den : 0;
+    intercept = my - slope * mx;
+  }
+
+  return { scPositions, gaps, logGaps, median, maxGap, slope, intercept, piC, N };
+}
+
+function drawSCScatter(res) {
+  const cv = setupCV('p3-scatter');
+  if (!cv) return;
+  const { ctx, W, H } = cv;
+  const pad = 32;
+  gridLines(ctx, W, H, pad);
+
+  const { logGaps, slope, intercept } = res;
+  if (!logGaps.length) return;
+  const n = logGaps.length;
+
+  const yMin = Math.floor(Math.min(...logGaps) - 0.15);
+  const yMax = Math.ceil(Math.max(...logGaps) + 0.25);
+  const pxi = i => mp(i, 0, n - 1, pad, W - pad);
+  const py = v => mp(v, yMin, yMax, H - pad, pad);
+
+  // trend line
+  const yL = intercept, yR = intercept + slope * (n - 1);
+  ctx.strokeStyle = 'rgba(144,112,216,.55)'; ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(pxi(0), py(yL)); ctx.lineTo(pxi(n - 1), py(yR)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // dots colored early→late (teal → violet)
+  for (let i = 0; i < n; i++) {
+    const t = n > 1 ? i / (n - 1) : 0;
+    const r2 = Math.round(61 + t * (144 - 61));
+    const g2 = Math.round(200 + t * (112 - 200));
+    const b2 = Math.round(184 + t * (216 - 184));
+    ctx.fillStyle = `rgba(${r2},${g2},${b2},.85)`;
+    ctx.beginPath(); ctx.arc(pxi(i), py(logGaps[i]), 3, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // y-axis labels
+  ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '9px JetBrains Mono,monospace';
+  ctx.textAlign = 'right';
+  for (let v = yMin; v <= yMax; v++) {
+    ctx.fillText(`10^${v}`, pad - 4, py(v) + 3);
+  }
+  ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(61,200,184,.5)';
+  ctx.fillText('log₁₀(gap_k)  vs  SC index k', pad + 5, pad + 12);
+  ctx.fillStyle = 'rgba(255,255,255,.15)';
+  ctx.fillText('k=1', pad, H - 4);
+  ctx.textAlign = 'right'; ctx.fillText('k=' + n, W - pad, H - 4);
+}
+
+function drawSCHist(res) {
+  const cv = setupCV('p3-hist');
+  if (!cv) return;
+  const { ctx, W, H } = cv;
+  const pad = 28;
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+  gridLines(ctx, W, H, pad, 4, 4);
+
+  const { logGaps } = res;
+  if (!logGaps.length) return;
+
+  const bins = 22;
+  const gMin = Math.min(...logGaps), gMax = Math.max(...logGaps) + 0.01;
+  const counts = new Array(bins).fill(0);
+  for (const g of logGaps) {
+    const b = Math.min(bins - 1, Math.floor((g - gMin) / (gMax - gMin) * bins));
+    counts[b]++;
+  }
+  const maxC = Math.max(...counts, 1);
+
+  for (let b = 0; b < bins; b++) {
+    if (!counts[b]) continue;
+    const x = mp(b, 0, bins, pad, W - pad);
+    const bw = (W - 2 * pad) / bins * 0.82;
+    const y = mp(counts[b], 0, maxC, H - pad, pad);
+    ctx.fillStyle = 'rgba(232,144,74,.72)';
+    ctx.fillRect(x, y, bw, H - pad - y);
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.font = '9px JetBrains Mono,monospace';
+  ctx.textAlign = 'center'; ctx.fillText('Inter-SC gap distribution', W / 2, pad - 5);
+  ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,255,255,.14)';
+  ctx.fillText('small', pad, H - 4); ctx.textAlign = 'right'; ctx.fillText('large', W - pad, H - 4);
+}
+
+function renderP3() {
+  if (!p3data) return;
+  drawSCScatter(p3data);
+  drawSCHist(p3data);
+  document.getElementById('p3-sc').textContent    = p3data.scPositions.length;
+  document.getElementById('p3-med').textContent   = p3data.median.toLocaleString();
+  document.getElementById('p3-max').textContent   = p3data.maxGap.toLocaleString();
+  document.getElementById('p3-slope').textContent = p3data.slope.toFixed(5);
+  const dens = p3data.piC > 0 ? (p3data.scPositions.length / p3data.piC).toFixed(4) : '—';
+  document.getElementById('p3-dens').textContent  = dens;
+}
+
+document.getElementById('p3-n').addEventListener('input', function () {
+  document.getElementById('p3-nv').textContent = (+this.value).toLocaleString();
+});
+document.getElementById('p3-btn').addEventListener('click', function () {
+  const N = +document.getElementById('p3-n').value;
+  this.textContent = 'Computing…'; this.disabled = true;
+  setTimeout(() => {
+    try { p3data = computeSCWaiting(N); renderP3(); }
+    catch (e) { console.error(e); }
+    this.textContent = 'Compute →'; this.disabled = false;
+  }, 20);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  PANEL 4 — PARITY INTERFERENCE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let p4data = null;
+
+function computeParity(N) {
+  const { spf } = buildSieves(N);
+
+  const LN = new Float64Array(N + 1);
+  let Lcur = 0, Lmin = 0, Lmax = 0;
+  let oddCop = 0, evenCop = 0;
+  const parityFrac = [];   // sampled every 50 steps
+
+  for (let n = 1; n <= N; n++) {
+    const om = bigOmega(n, spf);
+    Lcur += (om % 2 === 0) ? 1 : -1;
+    LN[n] = Lcur;
+    if (Lcur < Lmin) Lmin = Lcur;
+    if (Lcur > Lmax) Lmax = Lcur;
+
+    // parity among coprimes to 30
+    if (gcd(n, 30) === 1) {
+      if (om % 2 === 1) oddCop++;
+      else evenCop++;
+    }
+    if (n % 50 === 0) {
+      const tot = oddCop + evenCop;
+      parityFrac.push({ n, f: tot > 0 ? oddCop / tot : 0.5 });
+    }
+  }
+
+  const totCop = oddCop + evenCop;
+  return { LN, N, Lmin, Lmax, finalL: Lcur, parityFrac, finalPF: totCop > 0 ? oddCop / totCop : 0.5 };
+}
+
+function drawLiouville(res) {
+  const cv = setupCV('p4-liu');
+  if (!cv) return;
+  const { ctx, W, H } = cv;
+  const pad = 32;
+  gridLines(ctx, W, H, pad);
+
+  const { LN, N, Lmin, Lmax } = res;
+  const yMin = Lmin - Math.abs(Lmin) * 0.08 - 2;
+  const yMax = Lmax + 2;
+  const step = Math.max(1, Math.floor(N / (W * 2)));
+
+  const px = n => mp(n, 1, N, pad, W - pad);
+  const py = v => mp(v, yMin, yMax, H - pad, pad);
+
+  // zero line
+  ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1;
+  ctx.setLineDash([4, 5]);
+  ctx.beginPath(); ctx.moveTo(pad, py(0)); ctx.lineTo(W - pad, py(0)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // filled area
+  ctx.beginPath(); ctx.moveTo(px(1), py(0));
+  for (let n = 1; n <= N; n += step) ctx.lineTo(px(n), py(LN[n] || 0));
+  ctx.lineTo(px(N), py(0)); ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad, 0, H - pad);
+  grad.addColorStop(0, 'rgba(224,80,96,.3)');
+  grad.addColorStop(1, 'rgba(224,80,96,.04)');
+  ctx.fillStyle = grad; ctx.fill();
+
+  // line
+  ctx.strokeStyle = 'rgba(61,200,184,.88)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); let first = true;
+  for (let n = 1; n <= N; n += step) {
+    const x = px(n), y = py(LN[n] || 0);
+    if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // primorial markers
+  [6, 30, 210, 2310].forEach(pM => {
+    if (pM > N) return;
+    const x = px(pM);
+    ctx.strokeStyle = 'rgba(144,112,216,.38)'; ctx.lineWidth = 1;
+    ctx.setLineDash([2, 4]);
+    ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, H - pad); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(144,112,216,.5)'; ctx.font = '8px JetBrains Mono,monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(pM < 1000 ? pM : (pM / 1000).toFixed(0) + 'k', x + 2, pad + 10);
+  });
+
+  // y labels
+  ctx.fillStyle = 'rgba(255,255,255,.2)'; ctx.font = '9px JetBrains Mono,monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('0', pad - 5, py(0) + 3);
+  ctx.fillText(Math.round(Lmin), pad - 5, py(Lmin) + 3);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(61,200,184,.5)';
+  ctx.fillText('L(N) = Σ λ(n),   λ = (−1)^Ω', pad + 5, pad + 13);
+  ctx.fillStyle = 'rgba(255,255,255,.14)';
+  ctx.fillText('N=1', pad, H - 4); ctx.textAlign = 'right';
+  ctx.fillText('N=' + fmtN(N), W - pad, H - 4);
+}
+
+function drawParityFrac(res) {
+  const cv = setupCV('p4-par');
+  if (!cv) return;
+  const { ctx, W, H } = cv;
+  const pad = 28;
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+  gridLines(ctx, W, H, pad, 6, 4);
+
+  const { parityFrac, N } = res;
+  if (!parityFrac.length) return;
+
+  const yMin = 0.35, yMax = 0.65;
+  const px = d => mp(d.n, 50, N, pad, W - pad);
+  const py = v => mp(v, yMin, yMax, H - pad, pad);
+
+  // half line
+  ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad, py(0.5)); ctx.lineTo(W - pad, py(0.5)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // shaded area
+  ctx.beginPath(); ctx.moveTo(px(parityFrac[0]), py(0.5));
+  for (const d of parityFrac) ctx.lineTo(px(d), py(d.f));
+  ctx.lineTo(px(parityFrac[parityFrac.length - 1]), py(0.5));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(200,168,74,.12)'; ctx.fill();
+
+  // line
+  ctx.strokeStyle = 'rgba(200,168,74,.78)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); let first = true;
+  for (const d of parityFrac) {
+    const x = px(d), y = py(d.f);
+    if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // labels
+  ctx.fillStyle = 'rgba(200,168,74,.5)'; ctx.font = '9px JetBrains Mono,monospace';
+  ctx.textAlign = 'left'; ctx.fillText('Odd-Ω fraction among coprimes to 30', pad + 5, pad + 12);
+  ctx.fillStyle = 'rgba(255,255,255,.2)';
+  ctx.textAlign = 'right'; ctx.fillText('½', pad - 4, py(0.5) + 3);
+  ctx.fillText('0.60', pad - 4, py(0.6) + 3);
+  ctx.fillText('0.40', pad - 4, py(0.4) + 3);
+  ctx.fillStyle = 'rgba(255,255,255,.12)';
+  ctx.textAlign = 'left'; ctx.fillText('N=' + fmtN(50), pad, H - 4);
+  ctx.textAlign = 'right'; ctx.fillText('N=' + fmtN(N), W - pad, H - 4);
+}
+
+function renderP4() {
+  if (!p4data) return;
+  drawLiouville(p4data);
+  drawParityFrac(p4data);
+  document.getElementById('p4-LN').textContent   = p4data.finalL.toLocaleString();
+  document.getElementById('p4-Lrat').textContent = (p4data.finalL / p4data.N).toExponential(3);
+  document.getElementById('p4-Lmin').textContent = p4data.Lmin.toLocaleString();
+  document.getElementById('p4-Lmax').textContent = p4data.Lmax.toLocaleString();
+  document.getElementById('p4-pf').textContent   = p4data.finalPF.toFixed(6);
+}
+
+document.getElementById('p4-n').addEventListener('input', function () {
+  document.getElementById('p4-nv').textContent = (+this.value).toLocaleString();
+});
+document.getElementById('p4-btn').addEventListener('click', function () {
+  const N = +document.getElementById('p4-n').value;
+  this.textContent = 'Computing…'; this.disabled = true;
+  setTimeout(() => {
+    try { p4data = computeParity(N); renderP4(); }
+    catch (e) { console.error(e); }
+    this.textContent = 'Compute →'; this.disabled = false;
+  }, 20);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INIT — INTERSECTION OBSERVER & RESIZE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const panelObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.04 });
+document.querySelectorAll('.analysis-panel').forEach(el => panelObs.observe(el));
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (p1data) renderP1();
+    renderGhostRing();
+    if (p3data) renderP3();
+    if (p4data) renderP4();
+  }, 220);
+});
+
+// Initial render of Panel 2 (no computation needed for small M)
+renderGhostRing();
 </script>
 </body>
 </html>
