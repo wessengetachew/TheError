@@ -14,144 +14,31 @@
   --accent2: #c084fc;
   --text: #e0e0f0;
   --muted: #6060a0;
-  --nav-h: 44px;
-  --ctrl-h: 48px;
-  --drawer-w: 260px;
+  --ctrl-h: 44px;
+  --left-w: 240px;
+  --right-w: 220px;
+  --bottom-h: 90px;
   font-family: 'Courier New', monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-size: 11px; }
 
-/* ── Main layout: everything below the fixed nav ── */
-#page-body {
-  position: fixed;
-  top: var(--nav-h);
-  left: 0; right: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+/* ── Layout ── */
+#app { display: grid; grid-template-rows: var(--ctrl-h) 1fr var(--bottom-h); grid-template-columns: var(--left-w) 1fr var(--right-w); height: calc(100vh - 44px); }
+#ctrl { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; gap: 6px; padding: 0 8px; background: var(--panel); border-bottom: 1px solid var(--border); overflow-x: auto; overflow-y: hidden; white-space: nowrap; flex-wrap: nowrap; }
+#left { grid-column: 1; grid-row: 2; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border); padding: 6px; }
+#canvas-wrap { grid-column: 2; grid-row: 2; position: relative; overflow: hidden; }
+#glcanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#right { grid-column: 3; grid-row: 2; overflow-y: auto; background: var(--panel); border-left: 1px solid var(--border); padding: 6px; }
+#analysis-panel { grid-column: 1 / -1; grid-row: 3; background: #08080f; border-top: 1px solid var(--border); padding: 4px 10px; overflow-y: auto; display: flex; align-items: flex-start; gap: 16px; }
 
-/* ── Canvas area: square, centered, fills available space ── */
-#canvas-area {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  min-height: 0;
-  position: relative;
-  background: var(--bg);
-}
-#canvas-wrap {
-  position: relative;
-  /* JS will set width/height to maintain square */
-}
-#glcanvas {
-  display: block;
-  /* JS sets exact pixel size */
-}
-
-/* ── Bottom control bar ── */
-#ctrl {
-  flex-shrink: 0;
-  height: var(--ctrl-h);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 8px;
-  background: var(--panel);
-  border-top: 1px solid var(--border);
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-}
-
-/* ── Analysis strip (hidden on mobile, shown in drawer) ── */
-#analysis-panel {
-  display: none;
-}
-
-/* ── Drawer (slides in from left, collapsed by default) ── */
-#drawer {
-  position: fixed;
-  top: var(--nav-h);
-  left: 0;
-  bottom: 0;
-  width: var(--drawer-w);
-  background: var(--panel);
-  border-right: 1px solid var(--border);
-  transform: translateX(-100%);
-  transition: transform 0.25s cubic-bezier(.4,0,.2,1);
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-#drawer.open { transform: translateX(0); }
-#drawer-scroll { flex: 1; overflow-y: auto; padding: 6px; }
-#drawer-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  top: var(--nav-h);
-  background: rgba(0,0,0,0.5);
-  z-index: 99;
-}
-#drawer-backdrop.open { display: block; }
-
-/* ── Drawer toggle button (top-left, always visible) ── */
-#drawer-toggle {
-  position: fixed;
-  top: calc(var(--nav-h) + 8px);
-  left: 8px;
-  z-index: 101;
-  background: rgba(15,15,26,0.92);
-  border: 1px solid var(--border);
-  color: var(--accent);
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-  padding: 4px 8px;
-  cursor: pointer;
-  letter-spacing: .1em;
-  border-radius: 2px;
-  backdrop-filter: blur(4px);
-  transition: left 0.25s cubic-bezier(.4,0,.2,1), border-color .2s;
-  white-space: nowrap;
-}
-#drawer-toggle:hover { border-color: var(--accent); }
-#drawer-toggle.drawer-open { left: calc(var(--drawer-w) + 8px); color: var(--accent2); }
-
-/* ── Drawer inner tabs ── */
-#drawer-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.dtab {
-  flex: 1;
-  font-family: 'Courier New', monospace;
-  font-size: 9px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 7px 4px;
-  text-align: center;
-  cursor: pointer;
-  color: var(--muted);
-  border-bottom: 2px solid transparent;
-  background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  transition: color .15s;
-}
-.dtab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.dtab-panel { display: none; }
-.dtab-panel.active { display: block; }
-
-/* Mobile: drawer still works, ctrl bar thinner */
-@media (max-width: 640px) {
-  :root { --ctrl-h: 44px; --drawer-w: min(260px, 85vw); }
+/* Mobile: stack layout */
+@media (max-width: 700px) {
+  :root { --left-w: 0px; --right-w: 0px; --ctrl-h: 40px; --bottom-h: 60px; }
+  #app { grid-template-columns: 1fr; grid-template-rows: var(--ctrl-h) 1fr var(--bottom-h); }
+  #left, #right { display: none; }
+  #ctrl { font-size: 10px; gap: 4px; }
+  #mobile-panels { display: flex; }
 }
 
 /* ── Controls ── */
@@ -228,7 +115,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 @keyframes slidein{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 /* Theorem preset strip */
-#thm-strip{position:fixed;bottom:calc(var(--ctrl-h) + 6px);left:50%;transform:translateX(-50%);
+#thm-strip{position:fixed;bottom:calc(var(--bottom-h) + 4px);left:50%;transform:translateX(-50%);
   display:flex;gap:4px;z-index:150;flex-wrap:wrap;justify-content:center;
   background:rgba(4,4,10,.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.07);
   padding:5px 10px;border-radius:3px;}
@@ -284,19 +171,138 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <button class="thm-btn" onclick="applyThm('reset')">↺ Reset</button>
   <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'">■ Stop</button>
 </div>
-<div id="drawer-backdrop" onclick="closeDrawer()"></div>
-<button id="drawer-toggle" onclick="toggleDrawer()">☰ Controls</button>
+<div id="app">
 
-<div id="drawer">
-  <div id="drawer-tabs">
-    <button class="dtab active" onclick="showDTab('controls',this)">Controls</button>
-    <button class="dtab" onclick="showDTab('info',this)">Info</button>
-    <button class="dtab" onclick="showDTab('analysis',this)">Analysis</button>
+<!-- ══════════════ TOP CONTROL BAR ══════════════ -->
+<div id="ctrl">
+
+  <div class="ctrl-group">
+    <button id="btn-invert" title="Invert radius map">⇌ invert</button>
   </div>
-  <div id="drawer-scroll">
+  <div class="ctrl-sep"></div>
 
-    <div id="dtab-controls" class="dtab-panel active">
+  <div class="ctrl-group">
+    <span class="ctrl-label">View</span>
+    <select id="sel-view">
+      <option value="concentric">Concentric</option>
+      <option value="fermat">Fermat Spiral</option>
+      <option value="farey">Farey Half-Plane</option>
+      <option value="strip">Unfolded Strip</option>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
 
+  <div class="ctrl-group">
+    <span class="ctrl-label">M max</span>
+    <input type="range" id="sl-mmax" min="4" max="500" value="60" class="wide">
+    <input type="number" id="num-mmax" min="4" max="2000" value="60" class="narrow">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">δ</span>
+    <input type="range" id="sl-delta" min="-628" max="628" value="0" class="wide">
+    <input type="number" id="num-delta-r" value="0" class="narrow" title="r in r/m">/<input type="number" id="num-delta-m" value="1" class="narrow" title="m in r/m">
+    <button onclick="setDelta(0)">0</button>
+    <button onclick="setDelta(1/12)">1/12</button>
+    <button onclick="setDelta(1/6)">1/6</button>
+    <button onclick="setDelta(1/4)">¼</button>
+    <button onclick="setDelta(1/2)">½</button>
+    <button onclick="setDelta(-1/12)">−1/12</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Pt</span>
+    <input type="range" id="sl-ptsize" min="5" max="80" value="18">
+    <span id="lbl-ptsize">1.8</span>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Color</span>
+    <select id="sel-color">
+      <optgroup label="Basic">
+        <option value="angle">Angle</option>
+        <option value="prime_ring">Prime ring</option>
+        <option value="phi_density">φ/M density</option>
+        <option value="lift">Lift ✓/✗</option>
+        <option value="half">Top/Bottom half</option>
+      </optgroup>
+      <optgroup label="MLR">
+        <option value="entropy">Modular entropy ΔS</option>
+        <option value="mod6">Residue mod 6</option>
+        <option value="primorial">Primorial rings</option>
+        <option value="mersenne">Mersenne rings</option>
+        <option value="gap_class">Prime gap class</option>
+      </optgroup>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">H</span><input type="range" id="sl-hue" min="0" max="360" value="0" title="Hue shift">
+    <span class="ctrl-label">S</span><input type="range" id="sl-sat" min="0" max="200" value="100" title="Saturation">
+    <span class="ctrl-label">B</span><input type="range" id="sl-bri" min="0" max="200" value="100" title="Brightness">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <label><input type="checkbox" id="chk-lifts" checked> Lifts</label>
+    <label><input type="checkbox" id="chk-broken"> Broken</label>
+    <label><input type="checkbox" id="chk-noncop"> Non-cop</label>
+    <label><input type="checkbox" id="chk-area"> Area</label>
+    <label><input type="checkbox" id="chk-spin"> Spin</label>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chain</span>
+    <input type="range" id="sl-chain" min="0" max="12" value="0">
+    <span id="lbl-chain">off</span>
+    <button onclick="setState({chain:0})">off</button>
+    <button onclick="setState({chain:1})">1</button>
+    <button onclick="setState({chain:2})">2</button>
+    <button onclick="setState({chain:3})">3</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Zoom</span>
+    <input type="range" id="sl-zoom" min="10" max="500" value="100">
+    <button id="btn-zoom-reset">⌂</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Play M</span>
+    <button id="btn-play-prev">◀</button>
+    <button id="btn-play-play">▶▶</button>
+    <button id="btn-play-stop">⏮</button>
+    <input type="range" id="sl-play-speed" min="1" max="20" value="4" title="Speed">
+    <input type="number" id="num-from-m" value="2" class="narrow" title="From M">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label">Lift Scan</span>
+    <button id="btn-lift-prev">◀</button>
+    <button id="btn-lift-next">▶</button>
+    <button id="btn-lift-stop2">⏮</button>
+    <input type="range" id="sl-lift-speed" min="1" max="20" value="4" title="Lift speed">
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <button id="btn-export-4k">↓ 4K</button>
+    <button id="btn-export-all4">↓ All 4</button>
+    <button id="btn-export-csv">↓ CSV</button>
+  </div>
+
+</div>
+
+<!-- ══════════════ LEFT PANEL ══════════════ -->
+<div id="left">
 
   <div class="section">
     <div class="section-title">Prime Spiral</div>
@@ -465,10 +471,16 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     </div>
   </div>
 
-    </div>
+</div>
 
-    <div id="dtab-info" class="dtab-panel">
+<!-- ══════════════ WEBGL CANVAS ══════════════ -->
+<div id="canvas-wrap">
+  <canvas id="glcanvas"></canvas>
+  <div id="tooltip"></div>
+</div>
 
+<!-- ══════════════ RIGHT PANEL ══════════════ -->
+<div id="right">
 
   <div class="section">
     <div class="section-title">Legend</div>
@@ -524,11 +536,10 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <div id="spiral-table" class="info-box" style="font-size:9px">—</div>
   </div>
 
-    </div>
+</div>
 
-    <div id="dtab-analysis" class="dtab-panel">
-      <div style="padding:4px 0">
-
+<!-- ══════════════ BOTTOM STRIP ══════════════ -->
+<div id="analysis-panel">
   <div id="analysis-text"><strong>Canvas Analysis</strong> — click "▶ See on canvas" from Paper tab, or select a preset.</div>
   <div id="stats-live">
     φ(M): <span id="sl-phi">—</span><br>
@@ -537,172 +548,22 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     pts: <span id="sl-pts">—</span><br>
     M max: <span id="sl-mshow">—</span>
   </div>
-      </div>
-    </div>
+</div>
 
-  </div><!-- drawer-scroll -->
-</div><!-- drawer -->
-
-<div id="page-body">
-  <div id="canvas-area">
-    <div id="canvas-wrap">
-      <!-- WebGL canvas -->
-    </div>
-  </div>
-
-  <!-- ── Bottom control bar ── -->
-  <div id="ctrl">
-
-
-  <div class="ctrl-group">
-    <button id="btn-invert" title="Invert radius map">⇌ invert</button>
-    <button id="btn-inspect" title="Inspect mode: click points to pin/label them" style="border-color:var(--accent2);color:var(--accent2)">◉ Inspect</button>
-    <button id="btn-inspect-clear" title="Clear all pinned points">✕ Clear</button>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">View</span>
-    <select id="sel-view">
-      <option value="concentric">Concentric</option>
-      <option value="fermat">Fermat Spiral</option>
-      <option value="farey">Farey Half-Plane</option>
-      <option value="strip">Unfolded Strip</option>
-    </select>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">M max</span>
-    <input type="range" id="sl-mmax" min="4" max="500" value="60" class="wide">
-    <input type="number" id="num-mmax" min="4" max="2000" value="60" class="narrow">
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">δ</span>
-    <input type="range" id="sl-delta" min="-628" max="628" value="0" class="wide">
-    <input type="number" id="num-delta-r" value="0" class="narrow" title="r in r/m">/<input type="number" id="num-delta-m" value="1" class="narrow" title="m in r/m">
-    <button onclick="setDelta(0)">0</button>
-    <button onclick="setDelta(1/12)">1/12</button>
-    <button onclick="setDelta(1/6)">1/6</button>
-    <button onclick="setDelta(1/4)">¼</button>
-    <button onclick="setDelta(1/2)">½</button>
-    <button onclick="setDelta(-1/12)">−1/12</button>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">Pt</span>
-    <input type="range" id="sl-ptsize" min="5" max="80" value="18">
-    <span id="lbl-ptsize">1.8</span>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">Color</span>
-    <select id="sel-color">
-      <optgroup label="Basic">
-        <option value="angle">Angle</option>
-        <option value="prime_ring">Prime ring</option>
-        <option value="phi_density">φ/M density</option>
-        <option value="lift">Lift ✓/✗</option>
-        <option value="half">Top/Bottom half</option>
-      </optgroup>
-      <optgroup label="MLR">
-        <option value="entropy">Modular entropy ΔS</option>
-        <option value="mod6">Residue mod 6</option>
-        <option value="primorial">Primorial rings</option>
-        <option value="mersenne">Mersenne rings</option>
-        <option value="gap_class">Prime gap class</option>
-      </optgroup>
-    </select>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">H</span><input type="range" id="sl-hue" min="0" max="360" value="0" title="Hue shift">
-    <span class="ctrl-label">S</span><input type="range" id="sl-sat" min="0" max="200" value="100" title="Saturation">
-    <span class="ctrl-label">B</span><input type="range" id="sl-bri" min="0" max="200" value="100" title="Brightness">
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <label><input type="checkbox" id="chk-lifts" checked> Lifts</label>
-    <label><input type="checkbox" id="chk-broken"> Broken</label>
-    <label><input type="checkbox" id="chk-noncop"> Non-cop</label>
-    <label><input type="checkbox" id="chk-area"> Area</label>
-    <label><input type="checkbox" id="chk-spin"> Spin</label>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">Chain</span>
-    <input type="range" id="sl-chain" min="0" max="12" value="0">
-    <span id="lbl-chain">off</span>
-    <button onclick="setState({chain:0})">off</button>
-    <button onclick="setState({chain:1})">1</button>
-    <button onclick="setState({chain:2})">2</button>
-    <button onclick="setState({chain:3})">3</button>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">Zoom</span>
-    <input type="range" id="sl-zoom" min="5" max="500" value="85">
-    <button id="btn-zoom-reset">⌂</button>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">Play M</span>
-    <button id="btn-play-prev">◀</button>
-    <button id="btn-play-play">▶▶</button>
-    <button id="btn-play-stop">⏮</button>
-    <input type="range" id="sl-play-speed" min="1" max="20" value="4" title="Speed">
-    <input type="number" id="num-from-m" value="2" class="narrow" title="From M">
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <span class="ctrl-label">Lift Scan</span>
-    <button id="btn-lift-prev">◀</button>
-    <button id="btn-lift-next">▶</button>
-    <button id="btn-lift-stop2">⏮</button>
-    <input type="range" id="sl-lift-speed" min="1" max="20" value="4" title="Lift speed">
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <div class="ctrl-group">
-    <button id="btn-export-4k">↓ 4K</button>
-    <button id="btn-export-all4">↓ All 4</button>
-    <button id="btn-export-csv">↓ CSV</button>
-  </div>
-
-  </div>
-</div><!-- page-body -->
-
+</div><!-- #app -->
 
 <!-- ══════════════════════════════════════════ -->
 <!--  JAVASCRIPT                               -->
 <!-- ══════════════════════════════════════════ -->
 <script>
 // ── State ──────────────────────────────────────────────────────────────────
-// ── Inspect mode state ───────────────────────────────────────────────────────
-let inspectMode = false;
-let pinnedPoints = []; // array of {pt, color, idx}
-const PIN_COLORS = [
-  '#f5e050','#50f5c0','#f550a0','#50c0f5','#f5a050',
-  '#c050f5','#50f5a0','#f55050','#a0f550','#5050f5'
-];
-
 const S = {
   mmax: 60, ptsize: 1.8, view: 'concentric', color: 'angle',
   invert: false, hue: 0, sat: 1, bri: 1,
   delta: 0,  // fraction of full rotation applied per ring
   lifts: true, broken: false, noncop: false, area: false, spin: false,
   chain: 0,
-  zoom: 0.85, panX: 0, panY: 0,
+  zoom: 1, panX: 0, panY: 0,
   prime: 2, pidx: 0, allp: false, spiral: false, mirror: false,
   channel: 0,
   customR: null, rpath: false,
@@ -737,27 +598,17 @@ function gcd(a,b){ while(b){let t=b;b=a%b;a=t;} return a; }
 function coprimes(M){ const r=[]; for(let i=1;i<M;i++) if(gcd(i,M)===1) r.push(i); return r; }
 
 // ── WebGL setup ──────────────────────────────────────────────────────────────
-// Create and mount canvases dynamically so they work on mobile
-const canvas = document.createElement('canvas');
-canvas.id = 'glcanvas';
-canvas.style.display = 'block';
-canvas.style.touchAction = 'none'; // prevent default scroll on canvas touch
-document.getElementById('canvas-wrap').appendChild(canvas);
-
+const canvas = document.getElementById('glcanvas');
 let gl = canvas.getContext('webgl', {antialias:true, preserveDrawingBuffer:true});
 if(!gl){ gl = canvas.getContext('experimental-webgl', {antialias:true, preserveDrawingBuffer:true}); }
-if(!gl){ 
-  document.getElementById('canvas-wrap').innerHTML = 
-    '<div style="color:#e05060;font-family:monospace;padding:20px;text-align:center">WebGL not supported on this device.<br>Try Chrome or Firefox.</div>';
-}
 
 // NOTE: WebGL is used for the point cloud and line rendering (potentially
 // millions of points for M up to 2000). Text labels are drawn on a 2D
 // overlay canvas. If WebGL is unavailable, falls back to a warning.
 
-// 2D overlay for labels / hover / rings
+let gl2d = null; // 2D overlay for labels/tooltips
 const overlay = document.createElement('canvas');
-overlay.style.position='absolute'; overlay.style.top='0'; overlay.style.left='0'; overlay.style.pointerEvents='none';
+overlay.style.cssText='position:absolute;inset:0;pointer-events:none;width:100%;height:100%';
 document.getElementById('canvas-wrap').appendChild(overlay);
 const ctx2d = overlay.getContext('2d');
 
@@ -855,9 +706,6 @@ function buildPoints(){
         y = (M/mmax)*2-1;
       }
 
-      // PlayM filter — when active, dim/hide rings except current
-      if(S.playActive && M !== S.playM) continue;
-
       // Chain filter
       if(S.chain > 0){
         let survives = isCop;
@@ -954,7 +802,7 @@ function buildBuffers(){
     pos[i*2+1] = pt.y;
     const c = pointColor(pt);
     col[i*4]=c[0];col[i*4+1]=c[1];col[i*4+2]=c[2];col[i*4+3]=c[3];
-    sz[i] = S.ptsize * Math.min(devicePixelRatio, 2);
+    sz[i] = S.ptsize * devicePixelRatio;
   }
   gl.bindBuffer(gl.ARRAY_BUFFER, ptBuf);  gl.bufferData(gl.ARRAY_BUFFER, pos, gl.DYNAMIC_DRAW);
   gl.bindBuffer(gl.ARRAY_BUFFER, ptColBuf); gl.bufferData(gl.ARRAY_BUFFER, col, gl.DYNAMIC_DRAW);
@@ -1028,23 +876,17 @@ function buildBuffers(){
 }
 
 // ── Transform matrix ────────────────────────────────────────────────────────
-// Canvas is always square (JS enforces this), so aspect ratio = 1.
-// Pan is stored in world units.
-// NDC x = (worldX * sx) + panNdcX
-// NDC y = (worldY * sy) + panNdcY  (WebGL Y is up, world Y is up for concentric)
 function buildTransform(w,h){
-  const aspect = w / h; // should be ~1 since canvas is square
   const scale = S.zoom * 2 / S.mmax;
-  const sx = scale / aspect; // account for any residual non-square
-  const sy = scale;
-  // Pan in NDC: panX/panY are in world units
-  const tx = S.panX * sx;
-  const ty = S.panY * sy;
   // column-major 3x3 for WebGL
+  const sx = scale * (h/w); // correct for aspect
+  const sy = scale;
+  const tx = S.panX / w * 2;
+  const ty = S.panY / h * 2;
   return new Float32Array([
-    sx, 0, 0,
-     0,sy, 0,
-    tx,ty, 1
+    sx,0,0,
+    0,sy,0,
+    tx,ty,1
   ]);
 }
 
@@ -1054,39 +896,21 @@ let spinAngle = 0;
 let lastTime = 0;
 let animFrame = null;
 
-function fitCanvas(){
-  const cw = document.getElementById('canvas-wrap');
-  cw.style.position = 'relative';
-  cw.style.overflow = 'hidden';
-
-  // Measure true available area: full viewport minus nav (44px) and ctrl bar (48px)
-  const navH  = 44;
-  const ctrlH = document.getElementById('ctrl') ? document.getElementById('ctrl').offsetHeight : 48;
-  const availW = window.innerWidth;
-  const availH = window.innerHeight - navH - ctrlH;
-
-  // Square = use full width on mobile (portrait), full height on landscape/desktop
-  const size = Math.max(60, Math.min(availW, availH));
-  const dpr  = Math.min(devicePixelRatio, 2);
-
-  cw.style.width  = size + 'px';
-  cw.style.height = size + 'px';
-
-  canvas.width        = Math.round(size * dpr);
-  canvas.height       = Math.round(size * dpr);
-  canvas.style.width  = size + 'px';
-  canvas.style.height = size + 'px';
-  canvas.style.display = 'block';
-
-  overlay.width        = Math.round(size * dpr);
-  overlay.height       = Math.round(size * dpr);
-  overlay.style.width  = size + 'px';
-  overlay.style.height = size + 'px';
-
-  if(gl) gl.viewport(0, 0, canvas.width, canvas.height);
+function resize(){
+  const dpr = Math.min(devicePixelRatio,2);
+  const w = canvas.parentElement.clientWidth;
+  const h = canvas.parentElement.clientHeight;
+  canvas.width  = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  canvas.style.width  = w+'px';
+  canvas.style.height = h+'px';
+  overlay.width  = Math.round(w * dpr);
+  overlay.height = Math.round(h * dpr);
+  overlay.style.width  = w+'px';
+  overlay.style.height = h+'px';
+  gl.viewport(0,0,canvas.width,canvas.height);
   dirty = true;
 }
-function resize(){ fitCanvas(); }
 
 function draw(ts=0){
   animFrame = requestAnimationFrame(draw);
@@ -1107,9 +931,7 @@ function draw(ts=0){
   gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
   buildBuffers();
-  // Canvas is square; use CSS size for transform so world units are consistent
-  const cssSize = canvas.clientWidth || Math.round(w/Math.min(devicePixelRatio,2));
-  const mat = buildTransform(cssSize, cssSize);
+  const mat = buildTransform(w,h);
 
   // Draw lines first
   if(lineVerts.length > 0){
@@ -1143,16 +965,13 @@ function draw(ts=0){
     gl.drawArrays(gl.POINTS,0,ptCount);
   }
 
-  // Pass CSS dimensions (not physical) to overlay — worldToScreen handles dpr internally
-  const cssW = canvas.clientWidth || canvas.width/Math.min(devicePixelRatio,2);
-  const cssH = canvas.clientHeight || canvas.height/Math.min(devicePixelRatio,2);
-  drawOverlay(cssW,cssH,mat);
+  drawOverlay(w,h,mat);
   updateStatsPanel();
 }
 
 function drawOverlay(w,h,mat){
   ctx2d.clearRect(0,0,overlay.width,overlay.height);
-  const dpr = Math.min(devicePixelRatio,2);
+  const dpr = overlay.width / (canvas.parentElement.clientWidth||1);
 
   // Ring circles
   if(S.ringcirc && (S.view==='concentric'||S.view==='fermat')){
@@ -1220,125 +1039,24 @@ function drawOverlay(w,h,mat){
   // Hover cross
   if(hoverPt){
     const [sx,sy]=worldToScreen(hoverPt.x,hoverPt.y,w,h,mat,dpr);
-    const hkey = hoverPt.r+'_'+hoverPt.M;
-    const isPinned = pinnedPoints.some(p=>p.key===hkey);
-    if(inspectMode){
-      // Show pulsing ring on hover target
-      ctx2d.strokeStyle = isPinned ? 'rgba(255,80,80,0.9)' : 'rgba(255,255,255,0.9)';
-      ctx2d.lineWidth = 1.5*dpr;
-      ctx2d.beginPath(); ctx2d.arc(sx,sy,10*dpr,0,Math.PI*2); ctx2d.stroke();
-      ctx2d.strokeStyle='rgba(255,255,255,0.4)';
-      ctx2d.beginPath(); ctx2d.arc(sx,sy,16*dpr,0,Math.PI*2); ctx2d.stroke();
-    } else {
-      ctx2d.strokeStyle='rgba(255,255,255,0.8)'; ctx2d.lineWidth=1.5*dpr;
-      ctx2d.beginPath();ctx2d.moveTo(sx-8*dpr,sy);ctx2d.lineTo(sx+8*dpr,sy);ctx2d.stroke();
-      ctx2d.beginPath();ctx2d.moveTo(sx,sy-8*dpr);ctx2d.lineTo(sx,sy+8*dpr);ctx2d.stroke();
-    }
-  }
-
-  // ── Pinned points & connection lines ──────────────────────────────────────
-  if(pinnedPoints.length > 0){
-    const screenPins = pinnedPoints.map(p=>({
-      ...p,
-      sc: worldToScreen(p.pt.x, p.pt.y, w, h, mat, dpr)
-    }));
-
-    // Connection lines between consecutive pinned points
-    if(screenPins.length > 1){
-      for(let i=0;i<screenPins.length-1;i++){
-        const a=screenPins[i], b=screenPins[i+1];
-        // Gradient line from a.color to b.color
-        const grad=ctx2d.createLinearGradient(a.sc[0],a.sc[1],b.sc[0],b.sc[1]);
-        grad.addColorStop(0, a.color+'cc');
-        grad.addColorStop(1, b.color+'cc');
-        ctx2d.strokeStyle=grad;
-        ctx2d.lineWidth=1.5*dpr;
-        ctx2d.setLineDash([4*dpr,3*dpr]);
-        ctx2d.beginPath();
-        ctx2d.moveTo(a.sc[0],a.sc[1]);
-        ctx2d.lineTo(b.sc[0],b.sc[1]);
-        ctx2d.stroke();
-        ctx2d.setLineDash([]);
-
-        // Midpoint distance label
-        const mx=(a.sc[0]+b.sc[0])/2, my=(a.sc[1]+b.sc[1])/2;
-        const wd = Math.hypot(b.pt.x-a.pt.x, b.pt.y-a.pt.y);
-        const angDeg = (Math.atan2(b.pt.y-a.pt.y, b.pt.x-a.pt.x)*180/Math.PI).toFixed(1);
-        const dthA = 360*a.pt.r/a.pt.M, dthB = 360*b.pt.r/b.pt.M;
-        let dth = Math.abs(dthB-dthA); if(dth>180) dth=360-dth;
-        ctx2d.font = `${9*dpr}px 'Courier New',monospace`;
-        ctx2d.fillStyle='rgba(255,255,255,0.75)';
-        ctx2d.textAlign='center'; ctx2d.textBaseline='bottom';
-        ctx2d.fillText(`d=${wd.toFixed(2)} Δθ=${dth.toFixed(1)}°`, mx, my-3*dpr);
-      }
-    }
-
-    // Draw each pin: filled circle + halo + label
-    screenPins.forEach((p,i)=>{
-      const [sx,sy]=p.sc;
-      const r=p.pt.r, M=p.pt.M;
-
-      // Outer glow ring
-      ctx2d.strokeStyle=p.color+'66';
-      ctx2d.lineWidth=3*dpr;
-      ctx2d.beginPath(); ctx2d.arc(sx,sy,13*dpr,0,Math.PI*2); ctx2d.stroke();
-
-      // Main circle
-      ctx2d.strokeStyle=p.color;
-      ctx2d.lineWidth=2*dpr;
-      ctx2d.beginPath(); ctx2d.arc(sx,sy,8*dpr,0,Math.PI*2); ctx2d.stroke();
-
-      // Index dot
-      ctx2d.fillStyle=p.color;
-      ctx2d.beginPath(); ctx2d.arc(sx,sy,3*dpr,0,Math.PI*2); ctx2d.fill();
-
-      // Label: r/M
-      const lbl = r+'/'+M;
-      ctx2d.font=`bold ${10*dpr}px 'Courier New',monospace`;
-      ctx2d.textAlign='center'; ctx2d.textBaseline='bottom';
-      // Background pill
-      const tw=ctx2d.measureText(lbl).width;
-      const pad=3*dpr, lx=sx, ly=sy-16*dpr;
-      ctx2d.fillStyle='rgba(10,10,20,0.85)';
-      ctx2d.beginPath();
-      ctx2d.roundRect(lx-tw/2-pad, ly-10*dpr-pad, tw+pad*2, 10*dpr+pad*2, 3*dpr);
-      ctx2d.fill();
-      ctx2d.fillStyle=p.color;
-      ctx2d.fillText(lbl, lx, ly);
-
-      // Index number badge
-      ctx2d.font=`bold ${8*dpr}px 'Courier New',monospace`;
-      ctx2d.fillStyle='rgba(10,10,20,0.9)';
-      ctx2d.beginPath(); ctx2d.arc(sx+9*dpr,sy-9*dpr,6*dpr,0,Math.PI*2); ctx2d.fill();
-      ctx2d.fillStyle=p.color;
-      ctx2d.textAlign='center'; ctx2d.textBaseline='middle';
-      ctx2d.fillText(String(i+1), sx+9*dpr, sy-9*dpr);
-    });
+    ctx2d.strokeStyle='rgba(255,255,255,0.8)';ctx2d.lineWidth=1.5*dpr;
+    ctx2d.beginPath();ctx2d.moveTo(sx-8*dpr,sy);ctx2d.lineTo(sx+8*dpr,sy);ctx2d.stroke();
+    ctx2d.beginPath();ctx2d.moveTo(sx,sy-8*dpr);ctx2d.lineTo(sx,sy+8*dpr);ctx2d.stroke();
   }
 }
 
-// w,h = CSS pixel dimensions of the canvas element
-// mat = WebGL transform matrix (same as buildTransform output)
-// Returns overlay canvas pixel coords (already DPR-scaled since overlay matches physical canvas)
 function worldToScreen(wx,wy,w,h,mat,dpr){
-  const sx=mat[0], sy=mat[4], tx=mat[6], ty=mat[7];
-  // NDC: x in -1..1, y in -1..1 (WebGL: y=1 is top)
-  const ndcX = wx*sx + tx;
-  const ndcY = wy*sy + ty;
-  // CSS pixels (y=0 is top in screen space, so flip ndcY)
-  const cssX = (ndcX + 1) * 0.5 * w;
-  const cssY = (1 - ndcY) * 0.5 * h;   // flip Y
-  // Overlay is physical-pixel sized (w*dpr x h*dpr)
-  return [cssX * dpr, cssY * dpr];
+  // mat is column-major: [sx,0,0, 0,sy,0, tx,ty,1]
+  const sx2=mat[0],sy2=mat[4],tx=mat[6],ty=mat[7];
+  const cx=(wx*sx2+tx)*w/2+w/2;
+  const cy=(-wy*sy2-ty)*h/2+h/2;
+  return [cx*dpr,cy*dpr];
 }
-function screenToWorld(screenX,screenY,w,h,mat){
-  // screenX,screenY in CSS pixels
-  const sx=mat[0], sy=mat[4], tx=mat[6], ty=mat[7];
-  const ndcX = (screenX / w) * 2 - 1;
-  const ndcY = 1 - (screenY / h) * 2;  // flip Y
-  const wx = (ndcX - tx) / sx;
-  const wy = (ndcY - ty) / sy;
-  return [wx, wy];
+function screenToWorld(sx,sy,w,h,mat){
+  const sx2=mat[0],sy2=mat[4],tx=mat[6],ty=mat[7];
+  const wx=((sx/w*2-1)-tx)/sx2;
+  const wy=(-(sy/h*2-1)-ty)/sy2;
+  return [wx,wy];
 }
 
 // ── Interaction ──────────────────────────────────────────────────────────────
@@ -1351,19 +1069,8 @@ canvas.addEventListener('mousedown',e=>{
 window.addEventListener('mouseup',()=>drag=false);
 canvas.addEventListener('mousemove',e=>{
   if(drag){
-    const rect=canvas.getBoundingClientRect();
-    const w=rect.width, h=rect.height;
-    // Convert pixel delta to world-unit delta
-    // 1 CSS pixel = (mmax / zoom / 2) * (1/scale_factor) world units
-    // scale = zoom * 2 / mmax, so worldPerPx = mmax / (zoom * 2)
-    const worldPerPxX = S.mmax / (S.zoom * 2);
-    const worldPerPxY = S.mmax / (S.zoom * 2);
-    const dx = (e.clientX - dragX) * worldPerPxX / w * 2;
-    const dy = -(e.clientY - dragY) * worldPerPxY / h * 2; // Y flip: screen-down = world-up negate
-    S.panX += dx;
-    S.panY += dy;
-    dragX=e.clientX; dragY=e.clientY;
-    dirty=true;
+    S.panX += e.clientX-dragX; S.panY += e.clientY-dragY;
+    dragX=e.clientX; dragY=e.clientY; dirty=true;
   }
   const rect=canvas.getBoundingClientRect();
   const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
@@ -1376,59 +1083,26 @@ canvas.addEventListener('wheel',e=>{
   document.getElementById('sl-zoom').value=S.zoom*100;
   dirty=true;
 },{passive:false});
-canvas.addEventListener('dblclick',()=>{S.panX=0;S.panY=0;S.zoom=1;fitCanvas();dirty=true;});
+canvas.addEventListener('dblclick',()=>{S.panX=0;S.panY=0;S.zoom=1;dirty=true;});
 canvas.addEventListener('click',e=>{
-  // Distinguish drag from click
-  if(Math.hypot(e.clientX-dragX, e.clientY-dragY) > 4) return;
-
-  if(inspectMode && hoverPt){
-    const key = hoverPt.r+'_'+hoverPt.M;
-    const idx = pinnedPoints.findIndex(p=>p.key===key);
-    if(idx >= 0){
-      // Click again — remove pin
-      pinnedPoints.splice(idx,1);
-    } else {
-      // New pin
-      const color = PIN_COLORS[pinnedPoints.length % PIN_COLORS.length];
-      pinnedPoints.push({ pt: hoverPt, key, color, idx: pinnedPoints.length });
-    }
-    updateInspectPanel();
-    dirty = true;
-  } else if(!inspectMode && hoverPt){
-    showClickInfo(hoverPt);
-  }
+  if(hoverPt) showClickInfo(hoverPt);
 });
 
 // Touch
 let t0=null;
 canvas.addEventListener('touchstart',e=>{e.preventDefault();if(e.touches.length===1){drag=true;t0={x:e.touches[0].clientX,y:e.touches[0].clientY};}},{passive:false});
-canvas.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  if(drag&&e.touches.length===1){
-    const t=e.touches[0];
-    const rect=canvas.getBoundingClientRect();
-    const worldPerPxX=S.mmax/(S.zoom*2);
-    const worldPerPxY=S.mmax/(S.zoom*2);
-    const dx=(t.clientX-t0.x)*worldPerPxX/rect.width*2;
-    const dy=-(t.clientY-t0.y)*worldPerPxY/rect.height*2;
-    S.panX+=dx; S.panY+=dy;
-    t0={x:t.clientX,y:t.clientY};
-    dirty=true;
-  }
-},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(drag&&e.touches.length===1){const t=e.touches[0];S.panX+=t.clientX-t0.x;S.panY+=t.clientY-t0.y;t0={x:t.clientX,y:t.clientY};dirty=true;}},{passive:false});
 canvas.addEventListener('touchend',()=>{drag=false;});
 
 function findHover(cx,cy,w,h){
   if(!points.length){hoverPt=null;return;}
-  // w,h are CSS dimensions of canvas; build mat from CSS dims too
-  const mat=buildTransform(w,h);
-  const dpr=Math.min(devicePixelRatio,2);
+  const mat=buildTransform(canvas.width,canvas.height);
+  const dpr=canvas.width/w;
   let best=null,bestD=Infinity;
-  const threshold=16; // CSS pixels
+  const threshold=20*dpr;
   for(const pt of points){
-    const [sx,sy]=worldToScreen(pt.x,pt.y,w,h,mat,dpr);
-    // sx,sy are in overlay physical pixels; cx,cy are CSS pixels
-    const d=Math.hypot(sx/dpr-cx, sy/dpr-cy);
+    const [sx,sy]=worldToScreen(pt.x,pt.y,canvas.width,canvas.height,mat,dpr);
+    const d=Math.hypot(sx-cx*dpr,sy-cy*dpr);
     if(d<threshold&&d<bestD){bestD=d;best=pt;}
   }
   hoverPt=best;
@@ -1453,78 +1127,6 @@ function showClickInfo(pt){
     `lift ✓: <span style="color:${pt.lifted?'#22cc66':'#ff4444'}">${pt.lifted?'yes':'no'}</span><br>`+
     `θ = <span style="color:#e0e0ff">${(360*pt.r/pt.M).toFixed(2)}°</span><br>`+
     `mirror = <span style="color:#e0e0ff">${pt.M-pt.r}</span>`;
-}
-
-function ptDetail(pt, color, idx){
-  const g   = gcd(pt.r, pt.M);
-  const th  = (360*pt.r/pt.M).toFixed(3);
-  const thR = (2*Math.PI*pt.r/pt.M).toFixed(4);
-  const cop2 = new Set(coprimes(pt.M+1));
-  const liftR = pt.r % (pt.M+1);
-  const liftOk = cop2.has(liftR);
-  return `<div style="border-left:3px solid ${color};padding:5px 7px;margin-bottom:6px;background:rgba(0,0,0,0.3)">
-    <div style="color:${color};font-size:9px;letter-spacing:.1em;margin-bottom:3px">⬤ ${idx}  r/M = ${pt.r}/${pt.M} = ${(pt.r/pt.M).toFixed(5)}</div>
-    <div style="color:rgba(255,255,255,.5);font-size:9px;line-height:1.8">
-      θ = <b style="color:#e0e0ff">${th}°</b> &nbsp; ${thR} rad<br>
-      gcd(r,M) = <b style="color:#e0e0ff">${g}</b> &nbsp; ${g===1?'<span style="color:#22cc66">coprime</span>':'<span style="color:#ff9900">not coprime</span>'}<br>
-      φ(M) = <b style="color:#e0e0ff">${phi(pt.M)}</b> &nbsp; ${isPrime(pt.M)?'<span style="color:#c084fc">prime ring</span>':''}<br>
-      lift → ${liftR}/${pt.M+1}: <b style="color:${liftOk?'#22cc66':'#ff4444'}">${liftOk?'✓ survives':'✗ blocked'}</b><br>
-      mirror = <b style="color:#e0e0ff">${pt.M-pt.r}</b> &nbsp; angle = <b style="color:#e0e0ff">${(360*(pt.M-pt.r)/pt.M).toFixed(2)}°</b>
-    </div>
-  </div>`;
-}
-
-function pairDetail(a, b, ai, bi){
-  const worldDist = Math.hypot(b.pt.x-a.pt.x, b.pt.y-a.pt.y).toFixed(4);
-  const thA = 360*a.pt.r/a.pt.M, thB = 360*b.pt.r/b.pt.M;
-  let dth = Math.abs(thB-thA); if(dth>180) dth=360-dth;
-  const angBetween = (Math.atan2(b.pt.y-a.pt.y, b.pt.x-a.pt.x)*180/Math.PI).toFixed(1);
-  const gcdRR = gcd(a.pt.r, b.pt.r);
-  const rDiff = Math.abs(b.pt.r-a.pt.r), MDiff = Math.abs(b.pt.M-a.pt.M);
-  return `<div style="border:1px solid rgba(255,255,255,.1);padding:4px 7px;margin-bottom:5px;font-size:9px;background:rgba(255,255,255,.03)">
-    <div style="color:rgba(255,255,255,.4);margin-bottom:2px">
-      <span style="color:${a.color}">⬤${ai}</span> → <span style="color:${b.color}">⬤${bi}</span>
-    </div>
-    dist = <b style="color:#e0e0ff">${worldDist}</b> &nbsp;
-    Δθ = <b style="color:#e0e0ff">${dth.toFixed(2)}°</b><br>
-    angle = <b style="color:#e0e0ff">${angBetween}°</b> &nbsp;
-    Δr = <b style="color:#e0e0ff">${rDiff}</b> &nbsp; ΔM = <b style="color:#e0e0ff">${MDiff}</b><br>
-    gcd(r₁,r₂) = <b style="color:#e0e0ff">${gcdRR}</b>
-  </div>`;
-}
-
-function updateInspectPanel(){
-  const box = document.getElementById('click-info');
-  if(pinnedPoints.length === 0){
-    box.innerHTML = '<span style="color:var(--muted)">◉ Inspect mode — click points to pin them</span>';
-    return;
-  }
-  let html = `<div style="color:var(--accent2);font-size:9px;margin-bottom:5px;letter-spacing:.1em">◉ ${pinnedPoints.length} PINNED &nbsp;<span style="color:var(--muted);font-size:8px">(click again to remove)</span></div>`;
-  pinnedPoints.forEach((p,i)=> html += ptDetail(p, p.color, i+1));
-  if(pinnedPoints.length > 1){
-    html += `<div style="color:var(--muted);font-size:9px;margin:5px 0 3px">Connections</div>`;
-    for(let i=0;i<pinnedPoints.length-1;i++){
-      html += pairDetail(pinnedPoints[i], pinnedPoints[i+1], i+1, i+2);
-    }
-    // Also show first↔last if 3+
-    if(pinnedPoints.length > 2){
-      const a=pinnedPoints[0], b=pinnedPoints[pinnedPoints.length-1];
-      html += `<div style="color:var(--muted);font-size:8px;margin-top:3px">`;
-      const wd=Math.hypot(b.pt.x-a.pt.x,b.pt.y-a.pt.y).toFixed(3);
-      const thA=360*a.pt.r/a.pt.M, thB=360*b.pt.r/b.pt.M;
-      let dth=Math.abs(thB-thA); if(dth>180) dth=360-dth;
-      html+=`span ⬤1→⬤${pinnedPoints.length}: dist=${wd}, Δθ=${dth.toFixed(1)}°</div>`;
-    }
-  }
-  box.innerHTML = html;
-  // Auto-open drawer to info tab
-  if(!document.getElementById('drawer').classList.contains('open')){
-    document.getElementById('drawer').classList.add('open');
-    document.getElementById('drawer-backdrop').classList.add('open');
-    document.getElementById('drawer-toggle').classList.add('drawer-open');
-    document.getElementById('drawer-toggle').textContent='✕ Close';
-    showDTab('info', document.querySelectorAll('.dtab')[1]);
-  }
 }
 
 // ── Keyboard ─────────────────────────────────────────────────────────────────
@@ -1616,116 +1218,33 @@ document.getElementById('btn-export-csv').onclick=()=>{
   a.href=URL.createObjectURL(b); a.download='zmmz_points.csv'; a.click();
 };
 
-// ── Playback — Play M (ring by ring scan) ────────────────────────────────────
-let playTimer = null;
-
-function playSetM(m){
-  S.playM = Math.max(2, Math.min(S.mmax, m));
-  const ph = phi(S.playM);
-  const nxt = phi(S.playM+1);
-  const lifted = Math.round(ph * nxt / (S.playM+1));
-  document.getElementById('analysis-text').innerHTML =
-    `<strong>Ring M = ${S.playM}</strong> &nbsp;|&nbsp; `+
-    `φ(${S.playM}) = ${ph} &nbsp;|&nbsp; `+
-    (isPrime(S.playM) ? '<em style="color:#c084fc">prime</em>' : 'composite') +
-    ` &nbsp;|&nbsp; lifts ≈ ${lifted}/${ph}`;
-  dirty = true;
-}
-
-function playStop(){
-  clearInterval(playTimer);
-  playTimer = null;
-  S.playActive = false;
-  dirty = true;
-}
-
-document.getElementById('btn-play-play').onclick = ()=>{
-  if(S.playActive){ playStop(); return; }
-  S.playActive = true;
-  S.playM = parseInt(document.getElementById('num-from-m').value)||2;
-  const ms = Math.round(1200 / Math.max(1, S.playSpeed));
-  playTimer = setInterval(()=>{
-    S.playM = S.playM < S.mmax ? S.playM + 1 : 2;
-    playSetM(S.playM);
-  }, ms);
-  document.getElementById('btn-play-play').textContent = '⏸';
+// ── Playback ─────────────────────────────────────────────────────────────────
+let playTimer=null;
+document.getElementById('btn-play-play').onclick=()=>{
+  if(S.playActive){clearInterval(playTimer);S.playActive=false;return;}
+  S.playActive=true;
+  S.playM=parseInt(document.getElementById('num-from-m').value)||2;
+  const speed=1000/S.playSpeed;
+  playTimer=setInterval(()=>{
+    S.playM=S.playM<S.mmax?S.playM+1:2;
+    // Show only ring S.playM
+    // (for full impl: filter points by M===S.playM)
+    document.getElementById('analysis-text').innerHTML=`<strong>Playback M=${S.playM}</strong> — φ(${S.playM})=${phi(S.playM)}, ${isPrime(S.playM)?'prime':'composite'}`;
+    dirty=true;
+  },speed);
 };
+document.getElementById('btn-play-stop').onclick=()=>{clearInterval(playTimer);S.playActive=false;S.playM=2;dirty=true;};
+document.getElementById('btn-play-prev').onclick=()=>{S.playM=Math.max(2,S.playM-1);dirty=true;};
 
-document.getElementById('btn-play-stop').onclick = ()=>{
-  playStop();
-  S.playM = parseInt(document.getElementById('num-from-m').value)||2;
-  document.getElementById('btn-play-play').textContent = '▶▶';
-  dirty = true;
-};
-
-document.getElementById('btn-play-prev').onclick = ()=>{
-  playStop();
-  document.getElementById('btn-play-play').textContent = '▶▶';
-  playSetM(S.playM - 1);
-};
-
-// Add a "next" button handler too (btn-play-play was ▶▶, we reuse)
-// btn-play-prev is ◀, we need a ▶ next — wire it:
-(()=>{
-  // insert a next-ring button handler on the existing ▶▶ when stopped
-  // Actually ▶▶ starts play — we use btn-play-prev as ◀ and need next
-  // The HTML has btn-play-prev ◀  btn-play-play ▶▶  btn-play-stop ⏮
-  // Let's make prev/next step when stopped, play when running
-})();
-
-// ── Lift Scan ─────────────────────────────────────────────────────────────────
-let liftTimer = null;
-
-function liftSetM(m){
-  S.liftScanM = Math.max(2, Math.min(S.mmax-1, m));
-  S.liftScanActive = true;
-  const ph = phi(S.liftScanM);
-  const cop2 = new Set(coprimes(S.liftScanM+1));
-  const cop1 = coprimes(S.liftScanM);
-  const nLifts = cop1.filter(r => cop2.has(r % (S.liftScanM+1))).length;
-  const nBroken = ph - nLifts;
-  document.getElementById('analysis-text').innerHTML =
-    `<strong>Lift scan M = ${S.liftScanM} → ${S.liftScanM+1}</strong> &nbsp;|&nbsp; `+
-    `φ(${S.liftScanM}) = ${ph} &nbsp;|&nbsp; `+
-    `<span style="color:#22cc66">✓ ${nLifts}</span> lift &nbsp; `+
-    `<span style="color:#ff4444">✗ ${nBroken}</span> broken &nbsp;|&nbsp; `+
-    `ratio = ${(nLifts/ph).toFixed(4)}`;
-  dirty = true;
-}
-
-function liftScanStop(){
-  clearInterval(liftTimer);
-  liftTimer = null;
-  document.getElementById('btn-lift-next').textContent = '▶';
-}
-
-document.getElementById('btn-lift-next').onclick = ()=>{
-  if(liftTimer){ liftScanStop(); return; }
-  // Auto-scan mode
-  liftTimer = setInterval(()=>{
-    S.liftScanM = S.liftScanM < S.mmax-1 ? S.liftScanM+1 : 2;
-    liftSetM(S.liftScanM);
-  }, Math.round(1000 / Math.max(1, S.liftScanSpeed)));
-  document.getElementById('btn-lift-next').textContent = '⏸';
-};
-
-document.getElementById('btn-lift-prev').onclick = ()=>{
-  liftScanStop();
-  liftSetM(S.liftScanM - 1);
-};
-
-document.getElementById('btn-lift-stop2').onclick = ()=>{
-  liftScanStop();
-  S.liftScanActive = false;
-  S.liftScanM = 2;
-  dirty = true;
-};
+document.getElementById('btn-lift-next').onclick=()=>{S.liftScanM=Math.min(S.mmax-1,S.liftScanM+1);S.liftScanActive=true;dirty=true;};
+document.getElementById('btn-lift-prev').onclick=()=>{S.liftScanM=Math.max(2,S.liftScanM-1);S.liftScanActive=true;dirty=true;};
+document.getElementById('btn-lift-stop2').onclick=()=>{S.liftScanActive=false;dirty=true;};
 
 // ── Presets ───────────────────────────────────────────────────────────────────
 function setState(patch){Object.assign(S,patch);syncUI();dirty=true;}
 function applyPreset(name){
   const P={
-    reset:     {mmax:60,ptsize:1.8,view:'concentric',color:'angle',invert:false,delta:0,lifts:true,broken:false,chain:0,panX:0,panY:0,channel:0},
+    reset:     {mmax:60,ptsize:1.8,view:'concentric',color:'angle',invert:false,delta:0,lifts:true,broken:false,chain:0,zoom:1,panX:0,panY:0,channel:0},
     chain1:    {chain:1,color:'lift'},
     chain2:    {chain:2,color:'lift'},
     chain3:    {chain:3,color:'lift'},
@@ -1740,7 +1259,6 @@ function applyPreset(name){
     thm81: {mmax:100,color:'prime_ring',view:'fermat'},
   };
   if(P[name]) setState(P[name]);
-  autoFitZoom();
   document.getElementById('analysis-text').innerHTML=`<strong>${name}</strong> — preset applied.`;
 }
 
@@ -1802,8 +1320,8 @@ wire('sl-label-maxm','labelMaxM',Number);
 wire('num-channel','channel',Number);
 wire('num-custom-r','customR',v=>v?Number(v):null);
 wire('sl-pidx','pidx',v=>{ S.prime=PRIMES[v-1]; return Number(v); });
-wire('sl-lift-speed','liftScanSpeed',v=>{ const n=Number(v); S.liftScanSpeed=n; return n; });
-wire('sl-play-speed','playSpeed',v=>{ const n=Number(v); S.playSpeed=n; return n; });
+wire('sl-lift-speed','liftScanSpeed',Number);
+wire('sl-play-speed','playSpeed',Number);
 wire('txt-gaps','gapStr',v=>v);
 wire('sel-label-fmt','labelFmt',v=>v);
 
@@ -1819,76 +1337,14 @@ document.getElementById('chk-stats').addEventListener('change',e=>{
   document.getElementById('stats-panel').style.display=e.target.checked?'':'none';
 });
 
-
-// Auto-fit zoom — makes the full dataset fill ~88% of the canvas
-// buildTransform: NDC = worldCoord * (zoom * 2 / mmax)
-// So to map world radius R to NDC 0.88: zoom = 0.88 * mmax / (2*R) * 2 = 0.88*mmax/(2R)*2
-// For concentric: R = mmax → zoom = 0.88
-// For fermat:     R = sqrt(mmax) → zoom = 0.88 * mmax / sqrt(mmax) = 0.88*sqrt(mmax)  ← but that's huge
-//   Actually fermat world coords ARE sqrt(M)*cos/sin, max radius = sqrt(mmax)
-//   scale*sqrt(mmax) = zoom*2/mmax * sqrt(mmax) = zoom*2/sqrt(mmax) → want this = 0.88
-//   → zoom = 0.88 * sqrt(mmax) / 2
-// For farey: world x = r/M*2-1 ∈ (-1,1), y = 1/M*2, max y at M=2 → y=1
-//   scale * 1 = zoom*2/mmax → want = 0.88 → zoom = 0.88*mmax/2
-// For strip: world x,y ∈ (-1,1) same as concentric edge → zoom = 0.88
-function autoFitZoom(){
-  S.panX = 0;
-  S.panY = 0;
-  const m = S.mmax;
-  if(S.view === 'concentric'){
-    S.zoom = 0.88;
-  } else if(S.view === 'fermat'){
-    S.zoom = Math.max(0.3, 0.88 * Math.sqrt(m) / 2);
-  } else if(S.view === 'farey'){
-    S.zoom = Math.max(0.5, 0.88 * m / 2);
-  } else if(S.view === 'strip'){
-    S.zoom = 0.88;
-  }
-  // Sync slider
-  const sl = document.getElementById('sl-zoom');
-  if(sl) sl.value = Math.round(S.zoom * 100);
-  dirty = true;
-}
-
-document.getElementById('sel-view').addEventListener('change',e=>{
-  S.view=e.target.value;
-  autoFitZoom();
-  syncUI();
-});
+document.getElementById('sel-view').addEventListener('change',e=>{S.view=e.target.value;dirty=true;syncUI();});
 document.getElementById('sel-color').addEventListener('change',e=>{S.color=e.target.value;dirty=true;});
 document.getElementById('btn-invert').addEventListener('click',()=>{S.invert=!S.invert;dirty=true;syncUI();});
-
-document.getElementById('btn-inspect').addEventListener('click',()=>{
-  inspectMode = !inspectMode;
-  const btn = document.getElementById('btn-inspect');
-  btn.classList.toggle('active', inspectMode);
-  btn.textContent = inspectMode ? '◉ Inspecting' : '◉ Inspect';
-  btn.style.borderColor = inspectMode ? '#c084fc' : '';
-  btn.style.color = inspectMode ? '#c084fc' : '';
-  btn.style.background = inspectMode ? 'rgba(192,132,252,0.15)' : '';
-  if(inspectMode && pinnedPoints.length===0){
-    document.getElementById('click-info').innerHTML =
-      '<span style="color:var(--accent2);font-size:9px">◉ Inspect mode ON — click any point to pin it</span>';
-    // Open drawer to info tab
-    document.getElementById('drawer').classList.add('open');
-    document.getElementById('drawer-backdrop').classList.add('open');
-    document.getElementById('drawer-toggle').classList.add('drawer-open');
-    document.getElementById('drawer-toggle').textContent='✕ Close';
-    showDTab('info', document.querySelectorAll('.dtab')[1]);
-  }
-  dirty = true;
-});
-
-document.getElementById('btn-inspect-clear').addEventListener('click',()=>{
-  pinnedPoints = [];
-  document.getElementById('click-info').innerHTML = 'Click a point';
-  dirty = true;
-});
-document.getElementById('btn-zoom-reset').addEventListener('click',()=>{ autoFitZoom(); dirty=true; });
+document.getElementById('btn-zoom-reset').addEventListener('click',()=>{S.zoom=1;S.panX=0;S.panY=0;dirty=true;});
 
 // Sync mmax slider/num bidirectionally
-document.getElementById('sl-mmax').addEventListener('input',e=>{document.getElementById('num-mmax').value=e.target.value;S.mmax=Number(e.target.value);autoFitZoom();dirty=true;});
-document.getElementById('num-mmax').addEventListener('input',e=>{const v=Math.max(4,Math.min(2000,Number(e.target.value)));document.getElementById('sl-mmax').value=Math.min(v,500);S.mmax=v;autoFitZoom();dirty=true;});
+document.getElementById('sl-mmax').addEventListener('input',e=>{document.getElementById('num-mmax').value=e.target.value;S.mmax=Number(e.target.value);dirty=true;});
+document.getElementById('num-mmax').addEventListener('input',e=>{const v=Math.max(4,Math.min(2000,Number(e.target.value)));document.getElementById('sl-mmax').value=Math.min(v,500);S.mmax=v;dirty=true;});
 document.getElementById('sl-chain').addEventListener('input',e=>{S.chain=Number(e.target.value);document.getElementById('lbl-chain').textContent=S.chain||'off';dirty=true;});
 document.getElementById('sl-ptsize').addEventListener('input',e=>{S.ptsize=e.target.value/10;document.getElementById('lbl-ptsize').textContent=S.ptsize.toFixed(1);dirty=true;});
 
@@ -1928,9 +1384,10 @@ document.getElementById('btn-fi-go').addEventListener('click',()=>{
 document.getElementById('btn-fi-clear').addEventListener('click',()=>{S.frInspActive=false;document.getElementById('fi-info').textContent='—';dirty=true;});
 
 // ── Init ─────────────────────────────────────────────────────────────────────
-window.addEventListener('resize',()=>{ fitCanvas(); dirty=true; });
-// Initial fit after DOM is ready
-setTimeout(()=>{ fitCanvas(); autoFitZoom(); syncUI(); draw(); }, 50);
+window.addEventListener('resize',()=>{resize();dirty=true;});
+resize();
+syncUI();
+draw();
 
 // Report WebGL usage in analysis panel
 document.getElementById('analysis-text').innerHTML=
@@ -1986,7 +1443,6 @@ function applyThm(name){
   if(!p) { applyPreset(name); return; }
   animStop();
   Object.assign(S, p);
-  autoFitZoom();
   syncUI();
   dirty = true;
   if(p._analysis){
@@ -2191,32 +1647,6 @@ function animStart(name){
   }
 })();
 
-
-// ── Drawer ────────────────────────────────────────────────────────────────────
-function toggleDrawer(){
-  const d=document.getElementById('drawer');
-  const b=document.getElementById('drawer-backdrop');
-  const t=document.getElementById('drawer-toggle');
-  const open=d.classList.toggle('open');
-  b.classList.toggle('open',open);
-  t.classList.toggle('drawer-open',open);
-  t.textContent=open?'✕ Close':'☰ Controls';
-  // Refit canvas after drawer animation (drawer doesn't affect layout — it overlays)
-}
-function closeDrawer(){
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawer-backdrop').classList.remove('open');
-  const t=document.getElementById('drawer-toggle');
-  t.classList.remove('drawer-open');
-  t.textContent='☰ Controls';
-}
-function showDTab(name,el){
-  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.dtab-panel').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('dtab-'+name).classList.add('active');
-}
-
 </script>
 </body>
-</html>
+  </html>
