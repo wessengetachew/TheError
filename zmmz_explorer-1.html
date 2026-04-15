@@ -54,8 +54,8 @@ html, body { width:100%; height:100%; overflow:hidden; }
   z-index: 10;
 }
 #drawer.collapsed { width: 0; border-right: none; overflow: hidden; }
-#drawer-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px; }
-#drawer-backdrop { display: none; }
+#drawer-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px; touch-action: pan-y; }
+#drawer-backdrop { display: none; pointer-events: none; }
 
 /* ── Main column ── */
 #main-col {
@@ -105,7 +105,7 @@ html, body { width:100%; height:100%; overflow:hidden; }
   position: fixed;
   top: calc(var(--nav-h) + 8px);
   left: calc(var(--drawer-w) + 8px);
-  z-index: 200;
+  z-index: 150;
   background: rgba(10,10,20,0.92);
   border: 1px solid var(--border);
   color: var(--accent);
@@ -134,7 +134,7 @@ html, body { width:100%; height:100%; overflow:hidden; }
     width: var(--drawer-w) !important;
     transform: translateX(-100%);
     transition: transform 0.25s cubic-bezier(.4,0,.2,1);
-    z-index: 100;
+    z-index: 300;
     border-right: 1px solid var(--border) !important;
   }
   #drawer.open    { transform: translateX(0);    }
@@ -142,13 +142,16 @@ html, body { width:100%; height:100%; overflow:hidden; }
 
   #drawer-backdrop {
     display: none;
-    position: fixed; inset: 0; top: var(--nav-h);
+    pointer-events: none;
+    position: fixed;
+    top: var(--nav-h); left: var(--drawer-w); right: 0; bottom: 0;
     background: rgba(0,0,0,0.55); z-index: 99;
   }
-  #drawer-backdrop.open { display: block; }
+  #drawer-backdrop.open { display: block; pointer-events: auto; }
 
   #drawer-toggle { left: 8px !important; }
-  #drawer-toggle.drawer-open { left: calc(var(--drawer-w) + 8px) !important; }
+  /* When drawer is open on mobile, hide floating toggle — close btn is inside drawer */
+  #drawer-toggle.drawer-open { display: none !important; }
 
   #main-col { flex: 1; min-height: 0; }
 }
@@ -165,17 +168,21 @@ html, body { width:100%; height:100%; overflow:hidden; }
   font-size: 9px;
   letter-spacing: .1em;
   text-transform: uppercase;
-  padding: 7px 4px;
+  padding: 9px 4px;
   text-align: center;
   cursor: pointer;
-  color: var(--muted);
+  color: rgba(160,160,210,0.9);
   border-bottom: 2px solid transparent;
   background: none;
   border-top: none;
   border-left: none;
   border-right: none;
   transition: color .15s;
+  min-height: 36px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(74,158,255,0.2);
 }
+.dtab:active { background: rgba(255,255,255,0.07); }
 .dtab.active { color: var(--accent); border-bottom-color: var(--accent); }
 .dtab-panel { display: none; }
 .dtab-panel.active { display: block; }
@@ -306,15 +313,15 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   bottom:6px;
   left:50%;
   transform:translateX(-50%);
-  display:flex;gap:3px;flex-wrap:wrap;justify-content:center;align-items:center;
-  background:rgba(4,4,10,0.88);
-  backdrop-filter:blur(6px);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:4px;
-  padding:5px 10px;
+  display:flex;flex-direction:column;gap:4px;align-items:center;
+  background:rgba(4,4,10,0.92);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:6px;
+  padding:7px 12px;
   z-index:20;
-  max-width:calc(100% - 20px);
-  overflow-x:auto;overflow-y:hidden;
+  max-width:calc(100% - 16px);
+  width:max-content;
 }
 .thm-btn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.08em;text-transform:uppercase;
   background:rgba(200,168,74,.08);border:1px solid rgba(200,168,74,.2);color:rgba(200,168,74,.8);
@@ -350,11 +357,12 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 <div id="page-body">
 
 <div id="drawer">
-  <div id="drawer-tabs">
+  <div id="drawer-tabs" style="position:relative">
     <button class="dtab active" onclick="showDTab('controls',this)">Controls</button>
     <button class="dtab" onclick="showDTab('info',this)">Info</button>
     <button class="dtab" onclick="showDTab('analysis',this)">Analysis</button>
     <button class="dtab" id="dtab-ai-btn" onclick="showDTab('ai',this);buildAIPanel()" style="color:#50f5c0">AI ◈</button>
+    <button onclick="toggleDrawer()" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);font-size:11px;padding:2px 7px;cursor:pointer;border-radius:2px;line-height:1.4">✕</button>
   </div>
   <div id="drawer-scroll">
     <div id="dtab-controls" class="dtab-panel active">
@@ -371,8 +379,8 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       <label><input type="checkbox" id="chk-allp"> all p</label>
     </div>
     <div class="row">
-      <label><input type="checkbox" id="chk-spiral"> Show spiral</label>
-      <label><input type="checkbox" id="chk-mirror"> Mirror M−p</label>
+      <label><input type="checkbox" id="chk-spiral" checked> Show spiral</label>
+      <label><input type="checkbox" id="chk-mirror" checked> Mirror M−p</label>
     </div>
   </div>
 
@@ -406,7 +414,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <div class="row"><label><input type="checkbox" id="chk-sector"> 1/n sector lines</label></div>
     <div class="row"><label><input type="checkbox" id="chk-ringcirc"> Ring circles</label></div>
     <div class="row">
-      <label><input type="checkbox" id="chk-dim"> Dim non-sel</label>
+      <label><input type="checkbox" id="chk-dim" checked> Dim non-sel</label>
       <input type="range" id="sl-dim" min="1" max="20" value="5" title="Dim opacity">
     </div>
   </div>
@@ -436,7 +444,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <div class="section">
     <div class="section-title">Paths (M±n)/2</div>
     <div class="row">
-      <label><input type="checkbox" id="chk-npath"> ±n path</label>
+      <label><input type="checkbox" id="chk-npath" checked> ±n path</label>
       <label><input type="checkbox" id="chk-lockp"> Lock n→p</label>
     </div>
     <div class="row">
@@ -610,23 +618,41 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <div id="canvas-area">
     <div id="canvas-wrap"></div>
     <div id="thm-strip">
-  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding-right:6px">§8</span>
-  <button class="thm-btn" onclick="applyThm('thm81')">§8.1</button>
-  <button class="thm-btn coral" onclick="applyThm('thm82')">§8.2</button>
-  <button class="thm-btn teal" onclick="applyThm('thm83')">§8.3</button>
-  <button class="thm-btn violet" onclick="applyThm('thm84')">§8.4</button>
-  <button class="thm-btn" onclick="applyThm('thm85')">§8.5</button>
-  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding:0 4px">n</span>
-  <button class="thm-btn teal" onclick="applyThm('chain1')">1</button>
-  <button class="thm-btn teal" onclick="applyThm('chain2')">2</button>
-  <button class="thm-btn teal" onclick="applyThm('chain3')">3</button>
-  <button class="thm-btn coral" onclick="applyThm('chain4')">4</button>
-  <button class="thm-btn coral" onclick="applyThm('chain5')">5</button>
-  <button class="thm-btn coral" onclick="applyThm('chain6')">6</button>
-  <button class="thm-btn violet" onclick="applyThm('inv_primorial')">Primorial</button>
-  <button class="thm-btn violet" onclick="applyThm('rot_ch2_fermat')">½ch Fermat</button>
-  <button class="thm-btn" onclick="applyThm('reset')">↺</button>
-  <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'">■</button>
+
+  <!-- Row 1: prime spiral nav -->
+  <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:center;margin-bottom:4px">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#c8a84a;letter-spacing:.1em">SPIRAL p</span>
+    <button class="thm-btn" style="border-color:rgba(200,168,74,.4);color:#c8a84a;padding:3px 10px;font-size:11px" onclick="stepPrime(-1)">◀</button>
+    <span id="lbl-prime-strip" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c8a84a;min-width:22px;text-align:center;font-weight:bold">7</span>
+    <button class="thm-btn" style="border-color:rgba(200,168,74,.4);color:#c8a84a;padding:3px 10px;font-size:11px" onclick="stepPrime(1)">▶</button>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.2);padding:0 4px">|</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#3dc8b8;letter-spacing:.1em">PATH n</span>
+    <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="stepN(-1)">◀</button>
+    <span id="lbl-n-strip" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3dc8b8;min-width:22px;text-align:center;font-weight:bold">1</span>
+    <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="stepN(1)">▶</button>
+  </div>
+
+  <!-- Row 2: theorem presets + chain + misc -->
+  <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:center">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding-right:4px">§8</span>
+    <button class="thm-btn" onclick="applyThm('thm81')">§8.1</button>
+    <button class="thm-btn coral" onclick="applyThm('thm82')">§8.2</button>
+    <button class="thm-btn teal" onclick="applyThm('thm83')">§8.3</button>
+    <button class="thm-btn violet" onclick="applyThm('thm84')">§8.4</button>
+    <button class="thm-btn" onclick="applyThm('thm85')">§8.5</button>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding:0 3px">chain</span>
+    <button class="thm-btn teal" onclick="applyThm('chain1')">1</button>
+    <button class="thm-btn teal" onclick="applyThm('chain2')">2</button>
+    <button class="thm-btn teal" onclick="applyThm('chain3')">3</button>
+    <button class="thm-btn coral" onclick="applyThm('chain4')">4</button>
+    <button class="thm-btn coral" onclick="applyThm('chain5')">5</button>
+    <button class="thm-btn coral" onclick="applyThm('chain6')">6</button>
+    <button class="thm-btn violet" onclick="applyThm('inv_primorial')">Primorial</button>
+    <button class="thm-btn violet" onclick="applyThm('rot_ch2_fermat')">½ch Fermat</button>
+    <button class="thm-btn" onclick="applyThm('reset')">↺</button>
+    <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'">■</button>
+  </div>
+
   </div>
 </div>
   <div id="ctrl">
@@ -634,6 +660,22 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <button id="btn-invert" title="Invert radius map">⇌ invert</button>
     <button id="btn-inspect" title="Inspect mode: click points to pin/label them" style="border-color:var(--accent2);color:var(--accent2)">◉ Inspect</button>
     <button id="btn-inspect-clear" title="Clear all pinned points">✕ Clear</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label" style="color:#c8a84a">p</span>
+    <button onclick="stepPrime(-1)" title="Previous prime">◀</button>
+    <span id="lbl-prime-bar" style="font-family:'Courier New',monospace;font-size:10px;color:#c8a84a;min-width:20px;text-align:center">7</span>
+    <button onclick="stepPrime(1)" title="Next prime">▶</button>
+  </div>
+  <div class="ctrl-sep"></div>
+
+  <div class="ctrl-group">
+    <span class="ctrl-label" style="color:#3dc8b8">n</span>
+    <button onclick="stepN(-1)" title="Decrease n">◀</button>
+    <span id="lbl-n-bar" style="font-family:'Courier New',monospace;font-size:10px;color:#3dc8b8;min-width:20px;text-align:center">1</span>
+    <button onclick="stepN(1)" title="Increase n">▶</button>
   </div>
   <div class="ctrl-sep"></div>
 
@@ -773,20 +815,21 @@ const PIN_COLORS = [
 ];
 
 const S = {
-  mmax: 60, ptsize: 1.8, view: 'concentric', color: 'angle',
+  // Default matches index Explorer tab: spiral ON, ±n paths ON, dim ON, prime=7
+  mmax: 40, ptsize: 2.5, view: 'concentric', color: 'angle',
   invert: false, hue: 0, sat: 1, bri: 1,
-  delta: 0,  // fraction of full rotation applied per ring
+  delta: 0,
   lifts: true, broken: false, noncop: false, area: false, spin: false,
   chain: 0,
   zoom: 0.85, panX: 0, panY: 0,
-  prime: 2, pidx: 0, allp: false, spiral: false, mirror: false,
+  prime: 7, pidx: 3, allp: false, spiral: true, mirror: true,
   channel: 0,
   customR: null, rpath: false,
   allpts: true, equator: false, sector: false, ringcirc: false,
-  dim: false, dimAlpha: 0.1,
+  dim: true, dimAlpha: 0.08,
   labels: false, labelSize: 9, labelFmt: 'r', labelMaxM: 20,
-  npath: false, lockp: false, noffset: 1, allnodd: false,
-  liftThick: 0.8, liftAlpha: 0.30,
+  npath: true, lockp: false, noffset: 1, allnodd: false,
+  liftThick: 0.8, liftAlpha: 0.35,
   chords: false, gapStr: '2,4,6', chordAlpha: 0.25,
   frInspA: 1, frInspB: 7, frInspActive: false,
   showStats: false,
@@ -953,7 +996,55 @@ function buildPoints(){
         if(frac < lo || frac >= hi) continue;
       }
 
-      points.push({r,M,x,y,cx:rho*Math.cos(2*Math.PI*r/M), cy:rho*Math.sin(2*Math.PI*r/M), lifted, isCop});
+      // ── Path membership ──────────────────────────────────────────────────
+      let onPath = false;
+
+      // npath: (M±n)/2 — only valid when M and n have same parity (M odd ↔ n odd)
+      if(S.npath && isCop){
+        const n = S.lockp ? S.prime : S.noffset;
+        if((M % 2) === (n % 2)){          // same parity → integer residues
+          const rHi = (M + n) / 2;       // (M+n)/2
+          const rLo = (M - n) / 2;       // (M-n)/2
+          if(r === rHi || r === rLo) onPath = true;
+        }
+      }
+      if(S.allnodd && isCop){
+        for(const nn of [1,3,5,7,9]){
+          if((M%2)===(nn%2)){
+            if(r===(M+nn)/2 || r===(M-nn)/2){ onPath=true; break; }
+          }
+        }
+      }
+
+      // prime spiral: r ≡ prime (mod M) across rings
+      if(S.spiral && isCop){
+        if(S.allp){
+          for(const pp of PRIMES){ if(pp>=M) break; if(r===pp%M) onPath=true; }
+        } else {
+          if(r === S.prime % M) onPath = true;
+        }
+      }
+
+      // mirror spiral: r = M - prime
+      if(S.mirror && isCop){
+        const mir = M - (S.prime % M);
+        if(r === mir || r === mir % M) onPath = true;
+      }
+
+      // custom residue path
+      if(S.rpath && S.customR !== null && isCop){
+        if(r === ((S.customR % M) + M) % M) onPath = true;
+      }
+
+      // ½ equator special paths (always on odd-M rings where they're coprime)
+      // r=(M+1)/2 (½ above) and r=(M-1)/2 (½ below)
+      if(isCop && M%2===1){
+        const rHi = (M+1)/2;
+        const rLo = (M-1)/2;
+        if(r===rHi || r===rLo) onPath = true; // always tag; dim check uses npath
+      }
+
+      points.push({r,M,x,y,cx:rho*Math.cos(2*Math.PI*r/M), cy:rho*Math.sin(2*Math.PI*r/M), lifted, isCop, onPath});
     }
   }
 }
@@ -1024,13 +1115,21 @@ function buildBuffers(){
   const pos = new Float32Array(n*2);
   const col = new Float32Array(n*4);
   const sz  = new Float32Array(n);
+  // Any active path → dim non-path points
+  const anyPath = S.npath || S.allnodd || S.spiral || S.mirror ||
+                  (S.rpath && S.customR !== null);
+  const dimA = anyPath ? (S.dim ? S.dimAlpha : 0.08) : 1.0;
+
   for(let i=0;i<n;i++){
     const pt = points[i];
     pos[i*2]   = pt.x;
     pos[i*2+1] = pt.y;
-    const c = pointColor(pt);
-    col[i*4]=c[0];col[i*4+1]=c[1];col[i*4+2]=c[2];col[i*4+3]=c[3];
-    sz[i] = S.ptsize * Math.min(devicePixelRatio, 2);
+    const cv = pointColor(pt);
+    // Dim non-path points; fully illuminate path points
+    const alpha = anyPath ? (pt.onPath ? 1.0 : dimA) : cv[3];
+    col[i*4]=cv[0]; col[i*4+1]=cv[1]; col[i*4+2]=cv[2]; col[i*4+3]=alpha;
+    // Path points get a slight size boost
+    sz[i] = S.ptsize * Math.min(devicePixelRatio,2) * (anyPath && pt.onPath ? 1.4 : 1.0);
   }
   gl.bindBuffer(gl.ARRAY_BUFFER, ptBuf);  gl.bufferData(gl.ARRAY_BUFFER, pos, gl.DYNAMIC_DRAW);
   gl.bindBuffer(gl.ARRAY_BUFFER, ptColBuf); gl.bufferData(gl.ARRAY_BUFFER, col, gl.DYNAMIC_DRAW);
@@ -1249,6 +1348,37 @@ function drawOverlay(w,h,mat){
     const [x1,y1]=worldToScreen(-rmax,0,w,h,mat,dpr);
     const [x2,y2]=worldToScreen(rmax,0,w,h,mat,dpr);
     ctx2d.moveTo(x1,y1);ctx2d.lineTo(x2,y2);ctx2d.stroke();
+  }
+
+  // ½ equator special paths — draw connecting lines through (M±1)/2 and (M-1)/2
+  // r=(M+1)/2: ½ above equator, NEVER lifts (highlighted gold)
+  // r=(M-1)/2: ½ below equator, lifts iff gcd((M-1)/2, M+1)=1 (highlighted teal)
+  if(S.npath && (S.view==='concentric'||S.view==='fermat')){
+    const n = S.lockp ? S.prime : S.noffset;
+    // Draw connecting spiral through the path points
+    ['hi','lo'].forEach((which,wi)=>{
+      const pathColor = wi===0 ? 'rgba(200,168,74,0.85)' : 'rgba(61,200,184,0.85)';
+      ctx2d.strokeStyle = pathColor;
+      ctx2d.lineWidth = 1.5*dpr;
+      ctx2d.setLineDash([]);
+      ctx2d.beginPath();
+      let started = false;
+      for(let M=2;M<=S.mmax;M++){
+        if((M%2)!==(n%2)) continue; // wrong parity
+        const r = which==='hi' ? (M+n)/2 : (M-n)/2;
+        if(r<1||r>=M||gcd(r,M)!==1) continue;
+        const rho = S.invert?(S.mmax-M+2):M;
+        const theta = (2*Math.PI*r/M)+S.delta*M*2*Math.PI;
+        let px,py;
+        if(S.view==='concentric'){px=rho*Math.cos(theta);py=rho*Math.sin(theta);}
+        else{px=Math.sqrt(M)*Math.cos(theta);py=Math.sqrt(M)*Math.sin(theta);}
+        const [sx,sy]=worldToScreen(px,py,w,h,mat,dpr);
+        if(!started){ctx2d.moveTo(sx,sy);started=true;}
+        else ctx2d.lineTo(sx,sy);
+      }
+      ctx2d.stroke();
+      ctx2d.setLineDash([]);
+    });
   }
 
   // Labels
@@ -1716,12 +1846,9 @@ function updateInspectPanel(){
     }
   }
   box.innerHTML = html;
-  // Auto-open drawer to info tab
-  if(!document.getElementById('drawer').classList.contains('open')){
-    document.getElementById('drawer').classList.add('open');
-    document.getElementById('drawer-backdrop').classList.add('open');
-    document.getElementById('drawer-toggle').classList.add('drawer-open');
-    document.getElementById('drawer-toggle').textContent='✕ Close';
+  // On desktop (drawer always visible) switch to info tab silently.
+  // On mobile: never force-open — canvas must stay tappable.
+  if(window.innerWidth >= 900){
     showDTab('info', document.querySelectorAll('.dtab')[1]);
   }
 }
@@ -1920,7 +2047,7 @@ document.getElementById('btn-lift-stop2').onclick = ()=>{
 function setState(patch){Object.assign(S,patch);syncUI();dirty=true;}
 function applyPreset(name){
   const P={
-    reset:     {mmax:60,ptsize:1.8,view:'concentric',color:'angle',invert:false,delta:0,lifts:true,broken:false,chain:0,panX:0,panY:0,channel:0},
+    reset:     {mmax:40,ptsize:2.5,view:'concentric',color:'angle',invert:false,delta:0,lifts:true,broken:false,chain:0,panX:0,panY:0,channel:0,prime:7,pidx:3,spiral:true,mirror:true,npath:true,noffset:1,dim:true,dimAlpha:0.08},
     chain1:    {chain:1,color:'lift'},
     chain2:    {chain:2,color:'lift'},
     chain3:    {chain:3,color:'lift'},
@@ -1978,6 +2105,16 @@ function syncUI(){
     concentric:'Concentric: ρ = M',fermat:'Fermat Spiral: ρ = √M',
     farey:'Farey Half-Plane: x=r/M, y=1/M',strip:'Unfolded Strip'
   }[S.view];
+  // Auto-dim when any path is active
+  const _anyPath = S.npath||S.allnodd||S.spiral||S.mirror||(S.rpath&&S.customR!==null);
+  if(_anyPath && !S.dim){ S.dim=true; }
+  const dimChk=document.getElementById('chk-dim');
+  if(dimChk) dimChk.checked=S.dim;
+  // Update ctrl bar quick-access labels
+  const lblP = document.getElementById('lbl-prime-bar');
+  if(lblP) lblP.textContent = S.prime;
+  const lblN = document.getElementById('lbl-n-bar');
+  if(lblN) lblN.textContent = S.noffset;
 }
 
 // Wire controls
@@ -2082,13 +2219,11 @@ document.getElementById('btn-inspect').addEventListener('click',()=>{
   btn.style.background = inspectMode ? 'rgba(192,132,252,0.15)' : '';
   if(inspectMode && pinnedPoints.length===0){
     document.getElementById('click-info').innerHTML =
-      '<span style="color:var(--accent2);font-size:9px">◉ Inspect mode ON — click any point to pin it</span>';
-    // Open drawer to info tab
-    document.getElementById('drawer').classList.add('open');
-    document.getElementById('drawer-backdrop').classList.add('open');
-    document.getElementById('drawer-toggle').classList.add('drawer-open');
-    document.getElementById('drawer-toggle').textContent='✕ Close';
-    showDTab('info', document.querySelectorAll('.dtab')[1]);
+      '<span style="color:var(--accent2);font-size:9px">◉ Inspect ON — tap a point to pin it</span>';
+    // Desktop only: switch drawer tab silently (drawer already visible)
+    if(window.innerWidth >= 900){
+      showDTab('info', document.querySelectorAll('.dtab')[1]);
+    }
   }
   dirty = true;
 });
@@ -2127,8 +2262,30 @@ PRIMES.slice(0,20).forEach((p,i)=>{
 document.getElementById('sel-prime').addEventListener('change',e=>{
   S.pidx=Number(e.target.value)-1; S.prime=PRIMES[S.pidx]; dirty=true;
 });
-document.getElementById('btn-p-next').addEventListener('click',()=>{S.pidx=Math.min(19,S.pidx+1);S.prime=PRIMES[S.pidx];document.getElementById('sel-prime').value=S.pidx+1;dirty=true;});
-document.getElementById('btn-p-prev').addEventListener('click',()=>{S.pidx=Math.max(0,S.pidx-1);S.prime=PRIMES[S.pidx];document.getElementById('sel-prime').value=S.pidx+1;dirty=true;});
+function stepPrime(dir){
+  S.pidx = Math.max(0, Math.min(19, S.pidx + dir));
+  S.prime = PRIMES[S.pidx];
+  const sel = document.getElementById('sel-prime');
+  if(sel) sel.value = S.pidx + 1;
+  ['lbl-prime-bar','lbl-prime-strip'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=S.prime;});
+  dirty = true;
+}
+function stepN(dir){
+  S.noffset = Math.max(1, Math.min(999, S.noffset + dir));
+  // n and M must share parity for integer paths — skip even n if odd preferred
+  const nSlider = document.getElementById('sl-noffset');
+  const nNum    = document.getElementById('num-noffset');
+  if(nSlider) nSlider.value = S.noffset;
+  if(nNum)    nNum.value    = S.noffset;
+  ['lbl-n-bar','lbl-n-strip'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=S.noffset;});
+  const formula = document.getElementById('npath-formula');
+  if(formula) formula.innerHTML =
+    'n='+S.noffset+': <span style="color:#c8a84a">(M+'+S.noffset+')/2</span> never lifts &nbsp;'
+    +'<span style="color:#3dc8b8">(M-'+S.noffset+')/2</span> lifts iff gcd((M-'+S.noffset+')/2,M+1)=1';
+  dirty = true;
+}
+document.getElementById('btn-p-next').addEventListener('click',()=>stepPrime(1));
+document.getElementById('btn-p-prev').addEventListener('click',()=>stepPrime(-1));
 
 // Fraction inspector
 document.getElementById('btn-fi-go').addEventListener('click',()=>{
@@ -2413,6 +2570,15 @@ function animStart(name){
 // ── Drawer ────────────────────────────────────────────────────────────────────
 const isDesktop = () => window.innerWidth >= 900;
 
+function _setCanvasDrawerMode(drawerOpen){
+  // When drawer is open on mobile, canvas must not intercept touches
+  const ca = document.getElementById('canvas-area');
+  const cw = document.getElementById('canvas-wrap');
+  if(ca) ca.style.pointerEvents = drawerOpen ? 'none' : '';
+  if(cw) cw.style.pointerEvents = drawerOpen ? 'none' : '';
+  if(canvas) canvas.style.pointerEvents = drawerOpen ? 'none' : 'auto';
+  if(overlay) overlay.style.pointerEvents = 'none'; // always none
+}
 function toggleDrawer(){
   const d=document.getElementById('drawer');
   const b=document.getElementById('drawer-backdrop');
@@ -2427,6 +2593,7 @@ function toggleDrawer(){
     b.classList.toggle('open', open);
     t.classList.toggle('drawer-open', open);
     t.textContent = open ? '✕ Close' : '☰ Controls';
+    _setCanvasDrawerMode(open);
   }
 }
 function closeDrawer(){
@@ -2436,6 +2603,7 @@ function closeDrawer(){
   const t=document.getElementById('drawer-toggle');
   t.classList.remove('drawer-open');
   t.textContent='☰ Controls';
+  _setCanvasDrawerMode(false);
 }
 // On desktop: start with drawer open; on mobile: collapsed
 function initDrawer(){
