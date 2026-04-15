@@ -692,7 +692,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 
   <div class="ctrl-group">
     <span class="ctrl-label">M max</span>
-    <input type="range" id="sl-mmax" min="4" max="500" value="60" class="wide">
+    <input type="range" id="sl-mmax" min="4" max="512" value="60" class="wide">
     <input type="number" id="num-mmax" min="4" max="2000" value="60" class="narrow">
   </div>
   <div class="ctrl-sep"></div>
@@ -840,9 +840,9 @@ const S = {
 // ── Primes ──────────────────────────────────────────────────────────────────
 const PRIMES = [];
 (function(){
-  const sieve = new Uint8Array(2001);
-  for(let i=2;i<=2000;i++){
-    if(!sieve[i]){ PRIMES.push(i); for(let j=2*i;j<=2000;j+=i) sieve[j]=1; }
+  const sieve = new Uint8Array(10001);
+  for(let i=2;i<=10000;i++){
+    if(!sieve[i]){ PRIMES.push(i); for(let j=2*i;j<=10000;j+=i) sieve[j]=1; }
   }
 })();
 function isPrime(n){ return n>=2 && PRIMES[PRIMES.indexOf(n)]===n; }
@@ -1128,8 +1128,9 @@ function buildBuffers(){
     // Dim non-path points; fully illuminate path points
     const alpha = anyPath ? (pt.onPath ? 1.0 : dimA) : cv[3];
     col[i*4]=cv[0]; col[i*4+1]=cv[1]; col[i*4+2]=cv[2]; col[i*4+3]=alpha;
-    // Path points get a slight size boost
-    sz[i] = S.ptsize * Math.min(devicePixelRatio,2) * (anyPath && pt.onPath ? 1.4 : 1.0);
+    // Path points get a slight size boost; non-coprime points are half-size
+    const szScale = !pt.isCop ? 0.55 : (anyPath && pt.onPath ? 1.4 : 1.0);
+    sz[i] = S.ptsize * Math.min(devicePixelRatio,2) * szScale;
   }
   gl.bindBuffer(gl.ARRAY_BUFFER, ptBuf);  gl.bufferData(gl.ARRAY_BUFFER, pos, gl.DYNAMIC_DRAW);
   gl.bindBuffer(gl.ARRAY_BUFFER, ptColBuf); gl.bufferData(gl.ARRAY_BUFFER, col, gl.DYNAMIC_DRAW);
@@ -2236,8 +2237,8 @@ document.getElementById('btn-inspect-clear').addEventListener('click',()=>{
 document.getElementById('btn-zoom-reset').addEventListener('click',()=>{ autoFitZoom(); dirty=true; });
 
 // Sync mmax slider/num bidirectionally
-document.getElementById('sl-mmax').addEventListener('input',e=>{document.getElementById('num-mmax').value=e.target.value;S.mmax=Number(e.target.value);_copCache={};autoFitZoom();dirty=true;});
-document.getElementById('num-mmax').addEventListener('input',e=>{const v=Math.max(4,Math.min(2000,Number(e.target.value)));document.getElementById('sl-mmax').value=Math.min(v,500);S.mmax=v;autoFitZoom();dirty=true;});
+document.getElementById('sl-mmax').addEventListener('input',e=>{document.getElementById('num-mmax').value=e.target.value;S.mmax=Number(e.target.value);_copCache={};rebuildPrimeSelect();autoFitZoom();dirty=true;});
+document.getElementById('num-mmax').addEventListener('input',e=>{const v=Math.max(4,Math.min(2000,Number(e.target.value)));document.getElementById('sl-mmax').value=Math.min(v,512);S.mmax=v;_copCache={};rebuildPrimeSelect();autoFitZoom();dirty=true;});
 document.getElementById('sl-chain').addEventListener('input',e=>{S.chain=Number(e.target.value);document.getElementById('lbl-chain').textContent=S.chain||'off';dirty=true;});
 document.getElementById('sl-ptsize').addEventListener('input',e=>{S.ptsize=e.target.value/10;document.getElementById('lbl-ptsize').textContent=S.ptsize.toFixed(1);dirty=true;});
 
@@ -2253,18 +2254,37 @@ function setDelta(v){S.delta=v;document.getElementById('sl-delta').value=v*100;d
 function setChannel(n){S.channel=n;document.getElementById('num-channel').value=n;dirty=true;}
 function setN(n){S.noffset=n;document.getElementById('sl-noffset').value=n;document.getElementById('num-noffset').value=n;document.getElementById('npath-formula').textContent=`n=${n}: (M±${n})/2`;dirty=true;}
 
-// Prime select
-PRIMES.slice(0,20).forEach((p,i)=>{
-  const opt=document.createElement('option');
-  opt.value=i+1; opt.textContent=p;
-  document.getElementById('sel-prime').appendChild(opt);
-});
+// Prime select — rebuilt whenever mmax changes
+function rebuildPrimeSelect(){
+  const sel = document.getElementById('sel-prime');
+  const prevPrime = S.prime;
+  sel.innerHTML = '';
+  const eligible = PRIMES.filter(p => p <= S.mmax);
+  if(eligible.length === 0) eligible.push(2);
+  eligible.forEach((p,i)=>{
+    const opt = document.createElement('option');
+    opt.value = i+1; opt.textContent = p;
+    sel.appendChild(opt);
+  });
+  // Restore closest prime
+  let best = 0;
+  eligible.forEach((p,i)=>{ if(p<=prevPrime) best=i; });
+  S.pidx = best;
+  S.prime = eligible[best];
+  sel.value = best + 1;
+  ['lbl-prime-bar','lbl-prime-strip'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=S.prime;});
+}
 document.getElementById('sel-prime').addEventListener('change',e=>{
-  S.pidx=Number(e.target.value)-1; S.prime=PRIMES[S.pidx]; dirty=true;
+  const eligible = PRIMES.filter(p => p <= S.mmax);
+  S.pidx = Number(e.target.value)-1;
+  S.prime = eligible[S.pidx] || 2;
+  dirty = true;
 });
+rebuildPrimeSelect();
 function stepPrime(dir){
-  S.pidx = Math.max(0, Math.min(19, S.pidx + dir));
-  S.prime = PRIMES[S.pidx];
+  const eligible = PRIMES.filter(p => p <= S.mmax);
+  S.pidx = Math.max(0, Math.min(eligible.length-1, S.pidx + dir));
+  S.prime = eligible[S.pidx];
   const sel = document.getElementById('sel-prime');
   if(sel) sel.value = S.pidx + 1;
   ['lbl-prime-bar','lbl-prime-strip'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=S.prime;});
