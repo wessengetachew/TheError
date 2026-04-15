@@ -1036,13 +1036,9 @@ function buildPoints(){
         if(r === ((S.customR % M) + M) % M) onPath = true;
       }
 
-      // ½ equator special paths (always on odd-M rings where they're coprime)
-      // r=(M+1)/2 (½ above) and r=(M-1)/2 (½ below)
-      if(isCop && M%2===1){
-        const rHi = (M+1)/2;
-        const rLo = (M-1)/2;
-        if(r===rHi || r===rLo) onPath = true; // always tag; dim check uses npath
-      }
+      // ½ equator paths — only tag when npath is active (n=1 or matching parity)
+      // Do NOT unconditionally tag; that was causing all odd-M rings to have onPath points
+      // even when no path was selected, making anyPath=true and dimming everything.
 
       points.push({r,M,x,y,cx:rho*Math.cos(2*Math.PI*r/M), cy:rho*Math.sin(2*Math.PI*r/M), lifted, isCop, onPath});
     }
@@ -1118,15 +1114,19 @@ function buildBuffers(){
   // Any active path → dim non-path points
   const anyPath = S.npath || S.allnodd || S.spiral || S.mirror ||
                   (S.rpath && S.customR !== null);
-  const dimA = anyPath ? (S.dim ? S.dimAlpha : 0.08) : 1.0;
+  // When dim checkbox is OFF or no path is active: non-path points are full opacity.
+  // When dim is ON and a path is active: slider (dimAlpha) controls non-path alpha.
+  const dimA = (anyPath && S.dim) ? S.dimAlpha : 1.0;
 
   for(let i=0;i<n;i++){
     const pt = points[i];
     pos[i*2]   = pt.x;
     pos[i*2+1] = pt.y;
     const cv = pointColor(pt);
-    // Dim non-path points; fully illuminate path points
-    const alpha = anyPath ? (pt.onPath ? 1.0 : dimA) : cv[3];
+    // Non-coprime points: always use their own fixed alpha (0.5), half-size
+    // Path points: full alpha (1.0) + size boost
+    // Non-path coprime points: dimA (controlled by slider when dim checkbox on)
+    const alpha = !pt.isCop ? cv[3] : (anyPath ? (pt.onPath ? 1.0 : dimA) : cv[3]);
     col[i*4]=cv[0]; col[i*4+1]=cv[1]; col[i*4+2]=cv[2]; col[i*4+3]=alpha;
     // Path points get a slight size boost; non-coprime points are half-size
     const szScale = !pt.isCop ? 0.55 : (anyPath && pt.onPath ? 1.4 : 1.0);
@@ -1605,6 +1605,52 @@ function drawOverlay(w,h,mat){
         });
       }
     });
+  }
+
+  // ── Index chart connecting lines ─────────────────────────────────────────
+  if(_indexCmd && _indexCmd.M) {
+    const dpr = Math.min(devicePixelRatio, 2);
+    const M = Math.max(2, Math.min(_indexCmd.M, S.mmax));
+    const cop = coprimes(M);
+    if(cop.length >= 2) {
+      const cop2 = new Set(coprimes(M+1));
+      // world coords: concentric view, rho=M, angle=2πr/M + delta*M
+      function ringXY(r) {
+        const rho = S.invert ? (S.mmax - M + 2) : M;
+        const angle = (2*Math.PI*r/M) + S.delta*M;
+        return worldToScreen(rho*Math.cos(angle), rho*Math.sin(angle), w, h, mat, dpr);
+      }
+      ctx2d.save();
+      ctx2d.setLineDash([3*dpr, 5*dpr]);
+      ctx2d.strokeStyle = 'rgba(224,80,96,0.6)';
+      ctx2d.lineWidth = 1.5 * dpr;
+      ctx2d.beginPath();
+      let started = false;
+      for(const r of cop) {
+        const [sx2, sy2] = ringXY(r);
+        if(!started){ ctx2d.moveTo(sx2,sy2); started=true; } else ctx2d.lineTo(sx2,sy2);
+      }
+      const [cx0,cy0] = ringXY(cop[0]);
+      ctx2d.lineTo(cx0,cy0);
+      ctx2d.stroke();
+      ctx2d.setLineDash([]);
+      // dots — lifted=coral, blocked=dim
+      for(const r of cop) {
+        const lifted = cop2.has(r <= M ? r : r % (M+1));
+        const [sx2,sy2] = ringXY(r);
+        ctx2d.beginPath(); ctx2d.arc(sx2,sy2,3*dpr,0,Math.PI*2);
+        ctx2d.fillStyle = lifted ? 'rgba(224,80,96,1)' : 'rgba(224,80,96,0.3)';
+        ctx2d.fill();
+      }
+      // label
+      const mid = cop[Math.floor(cop.length/2)];
+      const [lx,ly] = ringXY(mid);
+      ctx2d.font = `${9*dpr}px 'JetBrains Mono',monospace`;
+      ctx2d.fillStyle = 'rgba(224,80,96,0.9)';
+      ctx2d.textAlign = 'left'; ctx2d.textBaseline = 'middle';
+      ctx2d.fillText('M='+M, lx+6*dpr, ly);
+      ctx2d.restore();
+    }
   }
 }
 
@@ -3048,12 +3094,52 @@ function buildAIPanel(){
   document.getElementById('ai-panel-content').innerHTML = html;
 }
 
-// Build the panel when tab is first shown
-document.getElementById('dtab-ai-btn').addEventListener('click', ()=>{
-  if(!document.getElementById('ai-panel-content').innerHTML){
-    buildAIPanel();
+// ── Index chart → Canvas bridge ──────────────────────────────────────────────
+let _indexCmd = null;
+
+// Nav badge
+const _indexBadge = document.createElement('span');
+_indexBadge.id = 'index-badge';
+_indexBadge.style.cssText = 'font-family:JetBrains Mono,monospace;font-size:8px;color:#e05060;border:1px solid rgba(224,80,96,.4);padding:2px 7px;border-radius:2px;margin-left:12px;cursor:pointer;display:none;';
+_indexBadge.title = 'Receiving from Index — click to clear';
+_indexBadge.onclick = () => { _indexCmd=null; _indexBadge.style.display='none'; dirty=true; };
+document.querySelector('.nav-right').parentNode.insertBefore(_indexBadge, document.querySelector('.nav-right'));
+
+function applyIndexCmd(cmd) {
+  if(!cmd || !cmd.M) return;
+  _indexCmd = cmd;
+  const M = Math.max(2, Math.min(cmd.M, 512));
+  const newMmax = Math.max(S.mmax, Math.min(M + 10, 512));
+  setState({
+    mmax: newMmax,
+    color: cmd.color || 'lift',
+    view: cmd.view || 'concentric',
+    lifts: true,
+    liftScanM: M,
+    liftScanActive: true,
+  });
+  _copCache = {};
+  rebuildPrimeSelect();
+  autoFitZoom();
+  _indexBadge.style.display = 'inline-block';
+  _indexBadge.textContent = '\u25c8 Chart ' + cmd.chart + '  M=' + M;
+  dirty = true;
+}
+
+// Listen for commands
+window.addEventListener('message', e => {
+  if(e.data && e.data.chart) applyIndexCmd(e.data);
+});
+window.addEventListener('storage', e => {
+  if(e.key === 'zmmz_cmd') {
+    try { const cmd = JSON.parse(e.newValue); if(cmd && cmd.chart) applyIndexCmd(cmd); } catch(err){}
   }
 });
+try {
+  const saved = localStorage.getItem('zmmz_cmd');
+  if(saved) { const cmd = JSON.parse(saved); if(cmd && cmd.chart && Date.now()-cmd.ts < 5000) applyIndexCmd(cmd); }
+} catch(e){}
+
 
 
 </script>
