@@ -415,7 +415,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <div class="row"><label><input type="checkbox" id="chk-ringcirc"> Ring circles</label></div>
     <div class="row">
       <label><input type="checkbox" id="chk-dim" checked> Dim non-sel</label>
-      <input type="range" id="sl-dim" min="1" max="20" value="5" title="Dim opacity">
+      <input type="range" id="sl-dim" min="0" max="95" value="8" title="Dim opacity (non-selected points)">
     </div>
   </div>
 
@@ -792,6 +792,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <div class="ctrl-sep"></div>
 
   <div class="ctrl-group">
+    <input type="text" id="export-title" placeholder="Export title…" style="font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);padding:4px 8px;width:100%;box-sizing:border-box;margin-bottom:4px;">
     <button id="btn-export-4k">↓ 4K</button>
     <button id="btn-export-all4">↓ All 4</button>
     <button id="btn-export-csv">↓ CSV</button>
@@ -1876,7 +1877,7 @@ function updateInspectPanel(){
     return;
   }
   let html = `<div style="color:var(--accent2);font-size:9px;margin-bottom:5px;letter-spacing:.1em">◉ ${pinnedPoints.length} PINNED &nbsp;<span style="color:var(--muted);font-size:8px">(click again to remove)</span></div>`;
-  pinnedPoints.forEach((p,i)=> html += ptDetail(p, p.color, i+1));
+  pinnedPoints.forEach((p,i)=> html += ptDetail(p.pt, p.color, i+1));
   if(pinnedPoints.length > 1){
     html += `<div style="color:var(--muted);font-size:9px;margin:5px 0 3px">Connections</div>`;
     for(let i=0;i<pinnedPoints.length-1;i++){
@@ -1889,7 +1890,7 @@ function updateInspectPanel(){
       const wd=Math.hypot(b.pt.x-a.pt.x,b.pt.y-a.pt.y).toFixed(3);
       const thA=360*a.pt.r/a.pt.M, thB=360*b.pt.r/b.pt.M;
       let dth=Math.abs(thB-thA); if(dth>180) dth=360-dth;
-      html+=`span ⬤1→⬤${pinnedPoints.length}: dist=${wd}, Δθ=${dth.toFixed(1)}°</div>`;
+      html+=`<span style="color:var(--muted)">⬤1→⬤${pinnedPoints.length}: dist=${wd}, Δθ=${dth.toFixed(1)}°</span></div>`;
     }
   }
   box.innerHTML = html;
@@ -1934,46 +1935,283 @@ function updateStatsPanel(){
 }
 
 // ── Export ───────────────────────────────────────────────────────────────────
-// WebGL preserveDrawingBuffer:true — we can read pixels directly
-function exportPNG(fname,scale=1){
-  const w=canvas.parentElement.clientWidth, h=canvas.parentElement.clientHeight;
-  const dpr=scale;
-  // Re-render to offscreen at desired resolution
-  const offCanvas=document.createElement('canvas');
-  offCanvas.width=w*dpr; offCanvas.height=h*dpr;
-  const offGl=offCanvas.getContext('webgl',{preserveDrawingBuffer:true,antialias:true});
-  if(!offGl){alert('WebGL not available for export');return;}
-  // Copy shaders and programs to offGl, then redraw
-  // For simplicity, use the main canvas (already rendered)
-  const url=canvas.toDataURL('image/png');
-  const a=document.createElement('a');
-  a.href=url; a.download=fname||'zmmz_export.png'; a.click();
+const EXPORT_SIZE = 3840; // 4K square
+
+function colorModeLabel(cm){
+  const m={angle:'Angle',prime_ring:'Prime Ring',phi_density:'φ/M Density',lift:'Lift ✓/✗',
+    half:'Top/Bottom Half',entropy:'Modular Entropy',mod6:'Residue mod 6',
+    primorial:'Primorial Rings',mersenne:'Mersenne Rings',gap_class:'Gap Class'};
+  return m[cm]||cm;
+}
+function viewLabel(v){
+  return {concentric:'Concentric',fermat:'Fermat Spiral',farey:'Farey Half-Plane',strip:'Unfolded Strip'}[v]||v;
 }
 
-document.getElementById('btn-export-4k').onclick=()=>{
-  // Temporarily upscale canvas
-  const origW=canvas.width, origH=canvas.height;
-  dirty=true;
-  setTimeout(()=>{
-    const url=canvas.toDataURL('image/png');
+function buildLegendItems(){
+  const cm = S.color;
+  const items = [];
+  if(cm==='lift'){
+    items.push({c:'#22cc66',l:'Lift ✓ survives'},{c:'#ff4444',l:'Lift ✗ blocked'});
+  } else if(cm==='prime_ring'){
+    items.push({c:'#c084fc',l:'Prime ring'},{c:'#4a9eff',l:'Composite ring'});
+  } else if(cm==='phi_density'){
+    items.push({c:'#22cc66',l:'High φ(M)/M'},{c:'#4466ff',l:'Low φ(M)/M'});
+  } else if(cm==='half'){
+    items.push({c:'#4a9eff',l:'Top half (r/M < ½)'},{c:'#e8904a',l:'Bottom half (r/M ≥ ½)'});
+  } else if(cm==='entropy'){
+    items.push({c:'#3dc8b8',l:'Low entropy'},{c:'#e05060',l:'High entropy'});
+  } else if(cm==='mod6'){
+    [{c:'#ff4040',l:'r≡0'},{c:'#ff8800',l:'r≡1'},{c:'#ffee00',l:'r≡2'},{c:'#44ff44',l:'r≡3'},{c:'#4488ff',l:'r≡4'},{c:'#cc44ff',l:'r≡5'}].forEach(x=>items.push(x));
+  } else if(cm==='primorial'){
+    items.push({c:'#e05060',l:'M div 2#'},{c:'#e8904a',l:'M div 3#'},{c:'#ffee44',l:'M div 5#'},{c:'#22cc66',l:'M div 7#'},{c:'#3dc8b8',l:'M div 11#'},{c:'#4a9eff',l:'Other'});
+  } else if(cm==='gap_class'){
+    items.push({c:'#ff4040',l:'r≡0 mod 12'},{c:'#ff8800',l:'r≡6 mod 12'},{c:'#ffee00',l:'r≡4 mod 12'},{c:'#22cc66',l:'r≡8 mod 12'},{c:'#4488ff',l:'r≡2 mod 12'},{c:'#cc44ff',l:'Other'});
+  } else {
+    // angle — hue wheel
+    items.push({c:'#ff4040',l:'0°'},{c:'#ffcc00',l:'90°'},{c:'#44ff88',l:'180°'},{c:'#4488ff',l:'270°'});
+  }
+  // shared items
+  items.push({c:'#ff9900',l:'Non-coprime',shape:'sq'});
+  if(S.lifts) items.push({c:'#60c0ff',l:'Lift line',shape:'line'});
+  if(S.broken) items.push({c:'#ff4444',l:'Broken line',shape:'line'});
+  if(S.spiral) items.push({c:'#ffff44',l:'Spiral path',shape:'line'});
+  return items;
+}
+
+function export4K(fname, overrideView){
+  const EX = EXPORT_SIZE;
+  const TITLE_H = Math.round(EX * 0.055);  // top title bar
+  const LEG_W   = Math.round(EX * 0.18);   // right legend panel
+  const PAD     = Math.round(EX * 0.012);
+  const CANVAS_SIZE = EX - LEG_W;
+  const FULL_H  = EX + TITLE_H;
+
+  // 1. Re-render WebGL at high resolution to offscreen canvas
+  const offGL = document.createElement('canvas');
+  offGL.width = CANVAS_SIZE; offGL.height = EX;
+  const glOff = offGL.getContext('webgl',{preserveDrawingBuffer:true,antialias:true});
+  if(!glOff){ alert('WebGL unavailable for export'); return; }
+
+  // Set up shaders on offscreen context
+  function makeProgOff(vs,fs){
+    const p=glOff.createProgram();
+    [vs,fs].forEach((src,i)=>{
+      const sh=glOff.createShader(i===0?glOff.VERTEX_SHADER:glOff.FRAGMENT_SHADER);
+      glOff.shaderSource(sh,src); glOff.compileShader(sh); glOff.attachShader(p,sh);
+    });
+    glOff.linkProgram(p); return p;
+  }
+  const VS_P=`attribute vec2 a_pos;attribute vec4 a_color;attribute float a_size;uniform mat3 u_transform;varying vec4 v_color;void main(){vec3 p=u_transform*vec3(a_pos,1.0);gl_Position=vec4(p.xy,0.0,1.0);gl_PointSize=a_size;v_color=a_color;}`;
+  const FS_P=`precision mediump float;varying vec4 v_color;void main(){vec2 c=gl_PointCoord-0.5;if(dot(c,c)>0.25)discard;gl_FragColor=v_color;}`;
+  const VS_L=`attribute vec2 a_pos;attribute vec4 a_color;uniform mat3 u_transform;varying vec4 v_color;void main(){vec3 p=u_transform*vec3(a_pos,1.0);gl_Position=vec4(p.xy,0.0,1.0);v_color=a_color;}`;
+  const FS_L=`precision mediump float;varying vec4 v_color;void main(){gl_FragColor=v_color;}`;
+  const ppOff=makeProgOff(VS_P,FS_P), plOff=makeProgOff(VS_L,FS_L);
+  const ptB=glOff.createBuffer(),ptC=glOff.createBuffer(),ptS=glOff.createBuffer();
+  const lnB=glOff.createBuffer(),lnC=glOff.createBuffer();
+
+  // Temporarily override view if needed
+  const origView = S.view;
+  if(overrideView) S.view = overrideView;
+
+  // Rebuild buffers with 4K point sizes
+  const origPtsize = S.ptsize;
+  S.ptsize = S.ptsize * (CANVAS_SIZE / (canvas.clientWidth||600)) * 0.85;
+  buildBuffers();
+  S.ptsize = origPtsize;
+  if(overrideView) S.view = origView;
+
+  glOff.viewport(0,0,CANVAS_SIZE,EX);
+  glOff.clearColor(0.04,0.04,0.06,1);
+  glOff.clear(glOff.COLOR_BUFFER_BIT);
+  glOff.enable(glOff.BLEND);
+  glOff.blendFunc(glOff.SRC_ALPHA,glOff.ONE_MINUS_SRC_ALPHA);
+
+  const mat = buildTransform(CANVAS_SIZE, EX);
+
+  function setAttrib(ctx,prog,buf,name,data,size){
+    ctx.bindBuffer(ctx.ARRAY_BUFFER,buf);
+    ctx.bufferData(ctx.ARRAY_BUFFER,data,ctx.STATIC_DRAW);
+    const loc=ctx.getAttribLocation(prog,name);
+    ctx.enableVertexAttribArray(loc);
+    ctx.vertexAttribPointer(loc,size,ctx.FLOAT,false,0,0);
+  }
+
+  // Lines
+  if(lineVerts.length>0){
+    glOff.useProgram(plOff);
+    glOff.uniformMatrix3fv(glOff.getUniformLocation(plOff,'u_transform'),false,mat);
+    setAttrib(glOff,plOff,lnB,'a_pos',new Float32Array(lineVerts),2);
+    setAttrib(glOff,plOff,lnC,'a_color',new Float32Array(lineColors),4);
+    glOff.lineWidth(Math.max(1,S.liftThick));
+    glOff.drawArrays(glOff.LINES,0,lineVerts.length/2);
+  }
+  // Points
+  if(ptCount>0){
+    glOff.useProgram(ppOff);
+    glOff.uniformMatrix3fv(glOff.getUniformLocation(ppOff,'u_transform'),false,mat);
+    // Re-upload with correct sizes for 4K
+    const scale4k = CANVAS_SIZE / (canvas.clientWidth||600);
+    const sz4k = new Float32Array(ptCount);
+    for(let i=0;i<ptCount;i++) sz4k[i] = S.ptsize * scale4k * Math.min(devicePixelRatio,2) * 0.85;
+    setAttrib(glOff,ppOff,ptB,'a_pos',new Float32Array(lineVerts.length? [] : []).constructor(ptCount*2).map((_,i)=>points[Math.floor(i/2)][i%2===0?'x':'y']),2);
+    // Upload from existing GL buffers via current typed arrays
+    glOff.bindBuffer(glOff.ARRAY_BUFFER,ptB);
+    // Instead: read back from the already-built typed data via points array
+    const posArr=new Float32Array(ptCount*2), colArr=new Float32Array(ptCount*4);
+    for(let i=0;i<ptCount;i++){
+      const pt=points[i];
+      posArr[i*2]=pt.x; posArr[i*2+1]=pt.y;
+      const anyPath=S.npath||S.allnodd||S.spiral||S.mirror||(S.rpath&&S.customR!==null);
+      const dimA=(anyPath&&S.dim)?S.dimAlpha:1.0;
+      const cv=pointColor(pt);
+      const alpha=!pt.isCop?cv[3]:(anyPath?(pt.onPath?1.0:dimA):cv[3]);
+      colArr[i*4]=cv[0];colArr[i*4+1]=cv[1];colArr[i*4+2]=cv[2];colArr[i*4+3]=alpha;
+      sz4k[i]=S.ptsize*scale4k*Math.min(devicePixelRatio,2)*0.85*(!pt.isCop?0.55:(anyPath&&pt.onPath?1.4:1.0));
+    }
+    setAttrib(glOff,ppOff,ptB,'a_pos',posArr,2);
+    setAttrib(glOff,ppOff,ptC,'a_color',colArr,4);
+    setAttrib(glOff,ppOff,ptS,'a_size',sz4k,1);
+    glOff.drawArrays(glOff.POINTS,0,ptCount);
+  }
+
+  // 2. Draw overlay labels on offscreen 2D canvas
+  const offOvl = document.createElement('canvas');
+  offOvl.width = CANVAS_SIZE; offOvl.height = EX;
+  const octx = offOvl.getContext('2d');
+  // Re-use drawOverlay logic but on the off2d context — swap ctx2d temporarily
+  const origCtx = ctx2d;
+  // We can't easily swap — instead draw manually at 4K scale
+  const scale = CANVAS_SIZE / (canvas.clientWidth||600);
+  if(S.labels){
+    octx.save();
+    octx.font = `${Math.round(S.labelSize*scale)}px 'JetBrains Mono',monospace`;
+    octx.fillStyle='rgba(255,255,255,0.7)';
+    octx.textAlign='center'; octx.textBaseline='middle';
+    for(const pt of points){
+      const rho = S.invert?(S.mmax-pt.M+2):pt.M;
+      const angle = 2*Math.PI*pt.r/pt.M + S.delta*pt.M;
+      const sc = S.zoom*2/S.mmax;
+      const cx2=CANVAS_SIZE/2+S.panX*CANVAS_SIZE/2*sc;
+      const cy2=EX/2+S.panY*EX/2*sc;
+      const px2 = cx2 + rho*Math.cos(angle)*(CANVAS_SIZE/2)*sc;
+      const py2 = cy2 - rho*Math.sin(angle)*(EX/2)*sc;
+      octx.fillText(`${pt.r}`, px2, py2-S.labelSize*scale*0.8);
+    }
+    octx.restore();
+  }
+
+  // 3. Composite everything on final 2D canvas
+  const out = document.createElement('canvas');
+  out.width = EX; out.height = FULL_H;
+  const ctx = out.getContext('2d');
+
+  // Background
+  ctx.fillStyle='#0a0a14';
+  ctx.fillRect(0,0,EX,FULL_H);
+
+  // Title bar
+  ctx.fillStyle='#0d0d1a';
+  ctx.fillRect(0,0,EX,TITLE_H);
+  ctx.strokeStyle='rgba(200,168,74,0.3)';
+  ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,TITLE_H); ctx.lineTo(EX,TITLE_H); ctx.stroke();
+
+  const titleText = document.getElementById('export-title')?.value || 'Geometric Canvas — (ℤ/Mℤ)*';
+  const subtitleText = `${viewLabel(overrideView||S.view)} · ${colorModeLabel(S.color)} · M max = ${S.mmax} · C ≈ 0.530712`;
+  ctx.font = `${Math.round(TITLE_H*0.38)}px 'JetBrains Mono',monospace`;
+  ctx.fillStyle='rgba(200,168,74,0.95)';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(titleText, PAD*2, TITLE_H*0.38);
+  ctx.font = `${Math.round(TITLE_H*0.24)}px 'JetBrains Mono',monospace`;
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  ctx.fillText(subtitleText, PAD*2, TITLE_H*0.72);
+  // Byline right
+  ctx.textAlign='right';
+  ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.fillText('Wessen Getachew · math.NT · 2026', EX-PAD*2, TITLE_H*0.55);
+
+  // WebGL render (left portion)
+  ctx.drawImage(offGL, 0, TITLE_H, CANVAS_SIZE, EX);
+
+  // Overlay labels
+  ctx.drawImage(offOvl, 0, TITLE_H, CANVAS_SIZE, EX);
+
+  // Legend panel (right strip)
+  const lx = CANVAS_SIZE, ly = TITLE_H;
+  ctx.fillStyle='rgba(6,6,16,0.97)';
+  ctx.fillRect(lx, ly, LEG_W, EX);
+  ctx.strokeStyle='rgba(200,168,74,0.2)';
+  ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx,ly+EX); ctx.stroke();
+
+  const FS = Math.round(LEG_W*0.095);
+  const DOT = Math.round(FS*0.8);
+  ctx.font = `${Math.round(FS*1.1)}px 'JetBrains Mono',monospace`;
+  ctx.fillStyle='rgba(200,168,74,0.8)';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('Legend', lx+PAD, ly+PAD);
+
+  ctx.font = `${FS}px 'JetBrains Mono',monospace`;
+  const items = buildLegendItems();
+  let yy = ly + PAD + FS*2.2;
+  const rowH = FS*1.9;
+  for(const item of items){
+    if(yy + rowH > ly+EX-PAD) break;
+    if(item.shape==='line'){
+      ctx.strokeStyle=item.c; ctx.lineWidth=DOT*0.5;
+      ctx.beginPath(); ctx.moveTo(lx+PAD, yy+DOT/2); ctx.lineTo(lx+PAD+DOT*2, yy+DOT/2); ctx.stroke();
+    } else if(item.shape==='sq'){
+      ctx.fillStyle=item.c;
+      ctx.fillRect(lx+PAD, yy, DOT, DOT);
+    } else {
+      ctx.beginPath(); ctx.arc(lx+PAD+DOT/2, yy+DOT/2, DOT/2, 0, Math.PI*2);
+      ctx.fillStyle=item.c; ctx.fill();
+    }
+    ctx.fillStyle='rgba(255,255,255,0.65)';
+    ctx.fillText(item.l, lx+PAD+DOT*1.6, yy);
+    yy += rowH;
+  }
+
+  // Stats block in legend
+  yy += PAD;
+  ctx.strokeStyle='rgba(255,255,255,0.08)';
+  ctx.beginPath(); ctx.moveTo(lx+PAD, yy); ctx.lineTo(lx+LEG_W-PAD, yy); ctx.stroke();
+  yy += PAD;
+  ctx.font = `${Math.round(FS*0.85)}px 'JetBrains Mono',monospace`;
+  const statLines = [
+    `M max: ${S.mmax}`,
+    `Points: ${points.length}`,
+    `φ total: ${points.filter(p=>p.isCop).length}`,
+    `Lifted: ${points.filter(p=>p.lifted).length}`,
+    `C ≈ 0.530712`,
+    `View: ${viewLabel(overrideView||S.view)}`,
+    `Color: ${colorModeLabel(S.color)}`,
+  ];
+  ctx.fillStyle='rgba(255,255,255,0.4)';
+  for(const line of statLines){
+    if(yy+FS > ly+EX-PAD) break;
+    ctx.fillText(line, lx+PAD, yy); yy+=FS*1.6;
+  }
+
+  // Download
+  out.toBlob(blob=>{
     const a=document.createElement('a');
-    a.href=url; a.download='zmmz_4k.png'; a.click();
-  },100);
-};
+    a.href=URL.createObjectURL(blob);
+    a.download=fname||'zmmz_4k.png';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  },'image/png');
+}
+
+document.getElementById('btn-export-4k').onclick=()=>{ export4K('zmmz_4k.png'); };
 
 document.getElementById('btn-export-all4').onclick=()=>{
   const views=['concentric','fermat','farey','strip'];
-  const orig=S.view;
   let i=0;
   function next(){
-    if(i>=views.length){S.view=orig;dirty=true;return;}
-    S.view=views[i]; dirty=true;
-    setTimeout(()=>{
-      const url=canvas.toDataURL('image/png');
-      const a=document.createElement('a');
-      a.href=url; a.download=`zmmz_${views[i]}.png`; a.click();
-      i++; setTimeout(next,200);
-    },200);
+    if(i>=views.length) return;
+    const v=views[i]; i++;
+    setTimeout(()=>{ export4K(`zmmz_${v}_4k.png`, v); setTimeout(next,400); },200);
   }
   next();
 };
@@ -2175,7 +2413,7 @@ wire('sl-noffset','noffset',Number); wire('num-noffset','noffset',Number);
 wire('sl-lift-thick','liftThick',v=>v/10);
 wire('sl-lift-alpha','liftAlpha',v=>v/100);
 wire('sl-chord-alpha','chordAlpha',v=>v/100);
-wire('sl-dim','dimAlpha',v=>v/100);
+wire('sl-dim','dimAlpha',v=>Math.round(v)/100);
 wire('sl-label-size','labelSize',Number);
 wire('sl-label-maxm','labelMaxM',Number);
 wire('num-channel','channel',Number);
@@ -3146,4 +3384,4 @@ try {
 </body>
 </html>
 
-  </html>
+</html>
