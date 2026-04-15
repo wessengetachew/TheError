@@ -5,150 +5,320 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Geometric Canvas — (ℤ/Mℤ)* Explorer · Wessen Getachew</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
 :root {
-  --bg:#0a0a0f; --panel:#0f0f1a; --border:#1e1e35;
-  --accent:#4a9eff; --accent2:#c084fc; --text:#e0e0f0; --muted:#6060a0;
-  --nav-h:44px; --ctrl-h:48px; --drawer-w:260px;
-  font-family:'Courier New',monospace;
+  --bg: #0a0a0f;
+  --panel: #0f0f1a;
+  --border: #1e1e35;
+  --accent: #4a9eff;
+  --accent2: #c084fc;
+  --text: #e0e0f0;
+  --muted: #6060a0;
+  --nav-h: 44px;
+  --ctrl-h: 48px;
+  --drawer-w: 260px;
+  font-family: 'Courier New', monospace;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-size:11px;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-size: 11px; }
 
-/* ── Core layout: flex column, fixed below nav ── */
-#page-body{
-  position:fixed;
-  top:var(--nav-h);left:0;right:0;bottom:0;
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  background:var(--bg);
+/* ══ LAYOUT ══════════════════════════════════════════════════════
+   html/body fill viewport, nav is fixed 44px top.
+   #page-body: fixed below nav, flex-row on desktop, flex-col on mobile.
+   #drawer: fixed-width sidebar on desktop, overlay on mobile.
+   #main-col: fills rest, flex-col → canvas-area + ctrl.
+   ═══════════════════════════════════════════════════════════════ */
+
+html, body { width:100%; height:100%; overflow:hidden; }
+
+#page-body {
+  position: fixed;
+  top: var(--nav-h); left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  background: var(--bg);
 }
-#canvas-area{
-  flex:1;min-height:0;
-  position:relative;
-  overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--bg);
-}
-#canvas-wrap{position:relative;flex-shrink:0;}
-#ctrl{
-  flex-shrink:0;height:var(--ctrl-h);
-  display:flex;align-items:center;gap:6px;padding:0 8px;
-  background:var(--panel);border-top:1px solid var(--border);
-  overflow-x:auto;overflow-y:hidden;white-space:nowrap;
-}
-#main-col{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
-#analysis-panel{display:none;}
 
 /* ── Drawer ── */
-#drawer-overlay{
-  position:fixed;top:var(--nav-h);left:0;bottom:0;
-  width:var(--drawer-w);
-  background:var(--panel);border-right:1px solid var(--border);
-  transform:translateX(-100%);
-  transition:transform .25s cubic-bezier(.4,0,.2,1);
-  z-index:100;display:flex;flex-direction:column;overflow:hidden;
+#drawer {
+  width: var(--drawer-w);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  transition: width 0.22s ease;
+  position: relative;  /* in-flow on desktop */
+  z-index: 10;
 }
-#drawer-overlay.open{transform:translateX(0);}
-#drawer-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px;}
-#drawer-backdrop{
-  display:none;position:fixed;inset:0;top:var(--nav-h);
-  background:rgba(0,0,0,.55);z-index:99;
-}
-#drawer-backdrop.open{display:block;}
-#drawer-toggle{
-  position:fixed;top:calc(var(--nav-h)+8px);left:8px;z-index:200;
-  background:rgba(10,10,20,.92);border:1px solid var(--border);
-  color:var(--accent);font-family:'Courier New',monospace;
-  font-size:10px;padding:4px 9px;cursor:pointer;letter-spacing:.1em;
-  border-radius:2px;backdrop-filter:blur(4px);white-space:nowrap;
-  transition:left .22s ease;
-}
-#drawer-toggle.open-left{left:calc(var(--drawer-w)+8px);}
+#drawer.collapsed { width: 0; border-right: none; overflow: hidden; }
+#drawer-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px; }
+#drawer-backdrop { display: none; }
 
-/* ── Tab nav ── */
-#tab-nav{
-  position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:300;
-  background:rgba(4,4,10,.95);backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(255,255,255,.07);
-  display:flex;align-items:center;padding:0 24px;
+/* ── Main column ── */
+#main-col {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
-.tabs{display:flex;flex:1;}
-.tab{
-  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;
-  text-decoration:none;padding:0 14px;height:var(--nav-h);
-  display:flex;align-items:center;gap:6px;
-  color:rgba(255,255,255,.28);border-bottom:2px solid transparent;
-  transition:color .2s;white-space:nowrap;
-}
-.tab:hover{color:rgba(255,255,255,.7);}
-.tab.active{color:#c8a84a;border-bottom-color:#c8a84a;}
-.tab-canvas{color:#e05060!important;}
-.tab-canvas:hover,.tab-canvas.active{border-bottom-color:#e05060!important;}
-.tab-explorer.active{color:#3dc8b8!important;border-bottom-color:#3dc8b8!important;}
-.tab-deep.active{color:#9070d8!important;border-bottom-color:#9070d8!important;}
-.nav-right{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);margin-left:auto;white-space:nowrap;}
 
-/* ── Drawer tabs ── */
-#drawer-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
-.dtab{
-  flex:1;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
-  padding:7px 4px;text-align:center;cursor:pointer;color:var(--muted);
-  border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;
-  transition:color .15s;
+/* ── Canvas area ── */
+#canvas-area {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--bg);
+  position: relative;
+  contain: layout;
 }
-.dtab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.dtab-panel{display:none;}
-.dtab-panel.active{display:block;}
+
+/* canvas-wrap size set by JS */
+#canvas-wrap { position: relative; flex-shrink: 0; }
+
+/* ── Control bar ── */
+#ctrl {
+  flex-shrink: 0;
+  height: var(--ctrl-h);
+  min-height: var(--ctrl-h);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+/* ── Drawer toggle button ── */
+#drawer-toggle {
+  position: fixed;
+  top: calc(var(--nav-h) + 8px);
+  left: calc(var(--drawer-w) + 8px);
+  z-index: 200;
+  background: rgba(10,10,20,0.92);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  padding: 4px 9px;
+  cursor: pointer;
+  letter-spacing: .1em;
+  border-radius: 2px;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  transition: left 0.22s ease;
+}
+#drawer-toggle:hover { border-color: var(--accent); }
+
+#analysis-panel { display: none; }
+
+/* ════ MOBILE (<= 900px) ════ */
+@media (max-width: 900px) {
+  #page-body { flex-direction: column; }
+
+  /* drawer becomes overlay */
+  #drawer {
+    position: fixed !important;
+    top: var(--nav-h); left: 0; bottom: 0;
+    width: var(--drawer-w) !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+    z-index: 100;
+    border-right: 1px solid var(--border) !important;
+  }
+  #drawer.open    { transform: translateX(0);    }
+  #drawer.collapsed { transform: translateX(-100%); }
+
+  #drawer-backdrop {
+    display: none;
+    position: fixed; inset: 0; top: var(--nav-h);
+    background: rgba(0,0,0,0.55); z-index: 99;
+  }
+  #drawer-backdrop.open { display: block; }
+
+  #drawer-toggle { left: 8px !important; }
+  #drawer-toggle.drawer-open { left: calc(var(--drawer-w) + 8px) !important; }
+
+  #main-col { flex: 1; min-height: 0; }
+}
+
+/* ── Drawer inner tabs ── */
+#drawer-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.dtab {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 7px 4px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  transition: color .15s;
+}
+.dtab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.dtab-panel { display: none; }
+.dtab-panel.active { display: block; }
+
+/* ── AI Tab styles ── */
+.ai-section { margin-bottom: 14px; }
+.ai-section-title {
+  font-family: 'Courier New', monospace;
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: #50f5c0; border-bottom: 1px solid rgba(80,245,192,.2);
+  padding-bottom: 3px; margin-bottom: 8px;
+}
+.ai-probe-btn {
+  display: block; width: 100%;
+  background: rgba(80,245,192,.06); border: 1px solid rgba(80,245,192,.2);
+  color: rgba(80,245,192,.9); font-family: 'Courier New',monospace;
+  font-size: 9px; letter-spacing: .08em; padding: 6px 8px;
+  cursor: pointer; text-align: left; margin-bottom: 4px;
+  border-radius: 2px; transition: background .15s, border-color .15s;
+  line-height: 1.5;
+}
+.ai-probe-btn:hover { background: rgba(80,245,192,.14); border-color: #50f5c0; color: #50f5c0; }
+.ai-probe-btn .probe-name { color: #50f5c0; font-weight: bold; display: block; margin-bottom: 2px; }
+.ai-probe-btn .probe-desc { color: rgba(255,255,255,.4); font-size: 8px; display: block; }
+.ai-obs { background: rgba(80,245,192,.04); border: 1px solid rgba(80,245,192,.15);
+  padding: 6px 8px; font-size: 9px; color: rgba(255,255,255,.55);
+  line-height: 1.7; margin-bottom: 8px; border-radius: 2px; }
+.ai-obs strong { color: #50f5c0; }
+.ai-obs em { color: rgba(255,255,255,.8); font-style: normal; }
+.ai-running { color: #50f5c0; font-size: 9px; letter-spacing: .1em;
+  animation: ai-pulse 1.2s ease-in-out infinite; }
+@keyframes ai-pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+.ai-ctrl-row { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
+.ai-ctrl-label { color: rgba(80,245,192,.6); font-size: 9px; letter-spacing:.08em; min-width: 52px; }
+.ai-slider { accent-color: #50f5c0; width: 90px; cursor: pointer; }
+.ai-num { background: #060610; border: 1px solid rgba(80,245,192,.2); color: #50f5c0;
+  font-family: 'Courier New',monospace; font-size: 9px; padding: 2px 4px; width: 44px; }
+.ai-check { accent-color: #50f5c0; }
+.ai-select { background: #0a0a18; border: 1px solid rgba(80,245,192,.2); color: #50f5c0;
+  font-family: 'Courier New',monospace; font-size: 9px; padding: 2px 4px; }
+#ai-log { font-size: 8px; color: rgba(80,245,192,.5); line-height: 1.9; max-height: 160px;
+  overflow-y: auto; background: rgba(0,0,0,.4); padding: 5px 7px; border-radius: 2px;
+  border: 1px solid rgba(80,245,192,.1); font-family:'Courier New',monospace; }
+#ai-log .log-entry { border-bottom: 1px solid rgba(80,245,192,.07); padding: 2px 0; }
+#ai-log .log-val { color: #50f5c0; }
+
+/* Mobile: drawer still works, ctrl bar thinner */
+@media (max-width: 640px) {
+  :root { --ctrl-h: 44px; --drawer-w: min(260px, 85vw); }
+}
 
 /* ── Controls ── */
-.ctrl-sep{width:1px;height:28px;background:var(--border);flex-shrink:0;}
-.ctrl-group{display:flex;align-items:center;gap:4px;flex-shrink:0;}
-.ctrl-label{color:var(--muted);font-size:10px;}
-button{background:#1a1a2e;border:1px solid var(--border);color:var(--text);padding:2px 6px;cursor:pointer;font-family:inherit;font-size:10px;border-radius:2px;}
-button:hover{background:#252545;border-color:var(--accent);}
-button.active{background:#1a2a4a;border-color:var(--accent);color:var(--accent);}
-input[type=range]{width:70px;accent-color:var(--accent);cursor:pointer;}
-input[type=range].wide{width:110px;}
-input[type=number],input[type=text]{background:#080810;border:1px solid var(--border);color:var(--text);padding:2px 4px;font-family:inherit;font-size:10px;width:52px;border-radius:2px;}
-input[type=number].narrow{width:38px;}
-select{background:#1a1a2e;border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:10px;padding:2px 4px;cursor:pointer;}
-label{display:flex;align-items:center;gap:3px;cursor:pointer;}
-input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
+.ctrl-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+.ctrl-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.ctrl-label { color: var(--muted); font-size: 10px; }
+button { background: #1a1a2e; border: 1px solid var(--border); color: var(--text); padding: 2px 6px; cursor: pointer; font-family: inherit; font-size: 10px; border-radius: 2px; }
+button:hover { background: #252545; border-color: var(--accent); }
+button.active { background: #1a2a4a; border-color: var(--accent); color: var(--accent); }
+input[type=range] { width: 70px; accent-color: var(--accent); cursor: pointer; }
+input[type=range].wide { width: 110px; }
+input[type=number], input[type=text] { background: #080810; border: 1px solid var(--border); color: var(--text); padding: 2px 4px; font-family: inherit; font-size: 10px; width: 52px; border-radius: 2px; }
+input[type=number].narrow { width: 38px; }
+input[type=number].w70 { width: 70px; }
+select { background: #1a1a2e; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 10px; padding: 2px 4px; cursor: pointer; }
+label { display: flex; align-items: center; gap: 3px; cursor: pointer; }
+input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 
-/* ── Panels ── */
-.section{margin-bottom:10px;}
-.section-title{color:var(--accent);font-size:10px;letter-spacing:.05em;border-bottom:1px solid var(--border);padding-bottom:2px;margin-bottom:5px;text-transform:uppercase;}
-.row{display:flex;align-items:center;gap:4px;margin-bottom:3px;flex-wrap:wrap;}
-.info-box{background:#080810;border:1px solid var(--border);padding:4px 6px;font-size:10px;line-height:1.6;color:var(--muted);}
-.info-box span{color:var(--text);}
-.card{background:#0d0d20;border:1px solid var(--border);padding:5px 7px;margin-bottom:4px;border-radius:2px;}
-.card-title{color:var(--accent2);font-size:9px;font-weight:bold;}
-.card-body{color:var(--muted);font-size:9px;line-height:1.5;margin-top:2px;}
-.card-body em{color:var(--text);font-style:normal;}
-.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-#tooltip{position:fixed;background:#0f0f2a;border:1px solid var(--accent);padding:5px 8px;font-size:10px;pointer-events:none;display:none;z-index:1000;color:var(--text);line-height:1.7;max-width:200px;}
+/* ── Left/Right panels ── */
+.section { margin-bottom: 10px; }
+.section-title { color: var(--accent); font-size: 10px; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 2px; margin-bottom: 5px; text-transform: uppercase; }
+.row { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; flex-wrap: wrap; }
+.info-box { background: #080810; border: 1px solid var(--border); padding: 4px 6px; font-size: 10px; line-height: 1.6; color: var(--muted); }
+.info-box span { color: var(--text); }
+.card { background: #0d0d20; border: 1px solid var(--border); padding: 5px 7px; margin-bottom: 4px; border-radius: 2px; }
+.card-title { color: var(--accent2); font-size: 9px; font-weight: bold; }
+.card-body { color: var(--muted); font-size: 9px; line-height: 1.5; margin-top: 2px; }
+.card-body em { color: var(--text); font-style: normal; }
 
-/* ── From-banner / anim-indicator ── */
-#from-banner{position:fixed;top:var(--nav-h);left:50%;transform:translateX(-50%);
+/* ── Legend dots ── */
+.legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+
+/* ── Analysis panel ── */
+#analysis-text { flex: 1; font-size: 10px; color: var(--muted); line-height: 1.6; }
+#analysis-text strong { color: var(--accent); }
+#stats-live { font-size: 10px; color: var(--muted); min-width: 160px; line-height: 1.7; }
+#stats-live span { color: var(--text); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── Mobile drawer toggle ── */
+#mobile-toggle { display: none; }
+@media (max-width: 700px) { #mobile-toggle { display: flex; } }
+
+/* ── Tooltip ── */
+#tooltip { position: fixed; background: #0f0f2a; border: 1px solid var(--accent); padding: 5px 8px; font-size: 10px; pointer-events: none; display: none; z-index: 1000; color: var(--text); line-height: 1.7; max-width: 200px; }
+
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(4,4,10,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 24px;height:44px;flex-shrink:0;}
+.tabs{display:flex;flex:1;}
+.tab{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  text-decoration:none;padding:0 16px;height:44px;display:flex;align-items:center;gap:6px;
+  color:rgba(255,255,255,.28);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
+.tab:hover{color:rgba(255,255,255,.6);}
+.tab.active{color:#e05060;border-bottom-color:#e05060;}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;flex-shrink:0;}
+.tab.active .tab-dot{opacity:1;}
+.tab-opener.active,.tab-opener:hover{color:#c8a84a!important;border-bottom-color:#c8a84a!important;}
+.tab-explorer.active,.tab-explorer:hover{color:#3dc8b8!important;border-bottom-color:#3dc8b8!important;}
+.tab-deep.active,.tab-deep:hover{color:#9070d8!important;border-bottom-color:#9070d8!important;}
+.tab-canvas{color:#e05060!important;}
+.tab-canvas.active{border-bottom-color:#e05060!important;}
+.nav-right{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.06em;white-space:nowrap;}
+
+/* Received-from banner */
+#from-banner{position:fixed;top:44px;left:50%;transform:translateX(-50%);
   background:#0d0d1a;border:1px solid rgba(224,80,96,.4);border-top:none;
-  font-family:'JetBrains Mono',monospace;font-size:9px;color:#e05060;
-  padding:5px 18px;z-index:300;display:none;}
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;
+  color:#e05060;padding:5px 18px;z-index:300;display:none;
+  animation:slidein .4s ease;}
+@keyframes slidein{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
-/* ── Theorem strip ── */
+/* Theorem preset strip */
 #thm-strip{
-  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
-  display:flex;gap:4px;z-index:50;flex-wrap:wrap;justify-content:center;
-  background:rgba(4,4,10,.88);backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,.08);padding:5px 10px;border-radius:3px;
+  position:absolute;
+  bottom:6px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:3px;flex-wrap:wrap;justify-content:center;align-items:center;
+  background:rgba(4,4,10,0.88);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:4px;
+  padding:5px 10px;
+  z-index:20;
   max-width:calc(100% - 20px);
+  overflow-x:auto;overflow-y:hidden;
 }
-.thm-btn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+.thm-btn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.08em;text-transform:uppercase;
   background:rgba(200,168,74,.08);border:1px solid rgba(200,168,74,.2);color:rgba(200,168,74,.8);
-  padding:3px 8px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+  padding:3px 7px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;}
 .thm-btn:hover{background:rgba(200,168,74,.2);border-color:rgba(200,168,74,.6);color:#e8d080;}
 .thm-btn.coral{background:rgba(224,80,96,.08);border-color:rgba(224,80,96,.2);color:rgba(224,80,96,.8);}
 .thm-btn.coral:hover{background:rgba(224,80,96,.2);border-color:#e05060;color:#f08090;}
@@ -157,21 +327,7 @@ input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
 .thm-btn.violet{background:rgba(144,112,216,.08);border-color:rgba(144,112,216,.2);color:rgba(144,112,216,.8);}
 .thm-btn.violet:hover{background:rgba(144,112,216,.2);border-color:#9070d8;color:#b090f0;}
 
-/* ── AI tab ── */
-.ai-section{margin-bottom:14px;}
-.ai-section-title{font-family:'Courier New',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#50f5c0;border-bottom:1px solid rgba(80,245,192,.2);padding-bottom:3px;margin-bottom:8px;}
-.ai-probe-btn{display:block;width:100%;background:rgba(80,245,192,.06);border:1px solid rgba(80,245,192,.2);color:rgba(80,245,192,.9);font-family:'Courier New',monospace;font-size:9px;letter-spacing:.08em;padding:6px 8px;cursor:pointer;text-align:left;margin-bottom:4px;border-radius:2px;transition:background .15s,border-color .15s;line-height:1.5;}
-.ai-probe-btn:hover{background:rgba(80,245,192,.14);border-color:#50f5c0;color:#50f5c0;}
-.ai-probe-btn .probe-name{color:#50f5c0;font-weight:bold;display:block;margin-bottom:2px;}
-.ai-probe-btn .probe-desc{color:rgba(255,255,255,.4);font-size:8px;display:block;}
-.ai-obs{background:rgba(80,245,192,.04);border:1px solid rgba(80,245,192,.15);padding:6px 8px;font-size:9px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:8px;border-radius:2px;}
-.ai-obs strong{color:#50f5c0;}
-#ai-log{font-size:8px;color:rgba(80,245,192,.5);line-height:1.9;max-height:160px;overflow-y:auto;background:rgba(0,0,0,.4);padding:5px 7px;border-radius:2px;border:1px solid rgba(80,245,192,.1);font-family:'Courier New',monospace;}
-.ai-ctrl-row{display:flex;align-items:center;gap:5px;margin-bottom:5px;flex-wrap:wrap;}
-.ai-ctrl-label{color:rgba(80,245,192,.6);font-size:9px;letter-spacing:.08em;min-width:52px;}
-.ai-slider{accent-color:#50f5c0;width:90px;cursor:pointer;}
-.ai-select{background:#0a0a18;border:1px solid rgba(80,245,192,.2);color:#50f5c0;font-family:'Courier New',monospace;font-size:9px;padding:2px 4px;}
-@keyframes ai-pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
 </style>
 </head>
 <body>
@@ -188,9 +344,10 @@ input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
 
 <div id="from-banner"></div>
 <div id="anim-indicator" style="display:none;position:fixed;top:44px;right:12px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;color:rgba(61,200,184,.9);background:rgba(4,4,10,.9);border:1px solid rgba(61,200,184,.25);padding:4px 10px;z-index:301;cursor:pointer;" onclick="animStop();this.style.display='none'">▶ —</div>
-
 <div id="drawer-backdrop" onclick="closeDrawer()"></div>
 <button id="drawer-toggle" onclick="toggleDrawer()">☰ Controls</button>
+
+<div id="page-body">
 
 <div id="drawer">
   <div id="drawer-tabs">
@@ -448,8 +605,10 @@ input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
   </div>
 </div>
 
-<div id="page-body">
-<div id="canvas-area">
+
+  <div id="main-col">
+  <div id="canvas-area">
+    <div id="canvas-wrap"></div>
     <div id="thm-strip">
   <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);padding-right:6px">§8</span>
   <button class="thm-btn" onclick="applyThm('thm81')">§8.1</button>
@@ -468,10 +627,9 @@ input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
   <button class="thm-btn violet" onclick="applyThm('rot_ch2_fermat')">½ch Fermat</button>
   <button class="thm-btn" onclick="applyThm('reset')">↺</button>
   <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'">■</button>
-</div>
-    <div id="canvas-wrap"></div>
   </div>
-<div id="ctrl">
+</div>
+  <div id="ctrl">
 <div class="ctrl-group">
     <button id="btn-invert" title="Invert radius map">⇌ invert</button>
     <button id="btn-inspect" title="Inspect mode: click points to pin/label them" style="border-color:var(--accent2);color:var(--accent2)">◉ Inspect</button>
@@ -597,11 +755,13 @@ input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
     <button id="btn-export-csv">↓ CSV</button>
   </div>
   </div>
+  </div><!-- main-col -->
 </div><!-- page-body -->
 
 <div id="tooltip"></div>
 
 <script>
+
 // ── State ──────────────────────────────────────────────────────────────────
 // ── Inspect mode state ───────────────────────────────────────────────────────
 let inspectMode = false;
@@ -971,13 +1131,20 @@ let lastTime = 0;
 let animFrame = null;
 
 function fitCanvas(){
+  const cw   = document.getElementById('canvas-wrap');
   const area = document.getElementById('canvas-area');
-  if(!area) return;
-  const aw = area.clientWidth  || 100;
-  const ah = area.clientHeight || 100;
-  const dpr = Math.min(devicePixelRatio, 2);
-  // Square: take min of width and height
-  const size = Math.max(60, Math.min(aw, ah));
+  if(!area || !cw) return;
+
+  // Let the browser finish layout first, then measure the actual container
+  const availW = area.clientWidth  || (window.innerWidth  - (window.innerWidth >= 900 ? 260 : 0));
+  const availH = area.clientHeight || (window.innerHeight - 44 - 48);
+
+  // Square = largest square that fits with a small margin
+  const size = Math.max(60, Math.min(availW, availH) - 8);
+  const dpr  = Math.min(devicePixelRatio, 2);
+
+  cw.style.width  = size + 'px';
+  cw.style.height = size + 'px';
 
   canvas.width        = Math.round(size * dpr);
   canvas.height       = Math.round(size * dpr);
@@ -1222,12 +1389,11 @@ function drawOverlay(w,h,mat){
       ctx2d.fillText(String(i+1), sx+9*dpr, sy-9*dpr);
     });
 
-    // ── Pinned-point lift lines ───────────────────────────────────────────────
+    // ── Pinned-point lift lines (colored, follow each pinned point) ──────────
+    // For each pinned point, draw its lift line to M+1 in its pin color
     screenPins.forEach(p=>{
       const pt=p.pt;
       if(!pt.isCop) return;
-      // Use cached coprime set (keyed by M) to avoid recomputing every frame
-      if(!_copCache) _copCache={};
       if(!_copCache[pt.M+1]) _copCache[pt.M+1]=new Set(coprimes(pt.M+1));
       const cop2 = _copCache[pt.M+1];
       const r2 = pt.r % (pt.M+1);
@@ -1340,8 +1506,9 @@ let drag=false, dragX=0, dragY=0;
 let hoverPt=null;
 
 canvas.addEventListener('mousedown',e=>{
-  if(inspectMode) return; // inspect mode: no drag, clicks only
+  if(inspectMode) return;
   drag=true; dragX=e.clientX; dragY=e.clientY;
+  _clickX=e.clientX; _clickY=e.clientY;
 });
 window.addEventListener('mouseup',()=>{ drag=false; });
 let _hoverThrottle = 0;
@@ -1374,9 +1541,9 @@ canvas.addEventListener('wheel',e=>{
   dirty=true;
 },{passive:false});
 canvas.addEventListener('dblclick',()=>{S.panX=0;S.panY=0;S.zoom=1;fitCanvas();dirty=true;});
+let _clickX=0,_clickY=0;
 canvas.addEventListener('click',e=>{
-  // Distinguish drag from click
-  if(Math.hypot(e.clientX-dragX, e.clientY-dragY) > 4) return;
+  if(Math.hypot(e.clientX-_clickX,e.clientY-_clickY) > 6) return;
 
   if(inspectMode && hoverPt){
     const key = hoverPt.r+'_'+hoverPt.M;
@@ -1398,7 +1565,19 @@ canvas.addEventListener('click',e=>{
 
 // Touch
 let t0=null;
-canvas.addEventListener('touchstart',e=>{e.preventDefault();if(inspectMode)return;if(e.touches.length===1){drag=true;t0={x:e.touches[0].clientX,y:e.touches[0].clientY};}},{passive:false});
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const t=e.touches[0];
+    const rect=canvas.getBoundingClientRect();
+    if(inspectMode){
+      // In inspect mode: find the nearest point immediately on touch
+      findHover(t.clientX-rect.left, t.clientY-rect.top, rect.width, rect.height);
+    } else {
+      drag=true; t0={x:t.clientX,y:t.clientY};
+    }
+  }
+},{passive:false});
 canvas.addEventListener('touchmove',e=>{
   e.preventDefault();
   if(drag&&e.touches.length===1){
@@ -1415,10 +1594,7 @@ canvas.addEventListener('touchmove',e=>{
 },{passive:false});
 canvas.addEventListener('touchend',e=>{
   if(inspectMode && e.changedTouches.length===1){
-    const t=e.changedTouches[0];
-    const rect=canvas.getBoundingClientRect();
-    const cx=t.clientX-rect.left, cy=t.clientY-rect.top;
-    findHover(cx,cy,rect.width,rect.height);
+    // hoverPt was set on touchstart; pin or unpin it
     if(hoverPt){
       const key=hoverPt.r+'_'+hoverPt.M;
       const idx=pinnedPoints.findIndex(p=>p.key===key);
@@ -1427,6 +1603,7 @@ canvas.addEventListener('touchend',e=>{
       updateInspectPanel();
       dirty=true;
     }
+    return; // don't fire drag=false path
   }
   drag=false;
 });
@@ -1539,9 +1716,12 @@ function updateInspectPanel(){
     }
   }
   box.innerHTML = html;
-  // Show info in drawer if already open; don't force-open (causes layout thrash)
-  const drawerEl = document.getElementById('drawer') || document.getElementById('drawer-overlay');
-  if(drawerEl && (drawerEl.classList.contains('open') || window.innerWidth >= 900)){
+  // Auto-open drawer to info tab
+  if(!document.getElementById('drawer').classList.contains('open')){
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawer-backdrop').classList.add('open');
+    document.getElementById('drawer-toggle').classList.add('drawer-open');
+    document.getElementById('drawer-toggle').textContent='✕ Close';
     showDTab('info', document.querySelectorAll('.dtab')[1]);
   }
 }
@@ -1655,6 +1835,8 @@ function playStop(){
   clearInterval(playTimer);
   playTimer = null;
   S.playActive = false;
+  const btn = document.getElementById('btn-play-play');
+  if(btn) btn.textContent = '▶▶';
   dirty = true;
 }
 
@@ -1683,14 +1865,7 @@ document.getElementById('btn-play-prev').onclick = ()=>{
   playSetM(S.playM - 1);
 };
 
-// Add a "next" button handler too (btn-play-play was ▶▶, we reuse)
-// btn-play-prev is ◀, we need a ▶ next — wire it:
-(()=>{
-  // insert a next-ring button handler on the existing ▶▶ when stopped
-  // Actually ▶▶ starts play — we use btn-play-prev as ◀ and need next
-  // The HTML has btn-play-prev ◀  btn-play-play ▶▶  btn-play-stop ⏮
-  // Let's make prev/next step when stopped, play when running
-})();
+
 
 // ── Lift Scan ─────────────────────────────────────────────────────────────────
 let liftTimer = null;
@@ -1715,7 +1890,8 @@ function liftSetM(m){
 function liftScanStop(){
   clearInterval(liftTimer);
   liftTimer = null;
-  document.getElementById('btn-lift-next').textContent = '▶';
+  const btn = document.getElementById('btn-lift-next');
+  if(btn) btn.textContent = '▶';
 }
 
 document.getElementById('btn-lift-next').onclick = ()=>{
@@ -1906,7 +2082,13 @@ document.getElementById('btn-inspect').addEventListener('click',()=>{
   btn.style.background = inspectMode ? 'rgba(192,132,252,0.15)' : '';
   if(inspectMode && pinnedPoints.length===0){
     document.getElementById('click-info').innerHTML =
-      '<span style="color:var(--accent2);font-size:9px">◉ Inspect ON — tap a point to pin it</span>';
+      '<span style="color:var(--accent2);font-size:9px">◉ Inspect mode ON — click any point to pin it</span>';
+    // Open drawer to info tab
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawer-backdrop').classList.add('open');
+    document.getElementById('drawer-toggle').classList.add('drawer-open');
+    document.getElementById('drawer-toggle').textContent='✕ Close';
+    showDTab('info', document.querySelectorAll('.dtab')[1]);
   }
   dirty = true;
 });
@@ -1960,9 +2142,8 @@ document.getElementById('btn-fi-go').addEventListener('click',()=>{
 document.getElementById('btn-fi-clear').addEventListener('click',()=>{S.frInspActive=false;document.getElementById('fi-info').textContent='—';dirty=true;});
 
 // ── Init ─────────────────────────────────────────────────────────────────────
-window.addEventListener('resize',()=>{ fitCanvas(); dirty=true; });
 // Initial fit after DOM is ready
-setTimeout(()=>{ fitCanvas(); autoFitZoom(); syncUI(); draw(); }, 50);
+setTimeout(()=>{ initDrawer(); fitCanvas(); autoFitZoom(); syncUI(); draw(); }, 50);
 
 // Report WebGL usage in analysis panel
 document.getElementById('analysis-text').innerHTML=
@@ -2062,7 +2243,12 @@ function animStop(){
   ANIM.timers=[]; ANIM.intervals=[];
   ANIM.active=null;
   S.spin=false;
-  if(document.getElementById('chk-spin')) document.getElementById('chk-spin').checked=false;
+  const spinChk = document.getElementById('chk-spin');
+  if(spinChk) spinChk.checked=false;
+  const ind = document.getElementById('anim-indicator');
+  if(ind) ind.style.display='none';
+  playStop();
+  liftScanStop();
 }
 
 function animStart(name){
@@ -2224,55 +2410,52 @@ function animStart(name){
 })();
 
 
-// ── Drawer (mobile overlay only; desktop uses in-flow #drawer-col) ──────────
+// ── Drawer ────────────────────────────────────────────────────────────────────
+const isDesktop = () => window.innerWidth >= 900;
+
 function toggleDrawer(){
-  const d = document.getElementById('drawer-overlay');
-  const b = document.getElementById('drawer-backdrop');
-  const t = document.getElementById('drawer-toggle');
-  if(!d) return;
-  const open = d.classList.toggle('open');
-  b.classList.toggle('open', open);
-  t.classList.toggle('open-left', open);
-  t.textContent = open ? '✕ Close' : '☰ Controls';
+  const d=document.getElementById('drawer');
+  const b=document.getElementById('drawer-backdrop');
+  const t=document.getElementById('drawer-toggle');
+  if(isDesktop()){
+    const collapsed = d.classList.toggle('collapsed');
+    t.textContent = collapsed ? '☰ Controls' : '✕ Close';
+    t.style.left  = collapsed ? '8px' : (getComputedStyle(document.documentElement).getPropertyValue('--drawer-w').trim() + ' + 8px').replace(/^/,'calc(');
+    setTimeout(()=>{ fitCanvas(); dirty=true; }, 220);
+  } else {
+    const open = d.classList.toggle('open');
+    b.classList.toggle('open', open);
+    t.classList.toggle('drawer-open', open);
+    t.textContent = open ? '✕ Close' : '☰ Controls';
+  }
 }
 function closeDrawer(){
-  const d = document.getElementById('drawer-overlay');
-  const b = document.getElementById('drawer-backdrop');
-  const t = document.getElementById('drawer-toggle');
-  if(!d) return;
-  d.classList.remove('open');
-  b.classList.remove('open');
-  t.classList.remove('open-left');
-  t.textContent = '☰ Controls';
+  if(isDesktop()) return;
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+  const t=document.getElementById('drawer-toggle');
+  t.classList.remove('drawer-open');
+  t.textContent='☰ Controls';
 }
-function initDrawer(){}  // no-op: CSS grid handles desktop, overlay handles mobile
-
-let resizeTimer;
-window.addEventListener('resize', ()=>{
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(()=>{ fitCanvas(); dirty=true; }, 100);
-});
-
-// Sync desktop tabs — showDTab targets mobile IDs; desktop has -d suffix
-function syncDesk(){} // tabs are independent on desktop, handled by showDTab
-function showDTab(name,el){
-  // Find which drawer this tab belongs to (mobile overlay or desktop col)
-  const tabBar = el.closest('#drawer-tabs, #drawer-tabs-desk');
-  if(tabBar){
-    tabBar.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
-    el.classList.add('active');
+// On desktop: start with drawer open; on mobile: collapsed
+function initDrawer(){
+  const d=document.getElementById('drawer');
+  const t=document.getElementById('drawer-toggle');
+  if(isDesktop()){
+    d.classList.remove('collapsed');
+    const dw = getComputedStyle(document.documentElement).getPropertyValue('--drawer-w').trim();
+    t.style.left = 'calc(' + dw + ' + 8px)';
+    t.textContent = '✕ Close';
   } else {
-    document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
-    el.classList.add('active');
+    t.textContent = '☰ Controls';
   }
-  // Show/hide panels in both drawers
-  ['dtab-controls','dtab-info','dtab-analysis','dtab-ai'].forEach(id=>{
-    const mob = document.getElementById(id);
-    const desk = document.getElementById(id+'-d');
-    const active = id === 'dtab-'+name;
-    if(mob)  mob.classList.toggle('active', active);
-    if(desk) desk.classList.toggle('active', active);
-  });
+}
+window.addEventListener('resize', ()=>{ initDrawer(); fitCanvas(); dirty=true; });
+function showDTab(name,el){
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.dtab-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('dtab-'+name).classList.add('active');
 }
 
 
@@ -2547,9 +2730,7 @@ function runProbe(probe){
 }
 
 // ── Build AI panel HTML ───────────────────────────────────────────────────
-let aiBuilt=false;
 function buildAIPanel(){
-  if(aiBuilt) return;
   const categories = [...new Set(AI_PROBES.map(p=>p.category))];
   let html = `
   <div style="padding:8px 6px 4px;border-bottom:1px solid rgba(80,245,192,.15);margin-bottom:10px">
@@ -2677,9 +2858,6 @@ function buildAIPanel(){
   </div>`;
 
   document.getElementById('ai-panel-content').innerHTML = html;
-  const d = document.getElementById('ai-panel-content-d');
-  if(d) d.innerHTML = html;
-  aiBuilt = true;
 }
 
 // Build the panel when tab is first shown
@@ -2689,6 +2867,9 @@ document.getElementById('dtab-ai-btn').addEventListener('click', ()=>{
   }
 });
 
+
 </script>
 </body>
-                              </html>
+</html>
+
+  </html>
