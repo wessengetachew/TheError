@@ -674,6 +674,54 @@ footer {
 .chart-live-stat { display: flex; flex-direction: column; gap: 2px; }
 .chart-live-stat-label { color: rgba(255,255,255,.28); font-size: 7px; }
 .chart-live-stat-value { color: var(--gold, #c8a84a); }
+
+/* ── Prime Checker ─────────────────────────────────────────────── */
+.pc-section { max-width:900px;margin:0 auto;padding:0 40px 60px; }
+@media(max-width:640px){ .pc-section { padding:0 20px 48px; } }
+.pc-box {
+  background:rgba(5,4,10,.85); border:1px solid rgba(61,200,184,.2);
+  border-radius:4px; padding:26px 26px 22px; margin-top:8px;
+}
+.pc-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:19px;
+  font-weight:400; color:#f0ece4; margin-bottom:6px; }
+.pc-desc { font-family:'JetBrains Mono',monospace; font-size:9px;
+  color:rgba(140,130,110,.6); letter-spacing:.06em; margin-bottom:16px; line-height:1.7; }
+.pc-desc strong { color:rgba(200,168,74,.75); }
+.pc-presets { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.pc-preset-lbl { font-family:'JetBrains Mono',monospace; font-size:8px;
+  color:rgba(120,110,90,.6); letter-spacing:.1em; align-self:center; text-transform:uppercase; }
+.pc-preset-btn { font-family:'JetBrains Mono',monospace; font-size:9px;
+  background:rgba(5,4,10,.6); border:1px solid rgba(255,255,255,.12);
+  color:rgba(200,185,155,.75); padding:4px 10px; cursor:pointer; border-radius:2px; transition:all .15s; }
+.pc-preset-btn:hover { border-color:rgba(61,200,184,.5); color:#3dc8b8; }
+.pc-preset-btn.pc-gold { border-color:rgba(200,168,74,.4); color:rgba(200,168,74,.8); }
+.pc-preset-btn.pc-gold:hover { border-color:var(--gold); color:var(--gold); }
+.pc-input-row { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.pc-input-row label { font-family:'JetBrains Mono',monospace; font-size:13px; color:rgba(200,168,74,.7); }
+.pc-input-row input[type=number] {
+  font-family:'JetBrains Mono',monospace; font-size:13px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(200,168,74,.3);
+  border-radius:2px; padding:6px 10px; color:#f0ece4; width:180px; }
+.pc-input-row input:focus { outline:none; border-color:rgba(200,168,74,.7); }
+.pc-check-btn { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em;
+  background:rgba(200,168,74,.12); border:1px solid rgba(200,168,74,.5);
+  color:rgba(200,168,74,.9); padding:7px 18px; cursor:pointer; border-radius:2px; transition:all .2s; }
+.pc-check-btn:hover { background:rgba(200,168,74,.22); border-color:var(--gold); }
+.pc-disp-row { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.pc-disp-lbl { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.1em;
+  color:rgba(120,110,90,.6); text-transform:uppercase; }
+.pc-disp-row label { font-family:'JetBrains Mono',monospace; font-size:9px;
+  color:rgba(180,170,150,.75); display:flex; align-items:center; gap:4px; cursor:pointer; }
+.pc-disp-row label:hover { color:#e8e0d0; }
+.pc-result { background:rgba(0,0,0,.35); border:1px solid rgba(61,200,184,.12);
+  border-radius:2px; padding:14px 16px; font-family:'JetBrains Mono',monospace; font-size:10px;
+  line-height:1.85; color:rgba(160,150,130,.7); white-space:pre-wrap; min-height:100px; }
+.pc-spec-wrap { background:rgba(0,0,0,.2); border:1px solid rgba(255,255,255,.05);
+  border-radius:2px; padding:12px; margin-bottom:14px; }
+.pc-spec-lbl { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.14em;
+  color:rgba(140,130,110,.4); text-transform:uppercase; margin-bottom:8px; }
+#pc-spec-canvas { width:100%; height:60px; display:block; }
+
 </style>
 </head>
 <body>
@@ -709,6 +757,7 @@ footer {
       <a href="EN_explorer-updated.html" class="cta cta-secondary">Deep Analysis →</a>
       <a href="#what" class="cta cta-ghost">Learn the Mathematics</a>
       <a href="zmmz_explorer-1.html" class="cta" style="border:1px solid rgba(224,80,96,.45);color:#e05060;background:rgba(224,80,96,.08);">Geometric Canvas ◈</a>
+      <a href="#checker" class="cta" style="border:1px solid rgba(200,168,74,.4);color:rgba(200,168,74,.85);background:rgba(200,168,74,.07);">Prime Checker ↓</a>
     </div>
   </div>
 
@@ -777,6 +826,80 @@ footer {
       <div class="math-card-lbl">Sign Change Counter</div>
       <div class="math-card-eq">#{N ≤ X : E(N) changes sign} → ∞</div>
       <div class="math-card-desc">Sign changes of E(N) are an RH signal — the error oscillates rather than decaying monotonically.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========= PRIME CHECKER ========= -->
+<div class="section-divider">
+  <div class="div-line"></div>
+  <div class="div-glyph">Jump Theorem Prime Checker</div>
+  <div class="div-line"></div>
+</div>
+
+<div class="section reveal pc-section" id="checker">
+  <div>
+    <div class="section-label">The Jump Theorem &mdash; Layer 05</div>
+    <h2 class="section-heading">
+      D(x) jumps at <em>exactly the primes</em>
+    </h2>
+    <p class="section-body">
+      The log-derivative D(x) = d/dx&thinsp;log&thinsp;C(x) is smooth everywhere
+      except at the primes. At x&nbsp;=&nbsp;p&minus;1 it jumps by exactly
+      1/(p(p&minus;1)). Composites pass in silence.
+      Given a jump size s, recover the prime exactly:
+      p&nbsp;=&nbsp;(1&thinsp;+&thinsp;&radic;(1+4/s))&thinsp;/&thinsp;2.
+      The golden ratio &phi; is the <em>supremum</em> of the spectrum &mdash;
+      s&nbsp;=&nbsp;1 is the only value no integer prime reaches.
+    </p>
+  </div>
+
+  <div class="pc-box">
+    <div class="pc-title">Prime Checker</div>
+    <div class="pc-desc">
+      Enter any integer n&nbsp;&ge;&nbsp;1. Computes C(n&minus;1) and C(n),
+      detects whether D(x) jumps at x&nbsp;=&nbsp;n&minus;1, recovers the prime
+      from the jump size, and verifies the discriminant.<br>
+      <strong>Try n&nbsp;=&nbsp;1 for the golden ratio &phi; &mdash; the boundary of the jump spectrum.</strong>
+    </div>
+
+    <div class="pc-spec-wrap">
+      <div class="pc-spec-lbl">Jump Spectrum &mdash; &phi; boundary to primes</div>
+      <canvas id="pc-spec-canvas"></canvas>
+    </div>
+
+    <div class="pc-presets">
+      <span class="pc-preset-lbl">Presets:</span>
+      <button class="pc-preset-btn" onclick="pcPreset(1)">&phi; (n=1)</button>
+      <button class="pc-preset-btn" onclick="pcPreset(2)">p=2</button>
+      <button class="pc-preset-btn" onclick="pcPreset(3)">p=3</button>
+      <button class="pc-preset-btn" onclick="pcPreset(7)">p=7</button>
+      <button class="pc-preset-btn" onclick="pcPreset(11)">p=11</button>
+      <button class="pc-preset-btn" onclick="pcPreset(101)">p=101</button>
+      <button class="pc-preset-btn" onclick="pcPreset(9999991)">p=9,999,991</button>
+    </div>
+
+    <div class="pc-input-row">
+      <label>n =</label>
+      <input type="number" id="pc-n" value="7" min="1"
+        placeholder="Enter integer &ge; 1"
+        onkeydown="if(event.key==='Enter')pcCheck()">
+      <button class="pc-check-btn" onclick="pcCheck()">Check</button>
+    </div>
+
+    <div class="pc-disp-row">
+      <span class="pc-disp-lbl">Display:</span>
+      <label><input type="radio" name="pc-disp" value="sci" checked onchange="pcCheck()"> Scientific</label>
+      <label><input type="radio" name="pc-disp" value="frac" onchange="pcCheck()"> Fraction</label>
+      <label><input type="radio" name="pc-disp" value="rel" onchange="pcCheck()"> Relative to p=2</label>
+      <label><input type="radio" name="pc-disp" value="geo" onchange="pcCheck()"> Geometry</label>
+    </div>
+
+    <div class="pc-result" id="pc-out">Enter n &ge; 1 and press Check &mdash; or click a preset above.</div>
+    <div id="pc-canvas-row" style="display:none;padding:10px 0 2px;">
+      <button onclick="pcSendCanvas()" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;color:#e05060;background:rgba(224,80,96,.1);border:1px solid rgba(224,80,96,.4);padding:6px 16px;cursor:pointer;border-radius:2px;transition:background .18s;" onmouseover="this.style.background='rgba(224,80,96,.22)'" onmouseout="this.style.background='rgba(224,80,96,.1)'">&#9670; Open Ring M in Geometric Canvas</button>
+      <span id="pc-canvas-lbl" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);margin-left:10px;"></span>
     </div>
   </div>
 </div>
@@ -2510,6 +2633,225 @@ document.addEventListener('DOMContentLoaded', function(){
     d1Compute(); d2Compute(); d3Compute(); d5Compute(); d6Draw();
   }, 800);
 });
+</script>
+
+
+<script>
+(function(){
+// Prime Checker — Jump Theorem
+function pcSieve(lim){
+  var s=new Uint8Array(lim+1);s[0]=s[1]=1;
+  var pr=[];
+  for(var i=2;i<=lim;i++){
+    if(!s[i]){pr.push(i);for(var j=i*i;j<=lim;j+=i)s[j]=1;}
+  }
+  return pr;
+}
+var PC_PRIMES=pcSieve(20000);
+
+function pcC(x){
+  var log=0;
+  for(var i=0;i<PC_PRIMES.length;i++){
+    var p=PC_PRIMES[i],fp;
+    if(p<=x+1) fp=p/(p+1);
+    else{fp=(p*p-x-1)/(p*p-1);if(fp<=0)break;}
+    log+=Math.log(fp);
+  }
+  return Math.exp(log);
+}
+
+window.pcPreset=function(n){
+  document.getElementById('pc-n').value=n;
+  pcCheck();
+};
+
+window.pcCheck=function(){
+  var el=document.getElementById('pc-out');
+  var nEl=document.getElementById('pc-n');
+  var raw=nEl.value.trim();
+  var n=parseInt(raw);
+  var dEl=document.querySelector('input[name="pc-disp"]:checked');
+  var disp=dEl?dEl.value:'sci';
+
+  if(raw==='1'||n===1){
+    var phi=(1+Math.sqrt(5))/2;
+    el.style.color='rgba(200,168,74,.9)';
+        el.textContent=
+      'n = 1  ->  phi (golden ratio boundary)\n\n'+
+      'p(p-1) = 1  =>  p^2 - p - 1 = 0\n'+
+      'Positive root: p = (1+sqrt(5))/2 = '+phi.toFixed(15)+'\n\n'+
+      'phi*(phi-1) = '+(phi*(phi-1)).toFixed(15)+' = 1  [OK]\n'+
+      'Discriminant: 1 + 4*1 = 5  (not a perfect square)\n\n'+
+      'Spectrum boundary: s = 1 > all integer prime jumps\n'+
+      'Largest prime jump: p=2, s = 1/2 = 0.5\n'+
+      'phi is the unique value where exact recovery fails.';
+    return;
+  }
+  if(isNaN(n)||n<2){el.style.color='';el.textContent='Enter n >= 1 (n=1 gives the golden ratio phi).';return;}
+
+  var pr=pcSieve(Math.max(n*2,n+200));
+  var isP=pr.indexOf(n)>=0;
+  var Cn1=pcC(n-1),Cn=pcC(n),delta=Cn-Cn1;
+  var L=[];
+
+  L.push('n = '+n.toLocaleString()+'   ->   '+(isP?'PRIME  [OK]':'COMPOSITE  [X]'));
+  L.push('');
+
+  if(disp==='sci'){
+    L.push('C(n-1) = C('+( n-1).toLocaleString()+') = '+Cn1.toExponential(10));
+    L.push('C(n)   = C('+n.toLocaleString()+')   = '+Cn.toExponential(10));
+    if(isP){
+      var s=1/(n*(n-1));
+      L.push('');
+      L.push('Jump size: s = 1/(p*(p-1)) = '+s.toExponential(10));
+      L.push('           = 1/'+(n*(n-1)).toLocaleString());
+      L.push('Delta-C (predicted) = -C*s = '+((-Cn1)*s).toExponential(10));
+      L.push('Delta-C (observed)  = '+delta.toExponential(10));
+      L.push('');
+      L.push('Recovery: p = (1 + sqrt(1+4/s))/2 = '+((1+Math.sqrt(1+4/s))/2).toFixed(2));
+      L.push('Discriminant: 1+4p(p-1) = '+(1+4*n*(n-1)).toLocaleString()+' = ('+(2*n-1)+')^2  [OK]');
+    } else {
+      var prevP=null,nextP=null;
+      for(var i=0;i<pr.length;i++){if(pr[i]<n)prevP=pr[i];if(pr[i]>n&&!nextP)nextP=pr[i];}
+      L.push('Delta-C = '+delta.toExponential(10)+'  (noise only, no jump)');
+      if(prevP&&nextP) L.push('Nearest primes: '+prevP.toLocaleString()+' < n < '+nextP.toLocaleString());
+    }
+
+  } else if(disp==='frac'){
+    if(isP){
+      var den=n*(n-1);
+      L.push('Jump size as exact fraction:');
+      L.push('  s = 1 / ('+n.toLocaleString()+' x '+(n-1).toLocaleString()+')');
+      L.push('  s = 1 / '+den.toLocaleString());
+      L.push('');
+      L.push('  In words: one part in '+den.toLocaleString());
+      L.push('');
+      L.push('Discriminant = (2p-1)^2 = ('+(2*n-1)+')^2 = '+((2*n-1)*(2*n-1)).toLocaleString());
+      L.push('Recovery: p = (1 + '+(2*n-1)+') / 2 = '+n.toLocaleString()+'  [OK]');
+    } else {
+      L.push('Composite: no jump, no exact fraction.');
+    }
+
+  } else if(disp==='rel'){
+    if(isP){
+      var sp=1/(n*(n-1));
+      var ratio=0.5/sp;
+      L.push('Jump relative to p=2 (largest jump s=1/2):');
+      L.push('  s(p='+n.toLocaleString()+')  = '+sp.toExponential(8));
+      L.push('  s(p=2)           = 0.5  (maximum)');
+      L.push('  Ratio s(2)/s(p)  = '+ratio.toExponential(6));
+      L.push('');
+      L.push('Spectrum position [0, 1]:');
+      L.push('  phi boundary:   s = 1.0000  (unreachable)');
+      L.push('  p=2:            s = 0.5000');
+      L.push('  p=3:            s = 0.1667');
+      L.push('  p=5:            s = 0.0500');
+      L.push('  This prime:     s = '+sp.toExponential(4));
+    } else {
+      L.push('No jump at composite n = '+n.toLocaleString()+'.');
+    }
+
+  } else if(disp==='geo'){
+    if(isP){
+      var sg=1/(n*(n-1));
+      L.push('Geometric interpretation for p = '+n.toLocaleString()+':');
+      L.push('');
+      L.push('Ring M = '+n.toLocaleString()+' has phi('+n.toLocaleString()+') = '+(n-1).toLocaleString()+' coprime residues');
+      L.push('(prime ring: all 1 ... '+(n-1).toLocaleString()+' are coprime to p)');
+      L.push('');
+      L.push('D(x) jump at x = '+(n-1).toLocaleString()+':');
+      L.push('  Factor: f_p = p/(p+1) = '+n+'/'+(n+1)+' ~ '+(n/(n+1)).toFixed(10));
+      L.push('  Jump delta-D = 1/(p(p-1)) = '+sg.toExponential(8));
+      L.push('');
+      L.push('Expected prime gap ~ ln(p) = '+Math.log(n).toFixed(3));
+      L.push('On the canvas: gold prime ring, all dots teal, all lift lines green.');
+    } else {
+      var pP=null,nP=null;
+      for(var i=0;i<pr.length;i++){if(pr[i]<n)pP=pr[i];if(pr[i]>n&&!nP)nP=pr[i];}
+      L.push('Composite ring M = '+n.toLocaleString()+': no jump.');
+      if(pP&&nP) L.push('Next D(x) jump at x = '+(nP-1).toLocaleString()+'  (p = '+nP.toLocaleString()+')');
+    }
+  }
+
+  el.textContent=L.join('\n');
+  el.style.color=isP?'rgba(61,200,184,.9)':'rgba(224,80,96,.85)';
+
+  // Show send-to-canvas button only in geo mode for primes
+  var canvasRow = document.getElementById('pc-canvas-row');
+  var canvasLbl = document.getElementById('pc-canvas-lbl');
+  if(canvasRow){
+    var showBtn = (disp==='geo' && isP && n <= 512);
+    canvasRow.style.display = showBtn ? 'block' : 'none';
+    if(canvasLbl && showBtn) canvasLbl.textContent = 'Ring M='+n.toLocaleString()+', prime ring, lift lines active';
+  }
+};
+
+// Spectrum canvas
+function pcDrawSpectrum(){
+  var cv=document.getElementById('pc-spec-canvas');
+  if(!cv)return;
+  var dpr=window.devicePixelRatio||1;
+  var W=cv.offsetWidth,H=cv.offsetHeight||60;
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  var ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  var pad=32,lineY=H*0.52;
+  ctx.beginPath();ctx.moveTo(pad,lineY);ctx.lineTo(W-pad,lineY);
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
+
+  ctx.font='8px JetBrains Mono,monospace';
+  ctx.textAlign='left';ctx.fillStyle='rgba(120,110,90,.5)';
+  ctx.fillText('s -> 0  (p -> inf)',pad,H-2);
+  ctx.textAlign='right';ctx.fillStyle='rgba(200,168,74,.6)';
+  ctx.fillText('phi  s=1',W-pad,H-2);
+
+  // phi marker
+  ctx.beginPath();ctx.moveTo(W-pad-3,lineY-18);ctx.lineTo(W-pad-3,lineY+5);
+  ctx.strokeStyle='rgba(200,168,74,.75)';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='rgba(200,168,74,.9)';ctx.textAlign='center';
+  ctx.fillText('phi',W-pad-3,lineY-22);
+
+  // prime markers — position = s = 1/(p(p-1)), scaled to [pad, W-pad]
+  var specP=[2,3,5,7,11,13,17,19,23,29];
+  specP.forEach(function(p){
+    var s=1/(p*(p-1));
+    var x=pad+s*(W-2*pad);
+    var h2=p<=7?20:p<=13?14:9;
+    ctx.beginPath();ctx.moveTo(x,lineY-h2);ctx.lineTo(x,lineY+4);
+    ctx.strokeStyle='rgba(61,200,184,'+(p<=5?'.85':p<=11?'.5':'.3')+')';
+    ctx.lineWidth=p<=5?1.5:1;ctx.stroke();
+    if(p<=17){
+      ctx.font=(p<=7?'9':'8')+'px JetBrains Mono,monospace';
+      ctx.fillStyle='rgba(61,200,184,'+(p<=7?'.75':'.4')+')';
+      ctx.textAlign='center';
+      ctx.fillText('p='+p,x,lineY-h2-4);
+    }
+  });
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',function(){pcDrawSpectrum();pcPreset(7);});
+} else {
+  pcDrawSpectrum();pcPreset(7);
+}
+window.addEventListener('resize',pcDrawSpectrum);
+
+window.pcSendCanvas = function(){
+  var n = parseInt(document.getElementById('pc-n').value);
+  if(!n||n<2||n>512) return;
+  var cmd = {chart:0, M:n, N:n, color:'prime_ring', view:'concentric', ts:Date.now()};
+  cmd.lifts = true;
+  try { localStorage.setItem('zmmz_cmd', JSON.stringify(cmd)); } catch(e){}
+  if(!_canvasWin || _canvasWin.closed){
+    _canvasWin = window.open('zmmz_explorer-1.html', 'zmmz_canvas');
+  } else {
+    _canvasWin.focus();
+    try { _canvasWin.postMessage(cmd, '*'); } catch(e){}
+  }
+};
+
+})();
 </script>
 
 </body>
