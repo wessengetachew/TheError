@@ -655,6 +655,25 @@ footer {
   letter-spacing:.06em;white-space:nowrap;margin-left:auto;}
 @media(max-width:600px){.nav-right{display:none;}.tab{padding:0 10px;font-size:8px;}}
 
+/* send-to-canvas button */
+.send-canvas-btn {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: .08em;
+  color: #e05060; background: rgba(224,80,96,.1); border: 1px solid rgba(224,80,96,.35);
+  padding: 3px 8px; cursor: pointer; border-radius: 2px; white-space: nowrap;
+  transition: background .18s;
+}
+.send-canvas-btn:hover { background: rgba(224,80,96,.25); }
+/* live stats strip — hidden until play is active */
+.chart-live-stats {
+  display: none; font-family: 'JetBrains Mono', monospace; font-size: 8px;
+  color: rgba(255,255,255,.5); background: rgba(0,0,0,.3);
+  padding: 5px 12px; gap: 16px; flex-wrap: wrap;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.chart-live-stats.active { display: flex; }
+.chart-live-stat { display: flex; flex-direction: column; gap: 2px; }
+.chart-live-stat-label { color: rgba(255,255,255,.28); font-size: 7px; }
+.chart-live-stat-value { color: var(--gold, #c8a84a); }
 </style>
 </head>
 <body>
@@ -782,7 +801,8 @@ footer {
 
   <div class="charts-grid">
     <div class="chart-card">
-      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-1" onclick="chartPlay(1)">&#9654;</button><input class="chart-n-input" id="ninput-1" type="number" value="100" min="10" max="5000" onchange="onNChange(1)"><span class="chart-warn" id="warn-1"></span></div>
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-1" onclick="chartPlay(1)">&#9654;</button><input class="chart-n-input" id="ninput-1" type="number" value="100" min="10" max="5000" onchange="onNChange(1)"><span class="chart-warn" id="warn-1"></span><button class="send-canvas-btn" onclick="sendToCanvas(1)" title="Open in Geometric Canvas">&#9670; Canvas</button></div>
+      <div class="chart-live-stats" id="ls-1"><div class="chart-live-stat"><div class="chart-live-stat-label">N</div><div class="chart-live-stat-value" id="ls-1-m">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">E(N)</div><div class="chart-live-stat-value" id="ls-1-e">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">|E(N)|</div><div class="chart-live-stat-value" id="ls-1-ae">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">R(N)</div><div class="chart-live-stat-value" id="ls-1-r">—</div></div></div>
       <canvas class="chart-card-preview" id="prev-1" width="600" height="160"></canvas>
       <button class="drawer-toggle" id="dtgl-1" onclick="toggleMiniDrawer(1,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 01 — |E(N)|</button>
       <div class="data-drawer" id="mdrawer-1"><div class="drawer-scroll"><table class="data-table" id="mtbl-1"><thead></thead><tbody></tbody></table></div></div>
@@ -797,7 +817,8 @@ footer {
       </div>
     </div>
     <div class="chart-card">
-      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-2" onclick="chartPlay(2)">&#9654;</button><input class="chart-n-input" id="ninput-2" type="number" value="100" min="10" max="5000" onchange="onNChange(2)"><span class="chart-warn" id="warn-2"></span></div>
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-2" onclick="chartPlay(2)">&#9654;</button><input class="chart-n-input" id="ninput-2" type="number" value="100" min="10" max="5000" onchange="onNChange(2)"><span class="chart-warn" id="warn-2"></span><button class="send-canvas-btn" onclick="sendToCanvas(2)" title="Open in Geometric Canvas">&#9670; Canvas</button></div>
+      <div class="chart-live-stats" id="ls-2"><div class="chart-live-stat"><div class="chart-live-stat-label">N</div><div class="chart-live-stat-value" id="ls-2-m">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">E·logN</div><div class="chart-live-stat-value" id="ls-2-e">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">c₁</div><div class="chart-live-stat-value" id="ls-2-r">—</div></div></div>
       <canvas class="chart-card-preview" id="prev-2" width="600" height="160"></canvas>
       <button class="drawer-toggle" id="dtgl-2" onclick="toggleMiniDrawer(2,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 02 — E(N)·log N</button>
       <div class="data-drawer" id="mdrawer-2"><div class="drawer-scroll"><table class="data-table" id="mtbl-2"><thead></thead><tbody></tbody></table></div></div>
@@ -827,7 +848,8 @@ footer {
       </div>
     </div>
     <div class="chart-card">
-      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-4" onclick="chartPlay(4)">&#9654;</button><input class="chart-n-input" id="ninput-4" type="number" value="100" min="10" max="5000" onchange="onNChange(4)"><span class="chart-warn" id="warn-4"></span></div>
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-4" onclick="chartPlay(4)">&#9654;</button><input class="chart-n-input" id="ninput-4" type="number" value="100" min="10" max="5000" onchange="onNChange(4)"><span class="chart-warn" id="warn-4"></span><button class="send-canvas-btn" onclick="sendToCanvas(4)" title="Open in Geometric Canvas">&#9670; Canvas</button></div>
+      <div class="chart-live-stats" id="ls-4"><div class="chart-live-stat"><div class="chart-live-stat-label">N</div><div class="chart-live-stat-value" id="ls-4-m">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">E(N)</div><div class="chart-live-stat-value" id="ls-4-e">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">sign</div><div class="chart-live-stat-value" id="ls-4-r">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">SC count</div><div class="chart-live-stat-value" id="ls-4-sc">—</div></div></div>
       <canvas class="chart-card-preview" id="prev-4" width="600" height="160"></canvas>
       <button class="drawer-toggle" id="dtgl-4" onclick="toggleMiniDrawer(4,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 04 — Signed E(N)</button>
       <div class="data-drawer" id="mdrawer-4"><div class="drawer-scroll"><table class="data-table" id="mtbl-4"><thead></thead><tbody></tbody></table></div></div>
@@ -841,7 +863,8 @@ footer {
       </div>
     </div>
     <div class="chart-card">
-      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-5" onclick="chartPlay(5)">&#9654;</button><input class="chart-n-input" id="ninput-5" type="number" value="100" min="10" max="5000" onchange="onNChange(5)"><span class="chart-warn" id="warn-5"></span></div>
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-5" onclick="chartPlay(5)">&#9654;</button><input class="chart-n-input" id="ninput-5" type="number" value="100" min="10" max="5000" onchange="onNChange(5)"><span class="chart-warn" id="warn-5"></span><button class="send-canvas-btn" onclick="sendToCanvas(5)" title="Open in Geometric Canvas">&#9670; Canvas</button></div>
+      <div class="chart-live-stats" id="ls-5"><div class="chart-live-stat"><div class="chart-live-stat-label">N</div><div class="chart-live-stat-value" id="ls-5-m">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">π(N)</div><div class="chart-live-stat-value" id="ls-5-e">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">SC(N)</div><div class="chart-live-stat-value" id="ls-5-r">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">SC/π</div><div class="chart-live-stat-value" id="ls-5-sc">—</div></div></div>
       <canvas class="chart-card-preview" id="prev-5" width="600" height="160"></canvas>
       <button class="drawer-toggle" id="dtgl-5" onclick="toggleMiniDrawer(5,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 05 — SC(N)/π(N)</button>
       <div class="data-drawer" id="mdrawer-5"><div class="drawer-scroll"><table class="data-table" id="mtbl-5"><thead></thead><tbody></tbody></table></div></div>
@@ -856,7 +879,8 @@ footer {
       </div>
     </div>
     <div class="chart-card">
-      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-6" onclick="chartPlay(6)">&#9654;</button><input class="chart-n-input" id="ninput-6" type="number" value="100" min="10" max="5000" onchange="onNChange(6)"><span class="chart-warn" id="warn-6"></span></div>
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-6" onclick="chartPlay(6)">&#9654;</button><input class="chart-n-input" id="ninput-6" type="number" value="100" min="10" max="5000" onchange="onNChange(6)"><span class="chart-warn" id="warn-6"></span><button class="send-canvas-btn" onclick="sendToCanvas(6)" title="Open in Geometric Canvas">&#9670; Canvas</button></div>
+      <div class="chart-live-stats" id="ls-6"><div class="chart-live-stat"><div class="chart-live-stat-label">N</div><div class="chart-live-stat-value" id="ls-6-m">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">SC count</div><div class="chart-live-stat-value" id="ls-6-e">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">last gap</div><div class="chart-live-stat-value" id="ls-6-r">—</div></div></div>
       <canvas class="chart-card-preview" id="prev-6" width="600" height="160"></canvas>
       <button class="drawer-toggle" id="dtgl-6" onclick="toggleMiniDrawer(6,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 06 — Gap histogram</button>
       <div class="data-drawer" id="mdrawer-6"><div class="drawer-scroll"><table class="data-table" id="mtbl-6"><thead></thead><tbody></tbody></table></div></div>
@@ -871,7 +895,8 @@ footer {
       </div>
     </div>
     <div class="chart-card">
-      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-7" onclick="chartPlay(7)">&#9654;</button><input class="chart-n-input" id="ninput-7" type="number" value="100" min="10" max="5000" onchange="onNChange(7)"><span class="chart-warn" id="warn-7"></span></div>
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-7" onclick="chartPlay(7)">&#9654;</button><input class="chart-n-input" id="ninput-7" type="number" value="100" min="10" max="5000" onchange="onNChange(7)"><span class="chart-warn" id="warn-7"></span><button class="send-canvas-btn" onclick="sendToCanvas(7)" title="Open in Geometric Canvas">&#9670; Canvas</button></div>
+      <div class="chart-live-stats" id="ls-7"><div class="chart-live-stat"><div class="chart-live-stat-label">N</div><div class="chart-live-stat-value" id="ls-7-m">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">lf=φ(M)/MC</div><div class="chart-live-stat-value" id="ls-7-e">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">prime?</div><div class="chart-live-stat-value" id="ls-7-r">—</div></div></div>
       <canvas class="chart-card-preview" id="prev-7" width="600" height="160"></canvas>
       <button class="drawer-toggle" id="dtgl-7" onclick="toggleMiniDrawer(7,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 07 — Lift factor</button>
       <div class="data-drawer" id="mdrawer-7"><div class="drawer-scroll"><table class="data-table" id="mtbl-7"><thead></thead><tbody></tbody></table></div></div>
@@ -886,7 +911,8 @@ footer {
       </div>
     </div>
     <div class="chart-card">
-      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-8" onclick="chartPlay(8)">&#9654;</button><input class="chart-n-input" id="ninput-8" type="number" value="100" min="10" max="5000" onchange="onNChange(8)"><span class="chart-warn" id="warn-8"></span></div>
+      <div class="chart-play-bar"><button class="chart-play-btn" id="pbtn-8" onclick="chartPlay(8)">&#9654;</button><input class="chart-n-input" id="ninput-8" type="number" value="100" min="10" max="5000" onchange="onNChange(8)"><span class="chart-warn" id="warn-8"></span><button class="send-canvas-btn" onclick="sendToCanvas(8)" title="Open in Geometric Canvas">&#9670; Canvas</button></div>
+      <div class="chart-live-stats" id="ls-8"><div class="chart-live-stat"><div class="chart-live-stat-label">N</div><div class="chart-live-stat-value" id="ls-8-m">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">E(N)</div><div class="chart-live-stat-value" id="ls-8-e">—</div></div><div class="chart-live-stat"><div class="chart-live-stat-label">E_χ₄</div><div class="chart-live-stat-value" id="ls-8-r">—</div></div></div>
       <canvas class="chart-card-preview" id="prev-8" width="600" height="160"></canvas>
       <button class="drawer-toggle" id="dtgl-8" onclick="toggleMiniDrawer(8,this)" aria-expanded="false"><span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 08 — χ₄-restricted</button>
       <div class="data-drawer" id="mdrawer-8"><div class="drawer-scroll"><table class="data-table" id="mtbl-8"><thead></thead><tbody></tbody></table></div></div>
@@ -1834,23 +1860,7 @@ requestAnimationFrame(masterLoop);
 var MINI_N = 100;
 var _r = null;
 
-// ── N input handling ────────────────────────────────────────────────────────
-window.onNChange = function(i) {
-  var inp = document.getElementById('ninput-'+i);
-  var warn = document.getElementById('warn-'+i);
-  if (!inp) return;
-  var N = parseInt(inp.value);
-  if (isNaN(N) || N < 10) { inp.value = 10; N = 10; }
-  if (N > 5000) { inp.value = 5000; N = 5000; }
-  if (warn) {
-    if (N > 2000) warn.textContent = '⛔ very slow';
-    else if (N > 800) warn.textContent = '⚠ may be slow';
-    else warn.textContent = '';
-  }
-  // recompute for this N and redraw this chart
-  var r = computeForN(N);
-  if(r) drawFull(i, r);
-};
+// ── N input handling is defined below with table sync ──────────────────────
 
 // cache per-N results
 var _cache = {};
@@ -2053,8 +2063,9 @@ window.chartPlay = function(i) {
       drawSlice(i,d,r2,14);
       var nl=document.getElementById('pn-'+i);
       if(nl&&d.length)nl.textContent='N='+d[d.length-1].m;
+      if(d.length) updateLiveStats(i, d[d.length-1], r2);
       if(frames[i]<total)rafs[i]=requestAnimationFrame(tick);
-      else{playing[i]=false;if(btn)btn.textContent='\u21BA';}
+      else{playing[i]=false;if(btn)btn.textContent='\u21BA';var ls=document.getElementById('ls-'+i);if(ls)ls.classList.remove('active');}
     }
     rafs[i]=requestAnimationFrame(tick);
   } else {
@@ -2084,6 +2095,49 @@ function drawAll(){
 }
 
 
+
+// ── Send-to-canvas bridge ─────────────────────────────────────────────────────
+var _canvasWin = null;
+var CHART_COLOR = {1:'lift',2:'lift',3:'phi_density',4:'lift',5:'prime_ring',6:'gap_class',7:'lift',8:'mod6'};
+var CHART_VIEW  = {1:'concentric',2:'concentric',3:'fermat',4:'concentric',5:'concentric',6:'concentric',7:'concentric',8:'concentric'};
+
+window.sendToCanvas = function(i) {
+  var inp = document.getElementById('ninput-'+i);
+  var N = inp ? Math.min(parseInt(inp.value)||100, 512) : 100;
+  var r = computeForN(N);
+  var M = (r && r.data.length) ? r.data[r.data.length-1].m : N;
+  M = Math.min(M, 512);
+  var cmd = {chart:i, M:M, N:N, color:CHART_COLOR[i]||'lift', view:CHART_VIEW[i]||'concentric', ts:Date.now()};
+  try { localStorage.setItem('zmmz_cmd', JSON.stringify(cmd)); } catch(e){}
+  if(!_canvasWin || _canvasWin.closed) {
+    _canvasWin = window.open('zmmz_explorer-1.html', 'zmmz_canvas');
+  } else {
+    _canvasWin.focus();
+    try { _canvasWin.postMessage(cmd, '*'); } catch(e){}
+  }
+};
+
+function updateLiveStats(i, d, r) {
+  var strip = document.getElementById('ls-'+i);
+  if(!strip) return;
+  strip.classList.add('active');
+  function set(id, v) { var el=document.getElementById(id); if(el) el.textContent=v; }
+  var m = d.m;
+  if(i===1){ set('ls-1-m',m); set('ls-1-e',(d.E>=0?'+':'')+d.E.toFixed(6)); set('ls-1-ae',d.absE.toFixed(6)); set('ls-1-r',(d.E+r.C).toFixed(6)); }
+  if(i===2){ set('ls-2-m',m); set('ls-2-e',(d.Elgm>=0?'+':'')+d.Elgm.toFixed(5)); set('ls-2-r',r.c1t.toFixed(5)); }
+  if(i===3){ set('ls-3-m',m); set('ls-3-e',isFinite(d.lgAbsE)?d.lgAbsE.toFixed(4):'—'); set('ls-3-r',isFinite(d.lglgm)?d.lglgm.toFixed(4):'—'); }
+  if(i===4){ set('ls-4-m',m); set('ls-4-e',(d.E>=0?'+':'')+d.E.toFixed(6)); set('ls-4-r',d.E>=0?'+1':'−1'); set('ls-4-sc',d.scC); }
+  if(i===5){ set('ls-5-m',m); set('ls-5-e',d.piC); set('ls-5-r',d.scC); set('ls-5-sc',d.piC>0?(d.scC/d.piC).toFixed(3):'—'); }
+  if(i===6){ set('ls-6-m',m); set('ls-6-e',d.scC); var lg=r.scGaps.length?r.scGaps[r.scGaps.length-1]:'—'; set('ls-6-r',lg); }
+  if(i===7){ set('ls-7-m',m); set('ls-7-e',d.lf.toFixed(5)); set('ls-7-r',d.ip?'prime':'—'); }
+  if(i===8){ set('ls-8-m',m); set('ls-8-e',(d.E>=0?'+':'')+d.E.toFixed(6)); set('ls-8-r',(d.E4>=0?'+':'')+d.E4.toFixed(6)); }
+  if(_canvasWin && !_canvasWin.closed) {
+    var cmd = {chart:i, M:Math.min(m,512), N:Math.min(m,512), color:CHART_COLOR[i]||'lift', view:CHART_VIEW[i]||'concentric', ts:Date.now()};
+    try { localStorage.setItem('zmmz_cmd', JSON.stringify(cmd)); } catch(e){}
+    try { _canvasWin.postMessage(cmd, '*'); } catch(e){}
+  }
+}
+
 // ── data drawers ─────────────────────────────────────────────────────────────
 window.toggleMiniDrawer = function(i, btn) {
   var drawer = document.getElementById('mdrawer-'+i);
@@ -2093,6 +2147,26 @@ window.toggleMiniDrawer = function(i, btn) {
   drawer.classList.toggle('open', opening);
   btn.classList.toggle('open', opening);
   btn.setAttribute('aria-expanded', opening);
+};
+
+// onNChange redraws chart but does NOT touch already-open table
+window.onNChange = function(i) {
+  var inp = document.getElementById('ninput-'+i);
+  var warn = document.getElementById('warn-'+i);
+  if (!inp) return;
+  var N = parseInt(inp.value);
+  if (isNaN(N) || N < 10) { inp.value = 10; N = 10; }
+  if (N > 5000) { inp.value = 5000; N = 5000; }
+  if (warn) {
+    if (N > 2000) warn.textContent = '⛔ very slow';
+    else if (N > 800) warn.textContent = '⚠ may be slow';
+    else warn.textContent = '';
+  }
+  var r = computeForN(N);
+  if(r) drawFull(i, r);
+  // Rebuild table only if drawer is already open
+  var drawer = document.getElementById('mdrawer-'+i);
+  if(drawer && drawer.classList.contains('open')) buildMiniTable(i);
 };
 
 function f6(v) { return isFinite(v)?v.toFixed(6):'\u2014'; }
@@ -2105,34 +2179,48 @@ function buildMiniTable(i) {
   var inp=document.getElementById('ninput-'+i);
   var N=inp?parseInt(inp.value)||100:100;
   var r=computeForN(N); if(!r)return; var data=r.data;
+
+  // Add export button once
+  var drawer=document.getElementById('mdrawer-'+i);
+  var scroll=drawer?drawer.querySelector('.drawer-scroll'):null;
+  if(scroll && !scroll.querySelector('.tbl-export-btn')){
+    var expBtn=document.createElement('button');
+    expBtn.className='tbl-export-btn';
+    expBtn.textContent='↓ CSV (first 10 + last 5)';
+    expBtn.style.cssText='font-family:var(--mono);font-size:8px;color:var(--gold);background:none;border:1px solid rgba(200,168,74,.25);padding:3px 10px;cursor:pointer;margin:6px 10px 4px;display:block;';
+    expBtn.onclick=function(){ exportTableCSV(i); };
+    scroll.insertBefore(expBtn, scroll.firstChild);
+  }
+
   var thead=tbl.createTHead(), tbody=tbl.createTBody();
   var mid=data[Math.floor(data.length/2)];
   var b3=mid?(mid.lgAbsE+mid.lglgm):0;
 
   var cfgs={
-    1:{heads:['N','R(N)','E(N)','|E(N)|','|c\u2081|/logN','Prime'],
+    1:{heads:['N','R(N)','E(N)','|E(N)|','|c₁|/logN','Prime'],
        row:function(d){return[d.m,f6(d.E+r.C),fs(d.E,6),f6(d.absE),f6(Math.abs(r.c1t)/d.lm),d.ip?'p':''];}},
-    2:{heads:['N','E(N)','E\u00b7logN','c\u2081','Prime'],
+    2:{heads:['N','E(N)','E·logN','c₁','Prime'],
        row:function(d){return[d.m,fs(d.E,6),fs(d.Elgm,6),f6(r.c1t),d.ip?'p':''];}},
-    3:{heads:['N','log(logN)','log|E(N)|','slope\u22121 ref','Prime'],
+    3:{heads:['N','log(logN)','log|E(N)|','slope−1 ref','Prime'],
        row:function(d){return[d.m,f4(d.lglgm),f4(d.lgAbsE),f4(-d.lglgm+b3),d.ip?'p':''];}},
     4:{heads:['N','E(N)','Sign','Prime','SC'],
-       row:function(d){return[d.m,fs(d.E,6),d.E>=0?'+1':'\u22121',d.ip?'p':'',d.isc?'SC':''];}},
-    5:{heads:['N','\u03c0(N)','SC(N)','SC/\u03c0','Prime'],
-       row:function(d){return[d.m,d.piC,d.scC,d.piC>0?f4(d.scC/d.piC):'\u2014',d.ip?'p':''];}},
+       row:function(d){return[d.m,fs(d.E,6),d.E>=0?'+1':'−1',d.ip?'p':'',d.isc?'SC':''];}},
+    5:{heads:['N','π(N)','SC(N)','SC/π','Prime'],
+       row:function(d){return[d.m,d.piC,d.scC,d.piC>0?f4(d.scC/d.piC):'—',d.ip?'p':''];}},
     6:{heads:['N','E(N)','SC','Gap to prev','Prime'],
        row:function(d,i2,arr){
-         var gap='\u2014';
+         var gap='—';
          if(d.isc){for(var j=i2-1;j>=0;j--){if(arr[j].isc){gap=d.m-arr[j].m;break;}}}
          return[d.m,fs(d.E,6),d.isc?'SC':'',gap,d.ip?'p':''];}},
-    7:{heads:['N','lf=\u03c6(M+1)/((M+1)C)','lf\u22121','Dir','Prime'],
-       row:function(d){return[d.m,f4(d.lf),fs(d.lf-1,4),d.lf>=1?'\u25b2':'\u25bc',d.ip?'p':''];}},
-    8:{heads:['N','E(N)','E_\u03c7\u2084','4\u00b7E_\u03c7\u2084','\u03c7\u2084 SC','Prime'],
+    7:{heads:['N','lf=φ(M+1)/((M+1)C)','lf−1','Dir','Prime'],
+       row:function(d){return[d.m,f4(d.lf),fs(d.lf-1,4),d.lf>=1?'▲':'▼',d.ip?'p':''];}},
+    8:{heads:['N','E(N)','E_χ₄','4·E_χ₄','χ₄ SC','Prime'],
        row:function(d){return[d.m,fs(d.E,6),fs(d.E4,6),fs(d.E4*4,6),d.isc4?'SC':'',d.ip?'p':''];}}
   };
   var cfg=cfgs[i]; if(!cfg)return;
   var hr=thead.insertRow();
   for(var h=0;h<cfg.heads.length;h++){var th=document.createElement('th');th.textContent=cfg.heads[h];hr.appendChild(th);}
+  // Show ALL rows — N input only affects the chart, not the table
   for(var k=0;k<data.length;k++){
     var d=data[k];
     var vals=cfg.row.length===3?cfg.row(d,k,data):cfg.row(d);
@@ -2142,6 +2230,35 @@ function buildMiniTable(i) {
     for(var v=0;v<vals.length;v++){var td=tr.insertCell();td.textContent=vals[v];}
   }
 }
+
+// Export: first 10 + last 5 rows
+window.exportTableCSV = function(i) {
+  var inp=document.getElementById('ninput-'+i);
+  var N=inp?parseInt(inp.value)||100:100;
+  var r=computeForN(N); if(!r)return;
+  var data=r.data;
+  var subset=data.slice(0,10).concat(data.length>15?data.slice(-5):[]);
+  var cfgHeads={1:['N','R(N)','E(N)','|E(N)|'],2:['N','E(N)','E_logN','c1'],
+    3:['N','log_logN','log_absE'],4:['N','E(N)','sign','SC'],
+    5:['N','pi(N)','SC(N)','SC_per_pi'],6:['N','E(N)','SC','gap'],
+    7:['N','lf','lf_minus_1'],8:['N','E(N)','E_chi4']};
+  var heads=cfgHeads[i]||['N','value'];
+  var csv=heads.join(',')+'\n';
+  for(var k=0;k<subset.length;k++){
+    var d=subset[k];
+    if(i===1) csv+=d.m+','+f6(d.E+r.C)+','+fs(d.E,6)+','+f6(d.absE)+'\n';
+    else if(i===2) csv+=d.m+','+fs(d.E,6)+','+fs(d.Elgm,6)+','+f6(r.c1t)+'\n';
+    else if(i===3) csv+=d.m+','+f4(d.lglgm)+','+f4(d.lgAbsE)+'\n';
+    else if(i===4) csv+=d.m+','+fs(d.E,6)+','+(d.E>=0?1:-1)+','+(d.isc?1:0)+'\n';
+    else if(i===5) csv+=d.m+','+d.piC+','+d.scC+','+(d.piC>0?f4(d.scC/d.piC):'')+'\n';
+    else if(i===6) csv+=d.m+','+fs(d.E,6)+','+(d.isc?1:0)+'\n';
+    else if(i===7) csv+=d.m+','+f4(d.lf)+','+fs(d.lf-1,4)+'\n';
+    else if(i===8) csv+=d.m+','+fs(d.E,6)+','+fs(d.E4,6)+'\n';
+  }
+  var b=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='chart0'+i+'_N'+N+'_sample.csv'; a.click();
+};
 
 // draw immediately (script is at bottom of body, DOM exists)
 drawAll();
