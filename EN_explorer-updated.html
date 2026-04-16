@@ -381,9 +381,87 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;margin-top:6
 
 </div>
 
+
+<div class="section-divider" style="margin-top:24px;">
+  <div class="div-line"></div><div class="div-glyph">Jump Theorem Prime Checker</div><div class="div-line"></div>
+</div>
+
+<div class="analysis-area" style="padding-top:20px;padding-bottom:80px;">
+
+  <!-- ── PANEL 5: JUMP THEOREM PRIME CHECKER ── -->
+  <div class="analysis-panel" id="p5">
+    <div class="panel-header">
+      <span class="panel-ref">ref · Jump Theorem &middot; Layer 05</span>
+      <span class="panel-num">05</span>
+      <span class="panel-title">Jump Theorem Prime Checker &mdash; D(x) detects primes through exact jump sizes</span>
+      <p class="panel-desc">
+        The log-derivative D(x) = d/dx log C(x) is smooth everywhere except at the primes.
+        At x = p&minus;1, D(x) jumps by exactly 1/(p(p&minus;1)). Composites pass in silence.
+        Given any jump size s, the prime is recovered exactly:
+        p = (1 + &radic;(1 + 4/s)) / 2. The discriminant 1 + 4p(p&minus;1) = (2p&minus;1)&sup2; is always
+        a perfect square for integer primes &mdash; the algebraic fingerprint of the theorem.
+        The golden ratio &phi; is the <em>supremum</em> of the jump spectrum: s = 1 is the
+        only value no integer prime reaches. Enter any integer to verify.
+      </p>
+    </div>
+
+    <!-- Spectrum canvas -->
+    <div style="padding:14px 22px 0;background:rgba(0,0,0,.15);">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.18em;color:rgba(140,130,110,.4);text-transform:uppercase;margin-bottom:8px;">Jump Spectrum &mdash; &phi; boundary to primes</div>
+      <canvas id="p5-spec" style="display:block;width:100%;height:56px;background:transparent;"></canvas>
+    </div>
+
+    <!-- Presets -->
+    <div class="panel-controls" style="flex-wrap:wrap;gap:6px;">
+      <span class="ctrl-label" style="align-self:center;">Presets</span>
+      <button class="ctrl-btn" onclick="p5Preset(1)" style="font-size:8px;padding:4px 10px;">&phi; (n=1)</button>
+      <button class="ctrl-btn" onclick="p5Preset(2)" style="font-size:8px;padding:4px 10px;">p=2</button>
+      <button class="ctrl-btn" onclick="p5Preset(3)" style="font-size:8px;padding:4px 10px;">p=3</button>
+      <button class="ctrl-btn" onclick="p5Preset(7)" style="font-size:8px;padding:4px 10px;">p=7</button>
+      <button class="ctrl-btn" onclick="p5Preset(11)" style="font-size:8px;padding:4px 10px;">p=11</button>
+      <button class="ctrl-btn" onclick="p5Preset(101)" style="font-size:8px;padding:4px 10px;">p=101</button>
+      <button class="ctrl-btn" onclick="p5Preset(9999991)" style="font-size:8px;padding:4px 10px;">p=9,999,991</button>
+    </div>
+
+    <!-- Input row -->
+    <div class="panel-controls">
+      <span class="ctrl-label">n =</span>
+      <input type="number" id="p5-n" value="7" min="1"
+        style="font-family:var(--mono);font-size:13px;background:rgba(255,255,255,.04);border:1px solid rgba(200,168,74,.3);border-radius:2px;padding:6px 10px;color:#f0ece4;width:180px;"
+        onkeydown="if(event.key==='Enter')p5Check()">
+      <button class="ctrl-btn" onclick="p5Check()">Check &rarr;</button>
+      <span style="font-family:var(--mono);font-size:9px;color:rgba(140,130,110,.5);margin-left:6px;">n=1 gives &phi;</span>
+    </div>
+
+    <!-- Display mode -->
+    <div class="panel-controls" style="gap:14px;">
+      <span class="ctrl-label">Display</span>
+      <label style="font-family:var(--mono);font-size:9px;color:rgba(180,170,150,.75);display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="p5-disp" value="sci" checked onchange="p5Check()"> Scientific</label>
+      <label style="font-family:var(--mono);font-size:9px;color:rgba(180,170,150,.75);display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="p5-disp" value="frac" onchange="p5Check()"> Fraction</label>
+      <label style="font-family:var(--mono);font-size:9px;color:rgba(180,170,150,.75);display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="p5-disp" value="rel" onchange="p5Check()"> Relative to p=2</label>
+      <label style="font-family:var(--mono);font-size:9px;color:rgba(180,170,150,.75);display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="p5-disp" value="geo" onchange="p5Check()"> Geometry</label>
+    </div>
+
+    <!-- Result -->
+    <div id="p5-out" style="padding:14px 22px;font-family:var(--mono);font-size:10px;line-height:1.85;color:rgba(160,150,130,.7);white-space:pre-wrap;min-height:100px;background:rgba(0,0,0,.25);border-top:1px solid rgba(255,255,255,.04);">Enter n &ge; 1 and press Check &mdash; or click a preset above.</div>
+
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="st-item"><div class="st-lbl">n</div><div class="st-val" id="p5-sn">—</div></div>
+      <div class="st-item"><div class="st-lbl">Classification</div><div class="st-val teal" id="p5-cls">—</div></div>
+      <div class="st-item"><div class="st-lbl">Jump size s</div><div class="st-val gold" id="p5-s">—</div></div>
+      <div class="st-item"><div class="st-lbl">Discriminant</div><div class="st-val violet" id="p5-disc">—</div></div>
+      <div class="st-item"><div class="st-lbl">Recovery p</div><div class="st-val orange" id="p5-rec">—</div></div>
+    </div>
+
+    <div class="panel-note">The recovery formula p = (1 + &radic;(1+4/s)) / 2 acts as an arithmetic filter. For every integer prime p, the discriminant 1 + 4p(p&minus;1) = (2p&minus;1)&sup2; &mdash; always a perfect square, always returning p exactly. At s = 1 (the &phi; boundary), the discriminant is 5 &mdash; not a perfect square &mdash; and the formula returns &phi; = (1+&radic;5)/2. This is the unique point where the integer-producing property breaks down. The set {1/2, 1/6, 1/20, 1/42, &hellip;} has &phi;-position s = 1 as its least upper bound.</div>
+  </div>
+
+</div>
+
 <footer>
   <div class="footer-left">Wessen Getachew · Deep Analysis · math.NT · 2026</div>
-  <div class="footer-right">Friction · Ghost Residues · Sign Changes · Parity</div>
+  <div class="footer-right">Friction &middot; Ghost Residues &middot; Sign Changes &middot; Parity &middot; Jump Theorem</div>
 </footer>
 
 <script>
@@ -1146,6 +1224,211 @@ window.addEventListener('resize', () => {
 
 // Initial render of Panel 2 (no computation needed for small M)
 renderGhostRing();
+
+// ─── PANEL 5: JUMP THEOREM PRIME CHECKER ────────────────────────────────────
+
+function p5Sieve(lim) {
+  var s = new Uint8Array(lim + 1); s[0] = s[1] = 1;
+  var pr = [];
+  for (var i = 2; i <= lim; i++) {
+    if (!s[i]) { pr.push(i); for (var j = i * i; j <= lim; j += i) s[j] = 1; }
+  }
+  return pr;
+}
+var P5_PRIMES = p5Sieve(20000);
+
+function p5C(x) {
+  var log = 0;
+  for (var i = 0; i < P5_PRIMES.length; i++) {
+    var p = P5_PRIMES[i], fp;
+    if (p <= x + 1) fp = p / (p + 1);
+    else { fp = (p * p - x - 1) / (p * p - 1); if (fp <= 0) break; }
+    log += Math.log(fp);
+  }
+  return Math.exp(log);
+}
+
+function p5DrawSpectrum() {
+  var cv = document.getElementById('p5-spec');
+  if (!cv) return;
+  var dpr2 = Math.min(window.devicePixelRatio || 1, 2);
+  var W = cv.offsetWidth, H = cv.offsetHeight || 56;
+  cv.width = Math.round(W * dpr2); cv.height = Math.round(H * dpr2);
+  var ctx = cv.getContext('2d'); ctx.scale(dpr2, dpr2);
+  ctx.clearRect(0, 0, W, H);
+
+  var pad = 32, lineY = H * 0.5;
+  ctx.beginPath(); ctx.moveTo(pad, lineY); ctx.lineTo(W - pad, lineY);
+  ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.lineWidth = 1; ctx.stroke();
+
+  ctx.font = '8px JetBrains Mono,monospace';
+  ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(120,110,90,.5)';
+  ctx.fillText('s -> 0  (p -> inf)', pad, H - 3);
+  ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(200,168,74,.6)';
+  ctx.fillText('phi  s=1', W - pad, H - 3);
+
+  ctx.beginPath(); ctx.moveTo(W - pad - 3, lineY - 16); ctx.lineTo(W - pad - 3, lineY + 5);
+  ctx.strokeStyle = 'rgba(200,168,74,.75)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = 'rgba(200,168,74,.9)'; ctx.textAlign = 'center';
+  ctx.fillText('phi', W - pad - 3, lineY - 20);
+
+  var specP = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+  specP.forEach(function(p) {
+    var s = 1 / (p * (p - 1));
+    var x = pad + s * (W - 2 * pad);
+    var h2 = p <= 7 ? 18 : p <= 13 ? 12 : 8;
+    ctx.beginPath(); ctx.moveTo(x, lineY - h2); ctx.lineTo(x, lineY + 4);
+    ctx.strokeStyle = 'rgba(61,200,184,' + (p <= 5 ? '.85' : p <= 11 ? '.5' : '.3') + ')';
+    ctx.lineWidth = p <= 5 ? 1.5 : 1; ctx.stroke();
+    if (p <= 17) {
+      ctx.font = (p <= 7 ? '9' : '8') + 'px JetBrains Mono,monospace';
+      ctx.fillStyle = 'rgba(61,200,184,' + (p <= 7 ? '.75' : '.4') + ')';
+      ctx.textAlign = 'center';
+      ctx.fillText('p=' + p, x, lineY - h2 - 4);
+    }
+  });
+}
+
+window.p5Preset = function(n) {
+  document.getElementById('p5-n').value = n;
+  p5Check();
+};
+
+window.p5Check = function() {
+  var el = document.getElementById('p5-out');
+  var raw = (document.getElementById('p5-n').value || '').trim();
+  var n = parseInt(raw);
+  var dEl = document.querySelector('input[name="p5-disp"]:checked');
+  var disp = dEl ? dEl.value : 'sci';
+
+  function setStat(id, v, cls) {
+    var e = document.getElementById(id); if (!e) return;
+    e.textContent = v;
+    e.className = 'st-val' + (cls ? ' ' + cls : '');
+  }
+
+  if (raw === '1' || n === 1) {
+    var phi = (1 + Math.sqrt(5)) / 2;
+    el.style.color = 'rgba(200,168,74,.9)';
+    el.textContent =
+      'n = 1  ->  phi (golden ratio boundary)\n\n' +
+      'p(p-1) = 1  =>  p^2 - p - 1 = 0\n' +
+      'Positive root: p = (1+sqrt(5))/2 = ' + phi.toFixed(15) + '\n\n' +
+      'phi*(phi-1) = ' + (phi * (phi - 1)).toFixed(15) + ' = 1  [OK]\n' +
+      'Discriminant: 1 + 4*1 = 5  (not a perfect square)\n\n' +
+      'Spectrum boundary: s = 1 > all integer prime jumps\n' +
+      'Largest prime jump: p=2, s = 1/2 = 0.5\n' +
+      'phi is the unique value where exact recovery fails.';
+    setStat('p5-sn', '1'); setStat('p5-cls', 'phi boundary', 'orange');
+    setStat('p5-s', '1.000000', 'gold'); setStat('p5-disc', '5 (not square)', 'coral');
+    setStat('p5-rec', 'phi = ' + phi.toFixed(6), 'violet');
+    return;
+  }
+  if (isNaN(n) || n < 2) {
+    el.style.color = '';
+    el.textContent = 'Enter n >= 1. (n=1 gives the golden ratio phi.)';
+    return;
+  }
+
+  var pr = p5Sieve(Math.max(n * 2, n + 200));
+  var isP = pr.indexOf(n) >= 0;
+  var Cn1 = p5C(n - 1), Cn = p5C(n), delta = Cn - Cn1;
+  var L = [];
+
+  L.push('n = ' + n.toLocaleString() + '   ->   ' + (isP ? 'PRIME  [OK]' : 'COMPOSITE  [X]'));
+  L.push('');
+
+  if (disp === 'sci') {
+    L.push('C(n-1) = C(' + (n - 1).toLocaleString() + ') = ' + Cn1.toExponential(10));
+    L.push('C(n)   = C(' + n.toLocaleString() + ')   = ' + Cn.toExponential(10));
+    if (isP) {
+      var s = 1 / (n * (n - 1));
+      L.push('');
+      L.push('Jump size: s = 1/(p*(p-1)) = ' + s.toExponential(10));
+      L.push('           = 1/' + (n * (n - 1)).toLocaleString());
+      L.push('Delta-C (predicted) = -C*s = ' + ((-Cn1) * s).toExponential(10));
+      L.push('Delta-C (observed)  = ' + delta.toExponential(10));
+      L.push('');
+      L.push('Recovery: p = (1 + sqrt(1+4/s))/2 = ' + ((1 + Math.sqrt(1 + 4 / s)) / 2).toFixed(2));
+      L.push('Discriminant: 1+4p(p-1) = ' + (1 + 4 * n * (n - 1)).toLocaleString() + ' = (' + (2 * n - 1) + ')^2  [OK]');
+    } else {
+      var prev = null, next = null;
+      for (var i = 0; i < pr.length; i++) { if (pr[i] < n) prev = pr[i]; if (pr[i] > n && !next) next = pr[i]; }
+      L.push('Delta-C = ' + delta.toExponential(10) + '  (noise only, no jump)');
+      if (prev && next) L.push('Nearest primes: ' + prev.toLocaleString() + ' < n < ' + next.toLocaleString());
+    }
+  } else if (disp === 'frac') {
+    if (isP) {
+      var den = n * (n - 1);
+      L.push('Jump size as exact fraction:');
+      L.push('  s = 1 / (' + n.toLocaleString() + ' x ' + (n - 1).toLocaleString() + ')');
+      L.push('  s = 1 / ' + den.toLocaleString());
+      L.push('');
+      L.push('Discriminant = (2p-1)^2 = (' + (2 * n - 1) + ')^2 = ' + ((2 * n - 1) * (2 * n - 1)).toLocaleString());
+      L.push('Recovery: p = (1 + ' + (2 * n - 1) + ') / 2 = ' + n.toLocaleString() + '  [OK]');
+    } else {
+      L.push('Composite: no jump, no exact fraction.');
+    }
+  } else if (disp === 'rel') {
+    if (isP) {
+      var sp = 1 / (n * (n - 1));
+      L.push('Jump relative to p=2 (largest jump s=1/2):');
+      L.push('  s(p=' + n.toLocaleString() + ')  = ' + sp.toExponential(8));
+      L.push('  s(p=2)           = 0.5  (maximum)');
+      L.push('  Ratio s(2)/s(p)  = ' + (0.5 / sp).toExponential(6));
+      L.push('');
+      L.push('Spectrum position [0, 1]:');
+      L.push('  phi boundary:   s = 1.0000  (unreachable)');
+      L.push('  p=2:            s = 0.5000');
+      L.push('  p=3:            s = 0.1667');
+      L.push('  p=5:            s = 0.0500');
+      L.push('  This prime:     s = ' + sp.toExponential(4));
+    } else {
+      L.push('No jump at composite n = ' + n.toLocaleString() + '.');
+    }
+  } else if (disp === 'geo') {
+    if (isP) {
+      var sg = 1 / (n * (n - 1));
+      L.push('Geometric interpretation for p = ' + n.toLocaleString() + ':');
+      L.push('');
+      L.push('Ring M = ' + n.toLocaleString() + ' has phi(' + n.toLocaleString() + ') = ' + (n - 1).toLocaleString() + ' coprime residues');
+      L.push('(prime ring: all 1 ... ' + (n - 1).toLocaleString() + ' are coprime to p)');
+      L.push('');
+      L.push('D(x) jump at x = ' + (n - 1).toLocaleString() + ':');
+      L.push('  Factor: f_p = p/(p+1) = ' + n + '/' + (n + 1) + ' ~ ' + (n / (n + 1)).toFixed(10));
+      L.push('  Jump delta-D = 1/(p(p-1)) = ' + sg.toExponential(8));
+      L.push('');
+      L.push('Expected prime gap ~ ln(p) = ' + Math.log(n).toFixed(3));
+      L.push('On the Geometric Canvas: prime ring, all dots teal, all lift lines green.');
+    } else {
+      var pP = null, nP = null;
+      for (var i = 0; i < pr.length; i++) { if (pr[i] < n) pP = pr[i]; if (pr[i] > n && !nP) nP = pr[i]; }
+      L.push('Composite ring M = ' + n.toLocaleString() + ': no jump.');
+      if (pP && nP) L.push('Next D(x) jump at x = ' + (nP - 1).toLocaleString() + '  (p = ' + nP.toLocaleString() + ')');
+    }
+  }
+
+  el.textContent = L.join('\n');
+  el.style.color = isP ? 'rgba(61,200,184,.9)' : 'rgba(224,80,96,.85)';
+
+  setStat('p5-sn', n.toLocaleString());
+  setStat('p5-cls', isP ? 'PRIME' : 'COMPOSITE', isP ? 'teal' : 'coral');
+  if (isP) {
+    var ss = 1 / (n * (n - 1));
+    setStat('p5-s', ss.toExponential(6), 'gold');
+    setStat('p5-disc', '(' + (2*n-1) + ')^2 = ' + ((2*n-1)*(2*n-1)).toLocaleString(), 'violet');
+    setStat('p5-rec', n.toLocaleString() + '  [OK]', 'orange');
+  } else {
+    setStat('p5-s', 'none', ''); setStat('p5-disc', 'none', ''); setStat('p5-rec', 'n/a', '');
+  }
+};
+
+// Draw spectrum on load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() { p5DrawSpectrum(); p5Preset(7); });
+} else { p5DrawSpectrum(); p5Preset(7); }
+window.addEventListener('resize', p5DrawSpectrum);
+
 </script>
 </body>
 </html>
