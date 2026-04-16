@@ -2816,9 +2816,15 @@ window.pcCheck=function(){
   var canvasRow = document.getElementById('pc-canvas-row');
   var canvasLbl = document.getElementById('pc-canvas-lbl');
   if(canvasRow){
-    var showBtn = (disp==='geo' && isP && n <= 512);
+    var showBtn = isP; // show for any prime regardless of display mode
     canvasRow.style.display = showBtn ? 'block' : 'none';
-    if(canvasLbl && showBtn) canvasLbl.textContent = 'Ring M='+n.toLocaleString()+', prime ring, lift lines active';
+    if(canvasLbl && showBtn){
+      if(n <= 512){
+        canvasLbl.textContent = 'Ring M='+n.toLocaleString()+' \u2014 prime ring, all '+((n-1)).toLocaleString()+' residues coprime, lift lines active';
+      } else {
+        canvasLbl.textContent = 'p='+n.toLocaleString()+' > 512 \u2014 canvas will show M=512 with p\u2019s lift pattern';
+      }
+    }
   }
 };
 
@@ -2875,14 +2881,34 @@ window.addEventListener('resize',pcDrawSpectrum);
 
 window.pcSendCanvas = function(){
   var n = parseInt(document.getElementById('pc-n').value);
-  if(!n||n<2||n>512) return;
-  var cmd = {chart:0, M:n, N:n, color:'prime_ring', view:'concentric', ts:Date.now()};
-  cmd.lifts = true;
+  if(!n || n < 2){ alert('Enter a prime first.'); return; }
+  // For display: use n directly if <=512, else cap at 512 and show surrounding context
+  var M = Math.min(n, 512);
+  // Set mmax to show n in context — a bit above so the ring isn't at the edge
+  var mmax = Math.min(Math.max(M + 15, 40), 512);
+  var cmd = {
+    chart: 0, M: M, N: mmax,
+    color: 'prime_ring', view: 'concentric',
+    lifts: true, ts: Date.now()
+  };
   try { localStorage.setItem('zmmz_cmd', JSON.stringify(cmd)); } catch(e){}
+
   if(!_canvasWin || _canvasWin.closed){
+    // Open new window — post message at 800ms, 2000ms, and 3500ms to catch whenever it loads
     _canvasWin = window.open('zmmz_explorer-1.html', 'zmmz_canvas');
+    [800, 2000, 3500].forEach(function(delay){
+      setTimeout(function(){
+        if(_canvasWin && !_canvasWin.closed){
+          cmd.ts = Date.now(); // refresh timestamp
+          try { localStorage.setItem('zmmz_cmd', JSON.stringify(cmd)); } catch(e){}
+          try { _canvasWin.postMessage(cmd, '*'); } catch(e){}
+        }
+      }, delay);
+    });
   } else {
     _canvasWin.focus();
+    cmd.ts = Date.now();
+    try { localStorage.setItem('zmmz_cmd', JSON.stringify(cmd)); } catch(e){}
     try { _canvasWin.postMessage(cmd, '*'); } catch(e){}
   }
 };
