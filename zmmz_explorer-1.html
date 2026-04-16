@@ -345,6 +345,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <a href="EN_explorer-1-2.html" class="tab tab-explorer"><span class="tab-dot"></span>Explorer</a>
     <a href="EN_explorer-updated.html" class="tab tab-deep"><span class="tab-dot"></span>Deep Analysis</a>
     <div class="tab tab-canvas active"><span class="tab-dot"></span>Geometric Canvas</div>
+    <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&#950;(2) Explorer</a>
   </div>
   <span class="nav-right">(ℤ/Mℤ)*</span>
 </nav>
@@ -399,12 +400,22 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   </div>
 
   <div class="section">
-    <div class="section-title">Custom Residue</div>
+    <div class="section-title">Custom Residue Path</div>
     <div class="row">
       <span class="ctrl-label">r =</span>
       <input type="number" id="num-custom-r" value="" class="narrow" placeholder="r">
       <label><input type="checkbox" id="chk-rpath"> Show path</label>
     </div>
+    <div class="row">
+      <span class="ctrl-label">mod</span>
+      <input type="number" id="num-path-mod" value="57" min="2" max="2000" class="narrow" placeholder="M">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3)">target</span>
+    </div>
+    <div class="row">
+      <button onclick="animResPath()" id="btn-respath-anim" style="font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(200,168,74,.12);border:1px solid rgba(200,168,74,.4);color:rgba(200,168,74,.9);padding:4px 10px;cursor:pointer;border-radius:2px;">&#9654; Animate path</button>
+      <button onclick="stopResPath()" style="font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(224,80,96,.08);border:1px solid rgba(224,80,96,.3);color:rgba(224,80,96,.8);padding:4px 8px;cursor:pointer;border-radius:2px;">&#9632;</button>
+    </div>
+    <div id="respath-info" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);line-height:1.6;margin-top:4px;"></div>
   </div>
 
   <div class="section">
@@ -825,6 +836,7 @@ const S = {
   prime: 7, pidx: 3, allp: false, spiral: true, mirror: true,
   channel: 0,
   customR: null, rpath: false,
+  resPathM: 57, resPathActive: false, resPathFrame: 2,
   allpts: true, equator: false, sector: false, ringcirc: false,
   dim: true, dimAlpha: 0.08,
   labels: false, labelSize: 9, labelFmt: 'r', labelMaxM: 20,
@@ -1354,9 +1366,55 @@ function drawOverlay(w,h,mat){
   // ½ equator special paths — draw connecting lines through (M±1)/2 and (M-1)/2
   // r=(M+1)/2: ½ above equator, NEVER lifts (highlighted gold)
   // r=(M-1)/2: ½ below equator, lifts iff gcd((M-1)/2, M+1)=1 (highlighted teal)
+  // ── Residue r path to target mod M ─────────────────────────────────────
+  if(S.rpath && S.customR !== null){
+    const r0 = S.customR;
+    const targetM = S.resPathM || 57;
+    const showUpTo = S.resPathActive ? S.resPathFrame : targetM;
+    ctx2d.save();
+    ctx2d.strokeStyle = 'rgba(200,168,74,0.9)';
+    ctx2d.lineWidth = 2 * dpr;
+    ctx2d.setLineDash([]);
+    ctx2d.beginPath();
+    let started = false;
+    const pathPts = [];
+    for(let M = 2; M <= Math.min(showUpTo, S.mmax); M++){
+      const r = ((r0 % M) + M) % M;
+      if(r < 1 || r >= M || gcd(r, M) !== 1) continue;
+      const rho = S.invert ? (S.mmax - M + 2) : M;
+      const theta = (2*Math.PI*r/M) + S.delta*M*2*Math.PI;
+      let px, py;
+      if(S.view==='concentric'||S.view==='strip'){ px=rho*Math.cos(theta); py=rho*Math.sin(theta); }
+      else if(S.view==='fermat'){ const rm=Math.sqrt(M); px=rm*Math.cos(theta); py=rm*Math.sin(theta); }
+      else { px=r/M*2-1; py=1/M*2; }
+      const [sx,sy] = worldToScreen(px,py,w,h,mat,dpr);
+      pathPts.push({sx,sy,M,r});
+      if(!started){ ctx2d.moveTo(sx,sy); started=true; } else ctx2d.lineTo(sx,sy);
+    }
+    ctx2d.stroke();
+    pathPts.forEach((p)=>{
+      const isTarget = p.M === Math.min(showUpTo, targetM, S.mmax);
+      ctx2d.beginPath(); ctx2d.arc(p.sx,p.sy,(isTarget?6:3.5)*dpr,0,Math.PI*2);
+      ctx2d.fillStyle = isTarget ? 'rgba(200,168,74,1)' : 'rgba(200,168,74,0.7)';
+      ctx2d.fill();
+      if(isTarget || p.M === targetM){
+        ctx2d.font = `${10*dpr}px 'JetBrains Mono',monospace`;
+        ctx2d.fillStyle = 'rgba(200,168,74,1)';
+        ctx2d.textAlign = 'left'; ctx2d.textBaseline = 'middle';
+        ctx2d.fillText(`${p.r}/${p.M}`, p.sx+8*dpr, p.sy);
+      }
+    });
+    if(pathPts.length > 0){
+      const last = pathPts[pathPts.length-1];
+      const infoEl = document.getElementById('respath-info');
+      if(infoEl) infoEl.textContent = `r=${r0} mod ${last.M} = ${last.r}  |  path: ${pathPts.length} rings  |  target: mod ${targetM}`;
+    }
+    ctx2d.restore();
+  }
+
   if(S.npath && (S.view==='concentric'||S.view==='fermat')){
-    const n = S.lockp ? S.prime : S.noffset;
     // Draw connecting spiral through the path points
+    const n = S.lockp ? S.prime : S.noffset;
     ['hi','lo'].forEach((which,wi)=>{
       const pathColor = wi===0 ? 'rgba(200,168,74,0.85)' : 'rgba(61,200,184,0.85)';
       ctx2d.strokeStyle = pathColor;
@@ -1936,44 +1994,70 @@ function updateStatsPanel(){
 // ── Export ───────────────────────────────────────────────────────────────────
 // WebGL preserveDrawingBuffer:true — we can read pixels directly
 function exportPNG(fname,scale=1){
-  const w=canvas.parentElement.clientWidth, h=canvas.parentElement.clientHeight;
-  const dpr=scale;
-  // Re-render to offscreen at desired resolution
-  const offCanvas=document.createElement('canvas');
-  offCanvas.width=w*dpr; offCanvas.height=h*dpr;
-  const offGl=offCanvas.getContext('webgl',{preserveDrawingBuffer:true,antialias:true});
-  if(!offGl){alert('WebGL not available for export');return;}
-  // Copy shaders and programs to offGl, then redraw
-  // For simplicity, use the main canvas (already rendered)
   const url=canvas.toDataURL('image/png');
   const a=document.createElement('a');
   a.href=url; a.download=fname||'zmmz_export.png'; a.click();
 }
 
-document.getElementById('btn-export-4k').onclick=()=>{
-  // Temporarily upscale canvas
+function exportViewPNG(viewName, filename, callback){
+  // Save state
+  const origView=S.view, origZoom=S.zoom, origPanX=S.panX, origPanY=S.panY;
   const origW=canvas.width, origH=canvas.height;
+  const origStyleW=canvas.style.width, origStyleH=canvas.style.height;
+  const origOvlW=overlay.width, origOvlH=overlay.height;
+
+  if(viewName) S.view=viewName;
+
+  // Upscale to 3840×3840
+  const EXP=3840;
+  canvas.width=EXP; canvas.height=EXP;
+  canvas.style.width=EXP+'px'; canvas.style.height=EXP+'px';
+  overlay.width=EXP; overlay.height=EXP;
+  overlay.style.width=EXP+'px'; overlay.style.height=EXP+'px';
+  if(gl) gl.viewport(0,0,EXP,EXP);
+
+  // Fit zoom for this view at export resolution
+  autoFitZoom();
+
+  // Scale up point sizes proportionally
+  const origPtsize=S.ptsize;
+  S.ptsize = S.ptsize * (EXP / Math.min(origW, origH || origW));
+
   dirty=true;
-  setTimeout(()=>{
+
+  // Two RAF cycles to ensure GL renders
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const url=canvas.toDataURL('image/png');
     const a=document.createElement('a');
-    a.href=url; a.download='zmmz_4k.png'; a.click();
-  },100);
+    a.href=url; a.download=filename||'zmmz_export.png'; a.click();
+
+    // Restore everything
+    S.view=origView; S.zoom=origZoom; S.panX=origPanX; S.panY=origPanY;
+    S.ptsize=origPtsize;
+    canvas.width=origW; canvas.height=origH;
+    canvas.style.width=origStyleW; canvas.style.height=origStyleH;
+    overlay.width=origOvlW; overlay.height=origOvlH;
+    overlay.style.width=origOvlW/Math.min(devicePixelRatio,2)+'px';
+    overlay.style.height=origOvlH/Math.min(devicePixelRatio,2)+'px';
+    if(gl) gl.viewport(0,0,origW,origH);
+    autoFitZoom(false);
+    dirty=true;
+
+    if(callback) setTimeout(callback, 300);
+  }));
+}
+
+document.getElementById('btn-export-4k').onclick=()=>{
+  exportViewPNG(null, 'zmmz_4k.png');
 };
 
 document.getElementById('btn-export-all4').onclick=()=>{
   const views=['concentric','fermat','farey','strip'];
-  const orig=S.view;
   let i=0;
   function next(){
-    if(i>=views.length){S.view=orig;dirty=true;return;}
-    S.view=views[i]; dirty=true;
-    setTimeout(()=>{
-      const url=canvas.toDataURL('image/png');
-      const a=document.createElement('a');
-      a.href=url; a.download=`zmmz_${views[i]}.png`; a.click();
-      i++; setTimeout(next,200);
-    },200);
+    if(i>=views.length) return;
+    const v=views[i]; i++;
+    exportViewPNG(v, `zmmz_${v}_4k.png`, next);
   }
   next();
 };
@@ -2196,6 +2280,78 @@ wireChk('chk-dim','dim'); wireChk('chk-labels','labels'); wireChk('chk-npath','n
 wireChk('chk-lockp','lockp'); wireChk('chk-allnodd','allnodd'); wireChk('chk-chords','chords');
 wireChk('chk-spiral','spiral'); wireChk('chk-mirror','mirror'); wireChk('chk-allp','allp');
 wireChk('chk-rpath','rpath');
+
+// Residue path mod target wiring
+document.getElementById('num-path-mod').addEventListener('input', e => {
+  const v = Math.max(2, Math.min(2000, Number(e.target.value)||57));
+  S.resPathM = v;
+  // Expand mmax if needed
+  if(v > S.mmax){
+    S.mmax = Math.min(v, 512);
+    document.getElementById('sl-mmax').value = Math.min(S.mmax, 512);
+    document.getElementById('num-mmax').value = S.mmax;
+    _copCache = {}; rebuildPrimeSelect();
+    autoFitZoom(false);
+  }
+  dirty = true;
+});
+
+let _resPathTimer = null;
+
+window.animResPath = function(){
+  if(!S.rpath || S.customR === null){
+    // auto-enable rpath if r is set
+    const rEl = document.getElementById('num-custom-r');
+    const rVal = rEl ? Number(rEl.value) : 0;
+    if(!rVal){ alert('Set a residue r first'); return; }
+    S.customR = rVal;
+    S.rpath = true;
+    document.getElementById('chk-rpath').checked = true;
+  }
+  const targetM = S.resPathM || 57;
+  // Expand mmax to cover target
+  if(targetM > S.mmax){
+    S.mmax = Math.min(targetM, 512);
+    document.getElementById('sl-mmax').value = Math.min(S.mmax, 512);
+    document.getElementById('num-mmax').value = S.mmax;
+    _copCache = {}; rebuildPrimeSelect();
+  }
+  // Zoom to fit: set zoom so ring targetM fills ~80% of view
+  S.zoom = 0.44 * 0.9; // will be scaled by autoFitZoom logic for concentric
+  autoFitZoom(); // full reset pan for animation start
+  S.resPathFrame = 2;
+  S.resPathActive = true;
+  dirty = true;
+  const btn = document.getElementById('btn-respath-anim');
+  if(btn) btn.textContent = '\u23F8 Animating\u2026';
+  if(_resPathTimer) clearInterval(_resPathTimer);
+  _resPathTimer = setInterval(()=>{
+    S.resPathFrame++;
+    // Gradually zoom out as path grows toward targetM
+    const progress = S.resPathFrame / targetM;
+    // At start zoom in tight (zoom=1.5), at end zoom to show full range
+    S.zoom = 1.5 - progress * 1.2;
+    S.zoom = Math.max(0.35, S.zoom);
+    dirty = true;
+    if(S.resPathFrame >= targetM){
+      clearInterval(_resPathTimer); _resPathTimer = null;
+      S.resPathActive = false;
+      if(btn) btn.textContent = '\u25B6 Animate path';
+      // Final zoom: fit the full path
+      autoFitZoom(false);
+      dirty = true;
+    }
+  }, 60);
+};
+
+window.stopResPath = function(){
+  if(_resPathTimer){ clearInterval(_resPathTimer); _resPathTimer = null; }
+  S.resPathActive = false;
+  const btn = document.getElementById('btn-respath-anim');
+  if(btn) btn.textContent = '\u25B6 Animate path';
+  dirty = true;
+};
+
 wireChk('chk-stats','showStats',v=>{document.getElementById('stats-panel').style.display=v?'':'none';});
 document.getElementById('chk-stats').addEventListener('change',e=>{
   document.getElementById('stats-panel').style.display=e.target.checked?'':'none';
@@ -2243,8 +2399,8 @@ function autoFitZoom(resetPan){
     zoom = 0.44 * m;
     S.panY = -0.5; // shift up slightly to center the data vertically
   } else { // strip
-    // world x ∈ [-1,1], y ∈ [-1,1]
-    // NDC = 1 * zoom*2/mmax → zoom = 0.44 * mmax
+    // strip: world x = r/M*2-1, y = M/mmax*2-1, both in (-1,1)
+    // NDC = world * zoom*2/mmax, to fill: zoom*2/mmax = 0.88 → zoom = 0.44*mmax
     zoom = 0.44 * m;
   }
   S.zoom = Math.max(0.05, Math.min(50, zoom));
@@ -2400,8 +2556,8 @@ const THM_PRESETS = {
   chain1: {chain:1,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,_anim:'chain_spin',
            _label:'Chain n=1: residues surviving 1 consecutive lift — C(1) ≈ 0.531',
            _analysis:'<strong>Chain n=1</strong> — Only residues r/M where r mod(M+1) is also coprime to M+1. Green = lift ✓, red = broken. The surviving fraction converges to C ≈ 0.530711806246.'},
-  chain2: {chain:2,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,_anim:'chain_spin',
-           _label:'Chain n=2: residues surviving 2 consecutive lifts',
+  chain2: {chain:2,color:'phi_density',mmax:100,view:'fermat',lifts:true,broken:true,_anim:'chain_spin',
+           _label:'Chain n=2: surviving 2 consecutive lifts — Fermat spiral shows angular clustering',
            _analysis:'<strong>Chain n=2</strong> — Residues surviving two consecutive lifts. Density thins geometrically; ratio approaches C².'},
   chain3: {chain:3,color:'lift',mmax:80,view:'concentric',lifts:true,broken:true,_anim:'chain_spin',
            _label:'Chain n=3: residues surviving 3 consecutive lifts',
@@ -2479,6 +2635,14 @@ function animStop(){
   if(spinChk) spinChk.checked=false;
   const ind = document.getElementById('anim-indicator');
   if(ind) ind.style.display='none';
+  // Persist last observation in sticky card
+  const obsEl = document.getElementById('ai-observation');
+  const stickyEl = document.getElementById('ai-obs-sticky');
+  const stickyBody = document.getElementById('ai-obs-sticky-body');
+  if(obsEl && stickyEl && stickyBody && obsEl.innerHTML && !obsEl.innerHTML.includes('Select a probe')){
+    stickyBody.innerHTML = obsEl.innerHTML;
+    stickyEl.style.display = 'block';
+  }
   playStop();
   liftScanStop();
 }
@@ -3079,6 +3243,10 @@ function buildAIPanel(){
     <strong>Select a probe below</strong><br>
     Each probe is a specific geometric question I would ask about (ℤ/Mℤ)*.<br>
     The canvas becomes an instrument for structural observation.
+  </div>
+  <div id="ai-obs-sticky" style="display:none;margin-top:8px;padding:8px 10px;background:rgba(0,0,0,.3);border:1px solid rgba(80,245,192,.1);border-radius:2px;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.14em;color:rgba(80,245,192,.4);text-transform:uppercase;margin-bottom:5px;">Last observation</div>
+    <div id="ai-obs-sticky-body" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.5);line-height:1.6;"></div>
   </div>`;
 
   categories.forEach(cat => {
@@ -3118,35 +3286,39 @@ function applyIndexCmd(cmd) {
   if(!cmd || !cmd.M) return;
   _indexCmd = cmd;
   const M = Math.max(2, Math.min(cmd.M, 512));
-  const newMmax = Math.max(S.mmax, Math.min(M + 10, 512));
+  const newMmax = Math.min(Math.max(S.mmax, M + 15), 512);
   setState({
     mmax: newMmax,
-    color: cmd.color || 'lift',
+    color: cmd.color || 'prime_ring',
     view: cmd.view || 'concentric',
-    lifts: true,
-    liftScanM: M,
-    liftScanActive: true,
+    lifts: cmd.lifts !== undefined ? cmd.lifts : true,
+    liftScanActive: false,
   });
+  // Highlight the target ring as the prime ring
+  S.prime = M;
+  S.pidx = PRIMES.indexOf(M) + 1;
+  S.npath = false;
+  S.spiral = false;
   _copCache = {};
   rebuildPrimeSelect();
   autoFitZoom();
   _indexBadge.style.display = 'inline-block';
-  _indexBadge.textContent = '\u25c8 Chart ' + cmd.chart + '  M=' + M;
+  _indexBadge.textContent = '\u25c8 Prime p=' + M;
   dirty = true;
 }
 
 // Listen for commands
 window.addEventListener('message', e => {
-  if(e.data && e.data.chart) applyIndexCmd(e.data);
+  if(e.data && e.data.M) applyIndexCmd(e.data);
 });
 window.addEventListener('storage', e => {
   if(e.key === 'zmmz_cmd') {
-    try { const cmd = JSON.parse(e.newValue); if(cmd && cmd.chart) applyIndexCmd(cmd); } catch(err){}
+    try { const cmd = JSON.parse(e.newValue); if(cmd && cmd.M) applyIndexCmd(cmd); } catch(err){}
   }
 });
 try {
   const saved = localStorage.getItem('zmmz_cmd');
-  if(saved) { const cmd = JSON.parse(saved); if(cmd && cmd.chart && Date.now()-cmd.ts < 5000) applyIndexCmd(cmd); }
+  if(saved) { const cmd = JSON.parse(saved); if(cmd && cmd.M && Date.now()-cmd.ts < 8000) applyIndexCmd(cmd); }
 } catch(e){}
 
 
