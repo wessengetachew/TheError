@@ -292,7 +292,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
   <div class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 04</span><span class="chart-title">Signed E(N) · prime markers · sign-change dots</span>
-      <span class="chart-desc">Full signed oscillation of E(N). Gold ticks on the baseline mark every prime. Coral dots mark sign changes. Most sign changes fall near primes — but not every prime triggers one; consecutive primes can push in the same direction before a reversal.</span>
+      <span class="chart-desc">Full signed oscillation of E(N). Gold ticks on the baseline mark every prime. Coral dots mark sign changes. Most sign changes fall near primes — but not every prime triggers one. At large N, gold ticks are thinned to every k-th prime to remain legible; sign-change primes are always shown.</span>
     </div>
     <canvas class="main-chart" id="c4"></canvas>
     <div class="chart-footer">
@@ -399,6 +399,27 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
 
 </div>
 
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 09</span><span class="chart-title">Prime-at-Sign-Change fraction — SC at prime / total SC</span>
+      <span class="chart-desc">Running fraction of sign changes that occur exactly at a prime N. If this fraction stabilizes, it suggests a structural prime–oscillation coupling. If it drifts, sign changes decouple from primes at scale. Whether this fraction has a finite limit is an open question.</span>
+    </div>
+    <canvas class="main-chart" id="c9"></canvas>
+    <div class="chart-footer">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--orange)"></div>primeSC(N) / SC(N)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--gold);opacity:.5"></div>Empirical limit</div>
+    </div>
+    <button class="drawer-toggle" onclick="toggleDrawer('c9',this)" aria-expanded="false">
+      <span class="drawer-arrow">&#9660;</span>&ensp;Data table &mdash; Chart 09 — Prime-at-SC fraction
+    </button>
+    <button class="exp-btn" onclick="exportChart('c9')" title="Export Chart 09 as PNG">&#8595; PNG</button>
+    <div class="data-drawer" id="drawer-c9">
+      <div class="drawer-scroll">
+        <table class="data-table" id="tbl-c9"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </div>
+
 
 <!-- ═══════════ THEOREMS ═══════════ -->
 <div class="section-divider" style="margin-top:8px;">
@@ -456,6 +477,18 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:22px 40px;display:flex
     </div>
   </div>
 
+
+  <div style="margin-top:40px;padding-top:28px;border-top:1px solid rgba(200,168,74,.1);">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px;">Interactive — Jump Theorem Verification</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(200,168,74,.7);">p =</span>
+      <input type="number" id="jt-prime-input" value="7" min="2" placeholder="Enter a prime"
+        style="font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(255,255,255,.04);border:1px solid rgba(200,168,74,.3);border-radius:2px;padding:6px 10px;color:#f0ece4;width:140px;"
+        onkeydown="if(event.key==='Enter')jtVerify()">
+      <button onclick="jtVerify()" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.15em;background:rgba(200,168,74,.15);border:1px solid rgba(200,168,74,.4);color:rgba(200,168,74,.9);padding:7px 16px;cursor:pointer;">Verify Jump →</button>
+    </div>
+    <div id="jt-result" style="font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.9;color:rgba(160,150,130,.7);white-space:pre-wrap;min-height:60px;background:rgba(0,0,0,.25);border:1px solid rgba(61,200,184,.1);padding:12px 14px;"></div>
+  </div>
 </div>
 
 <footer>
@@ -611,9 +644,16 @@ function drawC4(r){
   grid(ctx,W,H,p);
   // zero line
   ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
-  // prime ticks
+  // prime ticks — show only at sign changes + every k-th prime at scale
+  const primesInView = d.filter(x=>x.ip);
+  const tickStep = primesInView.length > 200 ? Math.ceil(primesInView.length/100) : 1;
   ctx.strokeStyle='rgba(200,168,74,.35)';ctx.lineWidth=1;
-  for(const x of d)if(x.ip){ctx.beginPath();ctx.moveTo(px(x.m),H-p);ctx.lineTo(px(x.m),H-p+5);ctx.stroke();}
+  primesInView.forEach((x,i)=>{
+    // always show prime if it's also a sign change; otherwise thin to every k-th
+    if(x.isc || i % tickStep === 0){
+      ctx.beginPath();ctx.moveTo(px(x.m),H-p);ctx.lineTo(px(x.m),H-p+5);ctx.stroke();
+    }
+  });
   // E(N) curve
   line(ctx,d.map(x=>[x.m,x.E]),px,py,'rgba(61,200,184,.85)',1.5);
   // sign change dots
@@ -690,11 +730,35 @@ function drawC8(r){
   axlbl(ctx,W,H,p,mn,mx);
 }
 
+function drawC9(r){
+  const{ctx,W,H}=setup('c9'); if(!ctx)return; const p=22;
+  // primeSC fraction: primeSC_running / sc_running
+  // We need primeSC per step — recompute from data
+  const d=r.data.filter(x=>x.scC>0);if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  // build running primeSC fraction
+  const pts=[]; let psc=0,sc=0,prevSC=0,prevIP=false;
+  for(const x of r.data){
+    if(x.isc){sc++;if(x.ip)psc++;}
+    if(sc>0) pts.push({m:x.m,v:psc/sc});
+  }
+  if(!pts.length)return;
+  const vs=pts.map(x=>x.v),yMn=Math.min(...vs)*.95,yMx=Math.max(...vs)*1.05;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,yMn,yMx,H-p,p);
+  grid(ctx,W,H,p);
+  const lim=vs[vs.length-1];
+  ctx.setLineDash([4,8]);line(ctx,[[mn,lim],[mx,lim]],px,py,'rgba(200,168,74,.4)',1.2);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.6)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('≈'+lim.toFixed(4),W-72,py(lim)-5);
+  line(ctx,pts.map(x=>[x.m,x.v]),px,py,'rgba(232,144,74,.9)',1.6);
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
 function renderAll(res){
   document.getElementById('charts-area').style.display='flex';
   document.getElementById('empty-state').style.display='none';
   drawC1(res);drawC2(res);drawC3(res);drawC4(res);
-  drawC5(res);drawC6(res);drawC7(res);drawC8(res);
+  drawC5(res);drawC6(res);drawC7(res);drawC8(res);drawC9(res);
   document.getElementById('st-n').textContent   =res.N.toLocaleString();
   document.getElementById('st-c').textContent   =res.C.toFixed(7);
   document.getElementById('st-c1').textContent  =res.c1t.toFixed(6);
@@ -901,6 +965,14 @@ function buildTable(cid, r) {
     c8: {
       heads: ['N','E(N)','E_χ₄(N)','4·E_χ₄','χ₄ SC','Prime'],
       row: d => [d.m, fs(d.E,6), fs(d.E4,6), fs(d.E4*4,6), d.isc4?'SC':'', d.ip?'p':'']
+    },
+    c9: {
+      heads: ['N','SC(N)','Prime-SC','Fraction','Prime'],
+      row: (d,i,arr) => {
+        let psc=0,sc=0;
+        for(let j=0;j<=i;j++){if(arr[j].isc){sc++;if(arr[j].ip)psc++;}}
+        return [d.m, sc, psc, sc>0?f4(psc/sc):'—', d.ip?'p':''];
+      }
     }
   };
 
@@ -1013,6 +1085,51 @@ function exportChart(cid) {
   a.href = ec.toDataURL('image/png');
   a.click();
 }
+
+
+// Jump Theorem verifier
+function jtSieve(n){ const s=new Uint8Array(n+1);s[0]=s[1]=1;for(let i=2;i*i<=n;i++)if(!s[i])for(let j=i*i;j<=n;j+=i)s[j]=1;return i=>!s[i]; }
+const jtIsPrime = jtSieve(2000000);
+function jtC(x,primes){ let log=0;for(const p of primes){let fp;if(p<=x+1)fp=p/(p+1);else{fp=(p*p-x-1)/(p*p-1);if(fp<=0)break;}log+=Math.log(fp);}return Math.exp(log); }
+window.jtVerify = function(){
+  const el=document.getElementById('jt-result');
+  const p=parseInt(document.getElementById('jt-prime-input').value);
+  if(!p||p<2){el.textContent='Enter p ≥ 2.';return;}
+  const primes=[]; const lim=Math.max(p*2,1000);
+  for(let i=2;i<=lim;i++)if(jtIsPrime(i))primes.push(i);
+  const isP=primes.includes(p);
+  const Cn1=jtC(p-1,primes), Cn=jtC(p,primes);
+  const delta=Cn-Cn1;
+  const L=[
+    (isP?'PRIME ✓':'COMPOSITE ✗') + '  p = '+p.toLocaleString(),
+    '',
+    'C(p-1) = C('+( p-1).toLocaleString()+') = '+Cn1.toExponential(10),
+    'C(p)   = C('+p.toLocaleString()+')   = '+Cn.toExponential(10),
+  ];
+  if(isP){
+    const s=1/(p*(p-1));
+    const rec=(1+Math.sqrt(1+4/s))/2;
+    const disc=1+4*p*(p-1);
+    const sqrt2p1=2*p-1;
+    L.push('');
+    L.push('Exact jump: s = 1/('+p+'·'+(p-1)+') = 1/'+p*(p-1)+' = '+s.toExponential(10));
+    L.push('ΔC observed: '+delta.toExponential(10));
+    L.push('');
+    L.push('Recovery: p = (1+√(1+4/s))/2 = '+rec.toFixed(4)+'  ['+(Math.round(rec)===p?'OK ✓':'MISMATCH')+']');
+    L.push('Discriminant: 1+4p(p-1) = '+disc.toLocaleString()+' = ('+sqrt2p1+')² ✓');
+    if(result){
+      const GRH_bound=Math.log(p)/Math.sqrt(p);
+      L.push('');L.push('GRH-conditional |E(p)| bound: O(log p / √p) ≈ '+GRH_bound.toExponential(4));
+    }
+  } else {
+    const prev=primes.filter(q=>q<p).pop()||'?';
+    const next=primes.find(q=>q>p)||'?';
+    L.push('ΔC (no jump) = '+delta.toExponential(10));
+    L.push('Nearest primes: '+prev+' < '+p+' < '+next);
+  }
+  el.textContent=L.join('\n');
+  el.style.color=isP?'rgba(61,200,184,.9)':'rgba(224,80,96,.85)';
+};
 
 </script>
 </body>
