@@ -117,6 +117,23 @@ canvas.mc.tall{height:300px;}
 
 /* Footer */
 footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.2);}
+
+/* ── Export buttons ── */
+.exp-panel-btn{
+  font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+  background:rgba(200,168,74,.1);border:1px solid rgba(200,168,74,.35);
+  color:rgba(200,168,74,.8);padding:4px 11px;cursor:pointer;
+  transition:background .15s,color .15s;white-space:nowrap;margin-left:auto;flex-shrink:0;
+}
+.exp-panel-btn:hover{background:rgba(200,168,74,.22);color:var(--gold2);}
+.exp-all-btn{
+  font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  background:rgba(200,168,74,.08);border:1px solid rgba(200,168,74,.3);
+  color:rgba(200,168,74,.7);padding:7px 18px;cursor:pointer;
+  transition:all .2s;
+}
+.exp-all-btn:hover{background:rgba(200,168,74,.18);color:var(--gold2);}
+
 </style>
 </head>
 <body>
@@ -129,7 +146,6 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
     <a href="zmmz_explorer-1.html" class="tab"><span class="tab-dot"></span>Geometric Canvas</a>
     <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&zeta;(2) Explorer</a>
     <div class="tab active"><span class="tab-dot"></span>GCD Explorer</div>
-    <a href="lift_paper.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
   </div>
   <span class="nav-right">6/&pi;&sup2; &asymp; 0.607927102</span>
 </nav>
@@ -199,7 +215,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
 <div id="charts-area">
 
   <!-- C1: running ratio -->
-  <div class="chart-panel">
+  <div id="cp1" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 01</span>
       <span class="chart-title">&Sigma;&phi;(m) / &Sigma;m converging to 6/&pi;&sup2; &mdash; prime spikes &amp; primorial dips</span>
@@ -217,7 +233,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
   </div>
 
   <!-- C2: phi(M)/M per integer -->
-  <div class="chart-panel">
+  <div id="cp2" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 02</span>
       <span class="chart-title">&phi;(M)/M per integer &mdash; primes cluster near 1, primorials near 0</span>
@@ -237,7 +253,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
   <div class="sdiv" style="margin:4px 0;"><div class="sdiv-line"></div><div class="sdiv-glyph">Error term E<sub>r</sub>(N) = &Sigma;&phi;/&Sigma;M &minus; 6/&pi;&sup2;</div><div class="sdiv-line"></div></div>
 
   <!-- C3: signed error -->
-  <div class="chart-panel">
+  <div id="cp3" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 03</span>
       <span class="chart-title">E<sub>r</sub>(N) signed &mdash; prime upward spikes, primorial downward pulls</span>
@@ -255,7 +271,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
   </div>
 
   <!-- C4: |Er|*N decay -->
-  <div class="chart-panel">
+  <div id="cp4" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 04</span>
       <span class="chart-title">|E<sub>r</sub>(N)| &middot; N &mdash; decay faster than O(1/N)</span>
@@ -271,7 +287,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
   </div>
 
   <!-- C5: log|Er| vs log N -->
-  <div class="chart-panel">
+  <div id="cp5" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 05</span>
       <span class="chart-title">log|E<sub>r</sub>(N)| vs log N &mdash; decay rate diagnostic</span>
@@ -291,7 +307,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
   <div class="sdiv" style="margin:4px 0;"><div class="sdiv-line"></div><div class="sdiv-glyph">GCD distribution &amp; Mertens structure</div><div class="sdiv-line"></div></div>
 
   <!-- C6: GCD distribution -->
-  <div class="chart-panel">
+  <div id="cp6" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 06</span>
       <span class="chart-title">GCD distribution &mdash; P(gcd = g) &rarr; 6/(&pi;&sup2;g&sup2;) = 1/(&zeta;(2)g&sup2;)</span>
@@ -307,7 +323,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
   </div>
 
   <!-- C7: Mertens primorial -->
-  <div class="chart-panel">
+  <div id="cp7" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 07</span>
       <span class="chart-title">Primorial coprimality density &phi;(p#)/p# &rarr; 0 &mdash; Mertens&rsquo; third theorem</span>
@@ -324,7 +340,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex
   </div>
 
   <!-- C8: comparison with E(N) -->
-  <div class="chart-panel">
+  <div id="cp8" class="chart-panel">
     <div class="chart-header">
       <span class="chart-num">Chart 08</span>
       <span class="chart-title">E<sub>r</sub>(N) vs E(N) &mdash; structural anti-correlation at every prime</span>
@@ -902,6 +918,273 @@ window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(res
 const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.06});
 document.querySelectorAll('.chart-panel').forEach(el=>obs.observe(el));
 window.addEventListener('load',()=>{result=compute(1000);renderAll(result);});
+</script>
+
+<script>
+// Universal chart export module — paste this into any page's <script> section
+// Captures: chart number, title, description, canvas, legend, data table
+// Output: A4 landscape at 4K (3508 × 2480px @ 300dpi equivalent)
+
+window.exportPanel = function(panelId) {
+  // Find the panel — accept panel div id OR canvas id
+  let panel = document.getElementById(panelId);
+  if (!panel) return;
+  // If given a canvas, walk up to .chart-panel
+  if (panel.tagName === 'CANVAS' || !panel.classList.contains('chart-panel')) {
+    panel = panel.closest('.chart-panel') || panel.parentElement;
+  }
+  if (!panel) return;
+
+  // ── Dimensions: A4 landscape 4K ────────────────────────────────────────────
+  const A4W = 3508, A4H = 2480;        // 300dpi A4 landscape
+  const PAD = 80, FONT_SCALE = 2.8;    // internal padding and font scale
+
+  const ec = document.createElement('canvas');
+  ec.width = A4W; ec.height = A4H;
+  const ctx = ec.getContext('2d');
+
+  // ── Background ──────────────────────────────────────────────────────────────
+  ctx.fillStyle = '#04040a';
+  ctx.fillRect(0, 0, A4W, A4H);
+
+  // Subtle grid lines
+  ctx.strokeStyle = 'rgba(200,168,74,.04)';
+  ctx.lineWidth = 1;
+  for (let y = 0; y < A4H; y += 120) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(A4W, y); ctx.stroke();
+  }
+  for (let x = 0; x < A4W; x += 120) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, A4H); ctx.stroke();
+  }
+
+  // ── Header bar ──────────────────────────────────────────────────────────────
+  const HDR_H = 130;
+  ctx.fillStyle = 'rgba(0,0,0,.45)';
+  ctx.fillRect(0, 0, A4W, HDR_H);
+  ctx.strokeStyle = 'rgba(200,168,74,.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, HDR_H); ctx.lineTo(A4W, HDR_H); ctx.stroke();
+
+  // Chart number tag
+  const numEl = panel.querySelector('.chart-num, .ch-num');
+  const numTxt = numEl ? numEl.textContent.trim() : '';
+  if (numTxt) {
+    ctx.fillStyle = 'rgba(200,168,74,.35)';
+    ctx.fillRect(PAD - 10, 0, numTxt.length * 14 * FONT_SCALE + 20, HDR_H);
+    ctx.fillStyle = '#c8a84a';
+    ctx.font = `${11 * FONT_SCALE}px JetBrains Mono, monospace`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(numTxt, PAD, HDR_H / 2);
+  }
+
+  // Chart title
+  const titleEl = panel.querySelector('.chart-title, .ch-title, .sec-title');
+  const titleTxt = titleEl ? titleEl.textContent.trim() : '';
+  if (titleTxt) {
+    ctx.fillStyle = '#e8d070';
+    ctx.font = `${13 * FONT_SCALE}px JetBrains Mono, monospace`;
+    ctx.textBaseline = 'middle';
+    const titleX = numTxt ? PAD + numTxt.length * 14 * FONT_SCALE + 40 : PAD;
+    // Truncate if too long
+    const maxW = A4W - titleX - PAD - 400;
+    let t = titleTxt;
+    while (ctx.measureText(t).width > maxW && t.length > 10) t = t.slice(0, -1);
+    if (t !== titleTxt) t += '…';
+    ctx.fillText(t, titleX, HDR_H / 2);
+  }
+
+  // Author + date
+  ctx.fillStyle = 'rgba(255,255,255,.28)';
+  ctx.font = `${9 * FONT_SCALE}px JetBrains Mono, monospace`;
+  ctx.textAlign = 'right';
+  ctx.fillText('Wessen Getachew · math.NT · 2026 · wessengetachew.github.io', A4W - PAD, HDR_H / 2 - 12);
+  ctx.fillText('C ≈ 0.530711806246 · E(N) = R(N) − C · O(1/N) conjecture', A4W - PAD, HDR_H / 2 + 18);
+  ctx.textAlign = 'left';
+
+  // ── Description ─────────────────────────────────────────────────────────────
+  const descEl = panel.querySelector('.chart-desc, .chart-description, .ch-desc, .sec-body');
+  const descTxt = descEl ? descEl.textContent.trim().replace(/\s+/g, ' ') : '';
+  let descEndY = HDR_H;
+
+  if (descTxt) {
+    const DESC_FONT = 9 * FONT_SCALE;
+    ctx.font = `${DESC_FONT}px Cormorant Garamond, Georgia, serif`;
+    ctx.fillStyle = 'rgba(255,255,255,.58)';
+    ctx.textBaseline = 'top';
+    const maxDescW = A4W - PAD * 2;
+    const lineH = DESC_FONT * 1.65;
+    const words = descTxt.split(' ');
+    let line = '', lines = [], y = HDR_H + 28;
+    for (const w of words) {
+      const test = line ? line + ' ' + w : w;
+      if (ctx.measureText(test).width > maxDescW) {
+        lines.push(line); line = w;
+      } else { line = test; }
+    }
+    if (line) lines.push(line);
+    // Max 3 lines in desc area
+    lines = lines.slice(0, 3);
+    for (const l of lines) {
+      ctx.fillText(l, PAD, y); y += lineH;
+    }
+    descEndY = y + 16;
+  } else {
+    descEndY = HDR_H + 16;
+  }
+
+  // ── Legend ──────────────────────────────────────────────────────────────────
+  const legEls = [...panel.querySelectorAll('.leg')];
+  let legEndY = descEndY;
+  if (legEls.length) {
+    const legFont = 8.5 * FONT_SCALE;
+    ctx.font = `${legFont}px JetBrains Mono, monospace`;
+    ctx.textBaseline = 'middle';
+    let lx = PAD;
+    for (const leg of legEls) {
+      const sw = leg.querySelector('.lsw, .ldot');
+      const txt = leg.textContent.trim();
+      if (sw) {
+        const col = sw.style.background || '#888';
+        if (sw.classList.contains('ldot')) {
+          ctx.beginPath(); ctx.arc(lx + 8, descEndY + 14, 7, 0, Math.PI * 2);
+          ctx.fillStyle = col; ctx.fill();
+          lx += 22;
+        } else {
+          ctx.fillStyle = col;
+          ctx.fillRect(lx, descEndY + 8, 36, 6);
+          lx += 44;
+        }
+      }
+      ctx.fillStyle = 'rgba(255,255,255,.45)';
+      ctx.fillText(txt, lx, descEndY + 14);
+      lx += ctx.measureText(txt).width + 40;
+      if (lx > A4W - PAD - 200) { lx = PAD; descEndY += 30; }
+    }
+    legEndY = descEndY + 34;
+  }
+
+  // ── Canvas chart ─────────────────────────────────────────────────────────────
+  const chartCanvas = panel.querySelector('canvas');
+  let chartEndY = legEndY;
+  if (chartCanvas && chartCanvas.width > 0 && chartCanvas.height > 0) {
+    // How much vertical space is left for chart?
+    // Reserve bottom for table: 300px if table exists
+    const hasTbl = panel.querySelector('table, .dtbl, .dtable');
+    const tblReserve = hasTbl ? 620 : 60;
+    const availH = A4H - legEndY - tblReserve - 60;
+    const availW = A4W - PAD * 2;
+
+    // Scale chart to fit available space preserving aspect ratio
+    const srcRatio = chartCanvas.width / chartCanvas.height;
+    let drawW = availW, drawH = availW / srcRatio;
+    if (drawH > availH) { drawH = availH; drawW = availH * srcRatio; }
+    drawW = Math.min(drawW, availW);
+    drawH = Math.min(drawH, availH);
+
+    const drawX = PAD + (availW - drawW) / 2;
+    const drawY = legEndY + 10;
+
+    // Chart border
+    ctx.strokeStyle = 'rgba(255,255,255,.08)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(drawX - 1, drawY - 1, drawW + 2, drawH + 2);
+
+    ctx.drawImage(chartCanvas, 0, 0, chartCanvas.width, chartCanvas.height,
+      drawX, drawY, drawW, drawH);
+    chartEndY = drawY + drawH + 20;
+  }
+
+  // ── Data table ───────────────────────────────────────────────────────────────
+  const tbl = panel.querySelector('table, .dtbl');
+  if (tbl) {
+    const rows = [...tbl.querySelectorAll('tr')];
+    const TBL_FONT = 8 * FONT_SCALE;
+    const ROW_H = TBL_FONT * 2.2;
+    const tblY = Math.max(chartEndY, A4H - rows.length * ROW_H - 80);
+    const maxRows = Math.min(rows.length, Math.floor((A4H - tblY - 30) / ROW_H));
+
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.fillRect(PAD - 10, tblY - 10, A4W - PAD * 2 + 20, maxRows * ROW_H + 20);
+    ctx.strokeStyle = 'rgba(200,168,74,.18)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(PAD - 10, tblY - 10, A4W - PAD * 2 + 20, maxRows * ROW_H + 20);
+
+    ctx.font = `${TBL_FONT}px JetBrains Mono, monospace`;
+    ctx.textBaseline = 'middle';
+
+    for (let ri = 0; ri < maxRows; ri++) {
+      const row = rows[ri];
+      const cells = [...row.querySelectorAll('th, td')];
+      const isHead = row.querySelector('th') !== null;
+      const y = tblY + ri * ROW_H + ROW_H / 2;
+
+      if (isHead) {
+        ctx.fillStyle = 'rgba(200,168,74,.1)';
+        ctx.fillRect(PAD - 10, tblY + ri * ROW_H, A4W - PAD * 2 + 20, ROW_H);
+      } else if (ri % 2 === 0) {
+        ctx.fillStyle = 'rgba(255,255,255,.02)';
+        ctx.fillRect(PAD - 10, tblY + ri * ROW_H, A4W - PAD * 2 + 20, ROW_H);
+      }
+
+      if (cells.length) {
+        const colW = (A4W - PAD * 2) / cells.length;
+        cells.forEach((cell, ci) => {
+          const txt = cell.textContent.trim().slice(0, 20);
+          const cx = PAD + ci * colW;
+          ctx.fillStyle = isHead ? '#c8a84a' :
+            cell.style.color || 'rgba(255,255,255,.55)';
+          ctx.textAlign = ci === 0 ? 'left' : 'right';
+          ctx.fillText(txt, ci === 0 ? cx : cx + colW - 8, y);
+        });
+        ctx.textAlign = 'left';
+      }
+
+      // Row separator
+      ctx.strokeStyle = 'rgba(255,255,255,.04)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(PAD - 10, tblY + (ri + 1) * ROW_H);
+      ctx.lineTo(A4W - PAD + 10, tblY + (ri + 1) * ROW_H);
+      ctx.stroke();
+    }
+  }
+
+  // ── Footer rule ─────────────────────────────────────────────────────────────
+  ctx.strokeStyle = 'rgba(200,168,74,.25)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PAD, A4H - 36); ctx.lineTo(A4W - PAD, A4H - 36); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,.2)';
+  ctx.font = `${8 * FONT_SCALE}px JetBrains Mono, monospace`;
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Lift Survival Framework · ' + (numTxt || 'Chart') + ' · ' + (titleTxt.slice(0, 60) || ''), PAD, A4H - 18);
+  ctx.textAlign = 'right';
+  ctx.fillText('3508 × 2480 · A4 Landscape · 300dpi', A4W - PAD, A4H - 18);
+  ctx.textAlign = 'left';
+
+  // ── Download ─────────────────────────────────────────────────────────────────
+  const slug = (numTxt || 'chart').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  const fname = `lift_${slug}_4k.png`;
+  const a = document.createElement('a');
+  a.download = fname;
+  a.href = ec.toDataURL('image/png');
+  a.click();
+};
+
+// Export ALL panels on the page at once (sequential with delay)
+window.exportAllPanels = function() {
+  const panels = [...document.querySelectorAll('.chart-panel')];
+  let i = 0;
+  function next() {
+    if (i >= panels.length) return;
+    const p = panels[i++];
+    const id = p.id || ('panel_' + i);
+    if (!p.id) p.id = id;
+    window.exportPanel(id);
+    setTimeout(next, 800);
+  }
+  next();
+};
+
 </script>
 </body>
 </html>
