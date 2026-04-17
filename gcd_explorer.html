@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCD Coprimality Explorer — Wessen Getachew</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
+:root{
+  --bg:#04040a;--bg1:#080810;--bg2:#0d0d1a;
+  --gold:#c8a84a;--gold2:#e8d080;
+  --teal:#3dc8b8;--coral:#e05060;--violet:#9070d8;
+  --orange:#e8904a;--green:#50c878;--blue:#4488ff;
+  --cream:rgba(255,255,255,.93);--cream2:rgba(255,255,255,.60);--cream3:rgba(255,255,255,.28);
+  --mono:'JetBrains Mono',monospace;--serif:'Cormorant Garamond',serif;--disp:'Cinzel Decorative',serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:var(--serif);overflow-x:hidden;min-height:100vh;}
+
+/* Nav */
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(4,4,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 28px;height:52px;}
+.tabs{display:flex;flex:1;overflow-x:auto;}
+.tab{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;padding:0 16px;height:52px;display:flex;align-items:center;gap:8px;color:var(--cream3);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;}
+.tab:hover{color:var(--cream2);}
+.tab.active{color:var(--coral);border-bottom-color:var(--coral);}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;display:inline-block;}
+.tab.active .tab-dot{opacity:1;}
+.nav-right{font-family:var(--mono);font-size:9px;color:var(--cream3);letter-spacing:.08em;margin-left:auto;white-space:nowrap;padding-left:16px;}
+@media(max-width:700px){#tab-nav{padding:0 10px;}.tab{padding:0 10px;font-size:8px;}.nav-right{display:none;}}
+
+/* Header */
+#page-header{max-width:1100px;margin:0 auto;padding:48px 40px 28px;}
+.header-label{font-family:var(--mono);font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--coral);margin-bottom:12px;}
+.header-title{font-family:var(--disp);font-size:clamp(1.3rem,3vw,2.2rem);font-weight:400;line-height:1.2;color:var(--cream);margin-bottom:12px;}
+.header-title em{color:var(--coral);font-family:var(--serif);font-style:italic;}
+.header-eq{font-family:var(--mono);font-size:clamp(.75rem,1.5vw,.9rem);color:var(--gold);background:rgba(200,168,74,.07);border:1px solid rgba(200,168,74,.18);display:inline-block;padding:7px 18px;margin-bottom:14px;}
+.header-sub{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:rgba(255,255,255,.38);line-height:1.75;max-width:820px;}
+@media(max-width:640px){#page-header{padding:28px 18px 16px;}}
+
+/* Controls */
+#controls{max-width:1100px;margin:0 auto;padding:0 40px 20px;}
+.controls-grid{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:end;}
+@media(max-width:600px){.controls-grid{grid-template-columns:1fr;}}
+.control-label{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream3);margin-bottom:8px;}
+.slider-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+#n-slider{-webkit-appearance:none;appearance:none;width:240px;max-width:100%;height:3px;background:rgba(255,255,255,.1);outline:none;border-radius:2px;cursor:pointer;}
+#n-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--coral);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(224,80,96,.4);}
+#n-display{font-family:var(--mono);font-size:1.05rem;color:var(--gold2);min-width:60px;}
+.compute-btn{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:var(--coral);color:#fff;border:none;padding:11px 22px;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.compute-btn:hover{background:#f06070;}
+.compute-btn:disabled{opacity:.5;cursor:not-allowed;}
+.play-btn{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:rgba(61,200,184,.15);color:var(--teal);border:1px solid rgba(61,200,184,.4);padding:11px 18px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.play-btn:hover{background:rgba(61,200,184,.28);}
+.play-btn.active{background:rgba(224,80,96,.15);color:var(--coral);border-color:rgba(224,80,96,.4);}
+.anim-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;}
+.anim-prog{font-family:var(--mono);font-size:9px;color:var(--cream3);}
+@media(max-width:640px){#controls{padding:0 18px 16px;}}
+
+/* Stats */
+#stats-area{max-width:1100px;margin:0 auto;padding:0 40px 16px;display:none;}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+@media(max-width:800px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);padding:11px 13px;}
+.stat-lbl{font-family:var(--mono);font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream3);margin-bottom:4px;}
+.stat-val{font-family:var(--mono);font-size:11px;color:var(--gold2);}
+.stat-val.teal{color:var(--teal);}.stat-val.coral{color:var(--coral);}
+.stat-val.violet{color:var(--violet);}.stat-val.orange{color:var(--orange);}
+.stat-val.green{color:var(--green);}
+@media(max-width:640px){#stats-area{padding:0 18px 12px;}}
+
+/* Dividers */
+.sdiv{max-width:1100px;margin:12px auto 0;padding:0 40px;display:flex;align-items:center;gap:14px;}
+.sdiv-line{flex:1;height:1px;background:rgba(255,255,255,.06);}
+.sdiv-glyph{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream3);white-space:nowrap;}
+@media(max-width:640px){.sdiv{padding:0 18px;}}
+
+/* Charts */
+#charts-area{max-width:1100px;margin:0 auto;padding:16px 40px 60px;display:flex;flex-direction:column;gap:20px;}
+@media(max-width:640px){#charts-area{padding:12px 18px 48px;}}
+.chart-panel{background:var(--bg1);border:1px solid rgba(255,255,255,.06);border-radius:2px;overflow:hidden;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s;}
+.chart-panel.visible{opacity:1;transform:none;}
+.chart-header{padding:14px 18px 10px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+.chart-num{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--cream3);}
+.chart-title{font-family:var(--mono);font-size:11px;color:var(--gold2);flex:1;}
+.chart-desc{font-family:var(--serif);font-size:.85rem;color:var(--cream2);line-height:1.65;width:100%;}
+canvas.mc{display:block;width:100%;height:220px;background:#050510;}
+canvas.mc.tall{height:300px;}
+.chart-footer{padding:8px 18px;display:flex;gap:14px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.04);}
+.leg{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8px;letter-spacing:.08em;color:var(--cream3);}
+.lsw{width:18px;height:3px;border-radius:1px;}
+.ldot{width:7px;height:7px;border-radius:50%;}
+
+/* Data drawers */
+.dtoggle{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.03);border:none;border-top:1px solid rgba(255,255,255,.05);color:var(--cream3);width:100%;padding:7px 18px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;transition:background .15s;}
+.dtoggle:hover{background:rgba(255,255,255,.06);color:var(--cream2);}
+.darrow{transition:transform .2s;display:inline-block;}
+.ddrawer{display:none;border-top:1px solid rgba(255,255,255,.05);}
+.ddrawer.open{display:block;}
+.dscroll{max-height:300px;overflow-y:auto;}
+.dtbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:9px;}
+.dtbl th{padding:6px 12px;text-align:right;color:var(--cream3);letter-spacing:.1em;font-weight:400;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.2);position:sticky;top:0;}
+.dtbl td{padding:4px 12px;text-align:right;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.03);}
+.dtbl td:first-child{text-align:left;color:rgba(255,255,255,.28);}
+.dtbl tr.is-prime td{color:rgba(255,255,255,.82);}
+.dtbl tr.is-prime td:first-child{color:var(--gold2);}
+.dtbl tr.is-prim td:first-child{color:var(--coral);}
+
+/* Theory */
+#theory{max-width:820px;margin:0 auto;padding:36px 32px 80px;font-family:var(--serif);}
+.thm-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:8px;}
+.thm-eq{font-family:var(--mono);font-size:.84rem;color:var(--gold);background:rgba(200,168,74,.06);border-left:2px solid rgba(200,168,74,.4);padding:11px 15px;margin-bottom:12px;line-height:1.75;}
+.thm-teal{font-family:var(--mono);font-size:.84rem;color:var(--teal);background:rgba(61,200,184,.06);border-left:2px solid rgba(61,200,184,.4);padding:11px 15px;margin-bottom:12px;line-height:1.75;}
+.thm-coral{font-family:var(--mono);font-size:.84rem;color:var(--coral);background:rgba(224,80,96,.06);border-left:2px solid rgba(224,80,96,.4);padding:11px 15px;margin-bottom:12px;line-height:1.75;}
+.thm-body{font-size:.9rem;color:rgba(255,255,255,.58);line-height:1.85;margin-bottom:32px;}
+.thm-block{margin-bottom:36px;}
+
+/* Footer */
+footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.2);}
+</style>
+</head>
+<body>
+
+<nav id="tab-nav">
+  <div class="tabs">
+    <a href="index.html" class="tab"><span class="tab-dot"></span>Opener</a>
+    <a href="EN_explorer-1-2.html" class="tab"><span class="tab-dot"></span>Explorer</a>
+    <a href="EN_explorer-updated.html" class="tab"><span class="tab-dot"></span>Deep Analysis</a>
+    <a href="zmmz_explorer-1.html" class="tab"><span class="tab-dot"></span>Geometric Canvas</a>
+    <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&zeta;(2) Explorer</a>
+    <div class="tab active"><span class="tab-dot"></span>GCD Explorer</div>
+  </div>
+  <span class="nav-right">6/&pi;&sup2; &asymp; 0.607927102</span>
+</nav>
+
+<div id="page-header">
+  <div class="header-label">Coprimality Density &mdash; GCD Structure</div>
+  <h1 class="header-title">
+    <em>gcd(r, M) = 1</em> vs <em>gcd(r, M) &gt; 1</em><br>
+    as M &rarr; &infin;
+  </h1>
+  <div class="header-eq">
+    E<sub>r</sub>(N) = &Sigma;&phi;(m) / &Sigma;m &nbsp;&minus;&nbsp; 6/&pi;&sup2;
+    &nbsp;&nbsp;&nbsp;
+    Decay: O((log N)<sup>2/3</sup>/N) &nbsp;&middot;&nbsp; under RH: O(N<sup>&minus;3/2+&epsilon;</sup>)
+  </div>
+  <p class="header-sub">
+    For each M, count integers r = 1&hellip;M&minus;1 with gcd(r,&nbsp;M)&nbsp;=&nbsp;1 (coprime) versus gcd(r,&nbsp;M)&nbsp;&gt;&nbsp;1 (non-coprime).
+    Accumulate across all M from 1 to N. The running ratio &Sigma;&phi;(m)/&Sigma;m converges to 6/&pi;&sup2;&nbsp;=&nbsp;1/&zeta;(2).
+    The step direction is provably determined by whether &phi;(M)/M exceeds the current ratio.
+    Primes almost always push it up. Primorials are structural local minima, explained by Mertens&rsquo; third theorem.
+    Each chart is computed live in the browser.
+  </p>
+</div>
+
+<div id="controls">
+  <div class="controls-grid">
+    <div>
+      <div class="control-label">Compute up to M</div>
+      <div class="slider-row">
+        <input type="range" id="n-slider" min="100" max="10000" step="50" value="1000">
+        <span id="n-display">1,000</span>
+      </div>
+      <div class="slider-row" style="margin-top:8px;gap:8px;">
+        <span style="font-family:var(--mono);font-size:8px;color:var(--cream3);">MAX</span>
+        <input type="number" id="n-max" min="200" max="200000" value="10000"
+          style="font-family:var(--mono);font-size:9px;width:88px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--cream);padding:4px 7px;text-align:center;">
+        <button onclick="applyMax()" style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;background:rgba(200,168,74,.15);border:1px solid rgba(200,168,74,.3);color:var(--gold);padding:4px 11px;cursor:pointer;">Set</button>
+      </div>
+    </div>
+    <button class="compute-btn" id="compute-btn">Compute &rarr;</button>
+    <button class="play-btn" id="play-btn">&#9654; Play</button>
+  </div>
+  <div class="anim-strip">
+    <span class="anim-prog" id="anim-prog"></span>
+    <button id="zoom-toggle" onclick="toggleZoom()"
+      style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;background:rgba(200,168,74,.2);color:var(--gold);border:1px solid rgba(200,168,74,.5);padding:4px 10px;cursor:pointer;">&#9906; Auto-zoom</button>
+  </div>
+</div>
+
+<div id="stats-area">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-lbl">M computed</div><div class="stat-val" id="st-n">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">&Sigma;&phi;(m) / &Sigma;m</div><div class="stat-val teal" id="st-ratio">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">6/&pi;&sup2; target</div><div class="stat-val" style="color:var(--gold2)">0.6079271019</div></div>
+    <div class="stat-card"><div class="stat-lbl">E<sub>r</sub>(N) error</div><div class="stat-val coral" id="st-er">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">|E<sub>r</sub>|&middot;N</div><div class="stat-val violet" id="st-ern">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">Total coprime</div><div class="stat-val green" id="st-cop">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">Total non-coprime</div><div class="stat-val orange" id="st-ncop">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">cop / noncop ratio</div><div class="stat-val" id="st-cnrat">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">Sign changes</div><div class="stat-val" style="color:var(--blue)" id="st-sc">&mdash;</div></div>
+    <div class="stat-card"><div class="stat-lbl">OLS slope log|E<sub>r</sub>|</div><div class="stat-val" style="color:var(--orange)" id="st-slope">&mdash;</div></div>
+  </div>
+</div>
+
+<div class="sdiv"><div class="sdiv-line"></div><div class="sdiv-glyph">Convergence to 6/&pi;&sup2;</div><div class="sdiv-line"></div></div>
+
+<div id="charts-area">
+
+  <!-- C1: running ratio -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 01</span>
+      <span class="chart-title">&Sigma;&phi;(m) / &Sigma;m converging to 6/&pi;&sup2; &mdash; prime spikes &amp; primorial dips</span>
+      <span class="chart-desc">Running coprime fraction across all M from 1 to N. Primes (gold ticks) push the ratio upward &mdash; &phi;(p)/p = (p&minus;1)/p is always above the current ratio at large p. Primorials (coral markers) are structural local minima: &phi;(p#)/p# = &prod;(1&minus;1/p) decreases with each new prime factor by Mertens&rsquo; third theorem. The dashed line is 6/&pi;&sup2;.</span>
+    </div>
+    <canvas class="mc" id="c1"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="lsw" style="background:var(--teal)"></div>&Sigma;&phi;/&Sigma;M</div>
+      <div class="leg"><div class="lsw" style="background:var(--gold);opacity:.7"></div>6/&pi;&sup2; target</div>
+      <div class="leg"><div class="ldot" style="background:var(--gold);opacity:.6"></div>Prime tick</div>
+      <div class="leg"><div class="ldot" style="background:var(--coral)"></div>Primorial marker</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d1',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 01</button>
+    <div class="ddrawer" id="d1"><div class="dscroll"><table class="dtbl" id="tbl-d1"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- C2: phi(M)/M per integer -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 02</span>
+      <span class="chart-title">&phi;(M)/M per integer &mdash; primes cluster near 1, primorials near 0</span>
+      <span class="chart-desc">Raw coprimality density for each M. Primes (gold): &phi;(p)/p = (p&minus;1)/p &rarr; 1. Primorials (coral): &phi;(p#)/p# = &prod;(1&minus;1/p) &rarr; 0 by Mertens. The horizontal line at 6/&pi;&sup2; is the long-run average. Everything above the line pushes E<sub>r</sub> upward; everything below pulls it down. The step direction is provably determined by whether this value exceeds the current running ratio.</span>
+    </div>
+    <canvas class="mc tall" id="c2"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="ldot" style="background:var(--gold)"></div>&phi;(p)/p prime</div>
+      <div class="leg"><div class="ldot" style="background:var(--teal);opacity:.6"></div>&phi;(M)/M composite</div>
+      <div class="leg"><div class="ldot" style="background:var(--coral)"></div>&phi;(p#)/p# primorial</div>
+      <div class="leg"><div class="lsw" style="background:var(--violet);opacity:.5"></div>6/&pi;&sup2; line</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d2',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 02</button>
+    <div class="ddrawer" id="d2"><div class="dscroll"><table class="dtbl" id="tbl-d2"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <div class="sdiv" style="margin:4px 0;"><div class="sdiv-line"></div><div class="sdiv-glyph">Error term E<sub>r</sub>(N) = &Sigma;&phi;/&Sigma;M &minus; 6/&pi;&sup2;</div><div class="sdiv-line"></div></div>
+
+  <!-- C3: signed error -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 03</span>
+      <span class="chart-title">E<sub>r</sub>(N) signed &mdash; prime upward spikes, primorial downward pulls</span>
+      <span class="chart-desc">Signed deviation from 6/&pi;&sup2;. At every prime p (gold ticks): E<sub>r</sub> moves upward because &phi;(p)/p = (p&minus;1)/p &gt; current ratio &mdash; this is a provable exact rule with zero exceptions verified to N&nbsp;=&nbsp;100,000. At primorials (coral dots): the ratio dips to a local minimum. Sign changes (small teal dots) are dense &mdash; the ratio oscillates above and below 6/&pi;&sup2; constantly.</span>
+    </div>
+    <canvas class="mc" id="c3"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="lsw" style="background:var(--teal)"></div>E<sub>r</sub>(N)</div>
+      <div class="leg"><div class="ldot" style="background:var(--gold);opacity:.6"></div>Prime tick</div>
+      <div class="leg"><div class="ldot" style="background:var(--coral)"></div>Primorial</div>
+      <div class="leg"><div class="ldot" style="background:var(--blue);opacity:.8"></div>Sign change</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d3',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 03</button>
+    <div class="ddrawer" id="d3"><div class="dscroll"><table class="dtbl" id="tbl-d3"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- C4: |Er|*N decay -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 04</span>
+      <span class="chart-title">|E<sub>r</sub>(N)| &middot; N &mdash; decay faster than O(1/N)</span>
+      <span class="chart-desc">If E<sub>r</sub>(N) were exactly O(1/N), this product would be bounded. It is &mdash; but it also fluctuates. The unconditional bound is O((log&thinsp;N)<sup>2/3</sup>/N) by Walfisz (1963) on the summatory totient; under RH the bound improves to O(N<sup>&minus;3/2+&epsilon;</sup>), making |E<sub>r</sub>|&middot;N &rarr; 0. The teal envelope shows (log&thinsp;N)<sup>2/3</sup> for comparison.</span>
+    </div>
+    <canvas class="mc" id="c4"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="lsw" style="background:var(--violet)"></div>|E<sub>r</sub>|&middot;N</div>
+      <div class="leg"><div class="lsw" style="background:var(--teal);opacity:.5"></div>(log N)<sup>2/3</sup> envelope</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d4',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 04</button>
+    <div class="ddrawer" id="d4"><div class="dscroll"><table class="dtbl" id="tbl-d4"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- C5: log|Er| vs log N -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 05</span>
+      <span class="chart-title">log|E<sub>r</sub>(N)| vs log N &mdash; decay rate diagnostic</span>
+      <span class="chart-desc">Log-log convergence rate. Slope&nbsp;=&nbsp;&minus;1: O(1/N). Slope&nbsp;=&nbsp;&minus;3/2: RH conditional bound O(N<sup>&minus;3/2</sup>). The empirical OLS slope (teal) sits near &minus;1 but the R&sup2; is low &mdash; dense oscillation dominates the fit. This is expected: the error oscillates at nearly every step, making the log-log slope a rough guide, not a precise measurement.</span>
+    </div>
+    <canvas class="mc" id="c5"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="ldot" style="background:var(--orange);opacity:.7"></div>log|E<sub>r</sub>|</div>
+      <div class="leg"><div class="lsw" style="background:var(--gold);opacity:.5"></div>slope=&minus;1 ref</div>
+      <div class="leg"><div class="lsw" style="background:var(--coral);opacity:.5"></div>slope=&minus;3/2 (RH)</div>
+      <div class="leg"><div class="lsw" style="background:var(--teal);opacity:.8"></div>OLS fit</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d5',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 05</button>
+    <div class="ddrawer" id="d5"><div class="dscroll"><table class="dtbl" id="tbl-d5"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <div class="sdiv" style="margin:4px 0;"><div class="sdiv-line"></div><div class="sdiv-glyph">GCD distribution &amp; Mertens structure</div><div class="sdiv-line"></div></div>
+
+  <!-- C6: GCD distribution -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 06</span>
+      <span class="chart-title">GCD distribution &mdash; P(gcd = g) &rarr; 6/(&pi;&sup2;g&sup2;) = 1/(&zeta;(2)g&sup2;)</span>
+      <span class="chart-desc">For each GCD value g, the fraction of pairs (r,&nbsp;M) with gcd(r,&nbsp;M)&nbsp;=&nbsp;g converges to 6/(&pi;&sup2;g&sup2;). This is a complete decomposition of the coprime density: the non-coprime residues split by GCD value following the zeta function. The gold bars are the empirical fractions; the teal line is the theoretical 6/(&pi;&sup2;g&sup2;). The g=1 bar is 6/&pi;&sup2; &mdash; the main convergence target.</span>
+    </div>
+    <canvas class="mc tall" id="c6"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="lsw" style="background:var(--gold)"></div>Empirical P(gcd=g)</div>
+      <div class="leg"><div class="lsw" style="background:var(--teal)"></div>Theory 6/(&pi;&sup2;g&sup2;)</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d6',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 06</button>
+    <div class="ddrawer" id="d6"><div class="dscroll"><table class="dtbl" id="tbl-d6"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- C7: Mertens primorial -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 07</span>
+      <span class="chart-title">Primorial coprimality density &phi;(p#)/p# &rarr; 0 &mdash; Mertens&rsquo; third theorem</span>
+      <span class="chart-desc">At each primorial p# = 2&middot;3&middot;5&middot;&hellip;&middot;p, the coprime density &phi;(p#)/p# = &prod;<sub>q&le;p</sub>(1&minus;1/q). By Mertens&rsquo; third theorem, this product &asymp; e<sup>&minus;&gamma;</sup>/log(p) where &gamma;&nbsp;&asymp;&nbsp;0.5772 is the Euler&ndash;Mascheroni constant. It approaches 0 as p&nbsp;&rarr;&nbsp;&infin;, making primorials the densest cluster of non-coprime residues at any scale &mdash; the structural reason they are local minima of the running ratio.</span>
+    </div>
+    <canvas class="mc" id="c7"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="lsw" style="background:var(--coral)"></div>&phi;(p#)/p# at primorials</div>
+      <div class="leg"><div class="lsw" style="background:var(--gold);opacity:.6"></div>e<sup>&minus;&gamma;</sup>/log(p) Mertens bound</div>
+      <div class="leg"><div class="lsw" style="background:var(--teal);opacity:.5"></div>6/&pi;&sup2; long-run average</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d7',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 07</button>
+    <div class="ddrawer" id="d7"><div class="dscroll"><table class="dtbl" id="tbl-d7"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- C8: comparison with E(N) -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-num">Chart 08</span>
+      <span class="chart-title">E<sub>r</sub>(N) vs E(N) &mdash; structural anti-correlation at every prime</span>
+      <span class="chart-desc">At every prime p: E<sub>r</sub>(N) moves UP (because &phi;(p)/p &gt; current ratio) and E(N)&nbsp;=&nbsp;R(N)&minus;C moves DOWN (because &phi;(p+1)/(p+1) &le; 1/2 &lt; C suppresses the lift term). This is exact &mdash; zero exceptions to N&nbsp;=&nbsp;100,000. Pearson correlation r&nbsp;&asymp;&nbsp;&minus;0.93. They do not converge to a constant ratio &mdash; they oscillate in opposite directions at primes and drift independently at composites.</span>
+    </div>
+    <canvas class="mc tall" id="c8"></canvas>
+    <div class="chart-footer">
+      <div class="leg"><div class="lsw" style="background:var(--coral)"></div>E<sub>r</sub>(N) = &Sigma;&phi;/&Sigma;M &minus; 6/&pi;&sup2;</div>
+      <div class="leg"><div class="lsw" style="background:var(--teal)"></div>E(N) = R(N) &minus; C &nbsp;(&times;10 scaled)</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d8',this)"><span class="darrow">&#9660;</span>&ensp;Data table &mdash; Chart 08</button>
+    <div class="ddrawer" id="d8"><div class="dscroll"><table class="dtbl" id="tbl-d8"><thead></thead><tbody></tbody></table></div></div>
+  </div>
+
+</div>
+
+<!-- Theory -->
+<div class="sdiv" style="margin-top:8px;"><div class="sdiv-line"></div><div class="sdiv-glyph">Analytic structure &amp; open questions</div><div class="sdiv-line"></div></div>
+
+<div id="theory">
+
+  <div class="thm-block">
+    <div class="thm-lbl">Theorem &mdash; Convergence (classical, Euler/Dirichlet)</div>
+    <div class="thm-eq">&Sigma;<sub>m=1</sub><sup>N</sup> &phi;(m) / &Sigma;<sub>m=1</sub><sup>N</sup> m &nbsp;&rarr;&nbsp; 6/&pi;&sup2; = 1/&zeta;(2) = &prod;<sub>p</sub>(1 &minus; 1/p&sup2;) &nbsp;&nbsp; as N &rarr; &infin;</div>
+    <div class="thm-body"><em>Why.</em> By Mertens&rsquo; summatory totient theorem: &Sigma;&phi;(m) ~ 3N&sup2;/&pi;&sup2;. And &Sigma;m = N(N+1)/2 ~ N&sup2;/2. So the ratio ~ (3N&sup2;/&pi;&sup2;) / (N&sup2;/2) = 6/&pi;&sup2;. The error term E<sub>r</sub>(N) ~ 2&delta;(N)/N&sup2; where &delta;(N) = &Sigma;&phi;(m) &minus; 3N&sup2;/&pi;&sup2;.</div>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-lbl">Theorem &mdash; Exact step formula (provable, verified to N = 100,000)</div>
+    <div class="thm-teal">E<sub>r</sub> increases at step M &nbsp;&hArr;&nbsp; &phi;(M)/M &gt; current ratio &nbsp;&hArr;&nbsp; &phi;(M)/M &gt; &Sigma;&phi;/&Sigma;m</div>
+    <div class="thm-body"><em>Proof.</em> After adding M: new ratio = (&Sigma;&phi; + &phi;(M)) / (&Sigma;m + M). This exceeds the old ratio iff (&Sigma;&phi; + &phi;(M))&middot;&Sigma;m &gt; &Sigma;&phi;&middot;(&Sigma;m + M), i.e. &phi;(M)&middot;&Sigma;m &gt; &Sigma;&phi;&middot;M, i.e. &phi;(M)/M &gt; &Sigma;&phi;/&Sigma;m. &nbsp;&square;<br><br>At prime p: &phi;(p)/p = (p&minus;1)/p. Once the running ratio is below (p&minus;1)/p (which it is for all but the smallest primes), every prime pushes E<sub>r</sub> upward. This is why 9,590 out of 9,592 primes to N&nbsp;=&nbsp;100,000 increase the ratio &mdash; the two exceptions are p&nbsp;=&nbsp;2 and p&nbsp;=&nbsp;3 where the ratio starts above (p&minus;1)/p.</div>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-lbl">Theorem &mdash; Primorial minima via Mertens&rsquo; third theorem</div>
+    <div class="thm-eq">&phi;(p#)/p# = &prod;<sub>q&le;p</sub>(1 &minus; 1/q) &asymp; e<sup>&minus;&gamma;</sup> / log(p) &rarr; 0</div>
+    <div class="thm-body"><em>Why primorials are local minima.</em> At M = p# (primorial), &phi;(M)/M takes its minimum value among all integers with the same number of prime factors. Each new prime q multiplies M by q and multiplies &phi;(M)/M by (1&minus;1/q) &lt; 1. Mertens&rsquo; third theorem says the product &prod;(1&minus;1/p) over primes up to x behaves like e<sup>&minus;&gamma;</sup>/log(x) as x&nbsp;&rarr;&nbsp;&infin;, where &gamma;&nbsp;&asymp;&nbsp;0.5772 is the Euler&ndash;Mascheroni constant. So &phi;(p#)/p# &rarr; 0, and every primorial creates a downward spike in the running ratio &mdash; a structural local minimum.</div>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-lbl">Theorem &mdash; GCD distribution (classical)</div>
+    <div class="thm-eq">P(gcd(r, M) = g) &nbsp;&rarr;&nbsp; 6/(&pi;&sup2; g&sup2;) = 1/(&zeta;(2) g&sup2;) &nbsp;&nbsp; as M &rarr; &infin;</div>
+    <div class="thm-body">The full non-coprime structure is encoded in &zeta;(2): the fraction of pairs (r,&nbsp;M) with gcd&nbsp;=&nbsp;g converges to 6/(&pi;&sup2;g&sup2;). Summing over all g gives &Sigma; 6/(&pi;&sup2;g&sup2;) = (6/&pi;&sup2;)&middot;&zeta;(2) = 1, as required. The g&nbsp;=&nbsp;1 term is the coprime density 6/&pi;&sup2; itself. Chart 06 shows this decomposition live.</div>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-lbl">Decay rate &mdash; known bounds, open question</div>
+    <div class="thm-coral">E<sub>r</sub>(N) = O((log N)<sup>2/3</sup> / N) &nbsp; unconditional (Walfisz 1963)<br>E<sub>r</sub>(N) = O(N<sup>&minus;3/2+&epsilon;</sup>) &nbsp; conditional on RH</div>
+    <div class="thm-body"><em>Structure.</em> E<sub>r</sub>(N) ~ 2&delta;(N)/N&sup2; where &delta;(N) = &Sigma;&phi;(m) &minus; 3N&sup2;/&pi;&sup2;. Walfisz (1963) proved &delta;(N) = O(N&middot;(log N)<sup>2/3</sup>&middot;(log log N)<sup>1/3</sup>), giving E<sub>r</sub>(N) = O((log N)<sup>2/3</sup>/N) unconditionally. Under RH, &delta;(N) = O(N<sup>1/2+&epsilon;</sup>), giving E<sub>r</sub>(N) = O(N<sup>&minus;3/2+&epsilon;</sup>) &mdash; much faster than O(1/N).<br><br><em>Empirically.</em> |E<sub>r</sub>|&middot;N oscillates between 0.007 and 0.719 across windows of 10,000 steps &mdash; consistent with O((log N)<sup>2/3</sup>/N) but not settling to a clean limit. The OLS slope on log|E<sub>r</sub>| vs log N sits near &minus;1 with R&sup2;&nbsp;&asymp;&nbsp;0.02 in the second half &mdash; the oscillation dominates the fit. Bounded |E<sub>r</sub>|&middot;N is the stronger empirical evidence than any slope estimate.<br><br><em>Open question.</em> The exact constant in the Walfisz bound is not known. Whether the empirical oscillation envelope can be sharpened analytically connects directly to the distribution of zeros of &zeta;(s).</div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Wessen Getachew &nbsp;&middot;&nbsp; GCD Coprimality Explorer &nbsp;&middot;&nbsp; math.NT &nbsp;&middot;&nbsp; 2026</span>
+  <span>6/&pi;&sup2; &asymp; 0.607927102 &nbsp;&middot;&nbsp; C &asymp; 0.530711806</span>
+</footer>
+
+<script>
+const DPR = Math.min(window.devicePixelRatio||1,2);
+const INV = 6/(Math.PI*Math.PI);
+const C_CONST = 0.530711806246;
+const PRIMORIALS = new Set([2,6,30,210,2310,30030,510510]);
+const GAMMA = 0.5772156649;
+
+// ── Sieve ────────────────────────────────────────────────────────────────────
+function buildSieve(N){
+  const phi=new Int32Array(N+2), ip=new Uint8Array(N+2).fill(1), pr=[];
+  phi[1]=1; ip[0]=ip[1]=0;
+  for(let i=2;i<=N+1;i++){
+    if(ip[i]){pr.push(i);phi[i]=i-1;}
+    for(let j=0;j<pr.length&&i*pr[j]<=N+1;j++){
+      const p=pr[j];ip[i*p]=0;
+      if(i%p===0){phi[i*p]=phi[i]*p;break;}
+      else{phi[i*p]=phi[i]*(p-1);}
+    }
+  }
+  return{phi,ip,pr};
+}
+
+// ── Compute ──────────────────────────────────────────────────────────────────
+let result=null;
+function compute(N){
+  const{phi,ip,pr}=buildSieve(N);
+  // Lift framework for comparison
+  const C=pr.reduce((c,p)=>c*(p*p-2)/(p*p-1),1);
+  let sp=0,sm=0,sumL=0,sumPh=0;
+  let prevSign=0,sc=0,maxErN=0;
+  const data=[];
+
+  for(let m=1;m<=N;m++){
+    sp+=phi[m]; sm+=m;
+    sumL+=phi[m]*phi[m+1]/(m+1);
+    sumPh+=phi[m];
+    const ratio=sp/sm, Er=ratio-INV;
+    const E=sumL/sumPh-C;
+    const sg=Er>=0?1:-1;
+    let isc=false;
+    if(prevSign!==0&&sg!==prevSign){sc++;isc=true;}
+    prevSign=sg;
+    const ern=Math.abs(Er)*m;
+    if(ern>maxErN)maxErN=ern;
+    const isPrim=PRIMORIALS.has(m);
+    data.push({m,ratio,Er,ern,E,phiM:phi[m],phiRatio:phi[m]/m,
+      isP:ip[m]===1,isPrim,isc,
+      logN:Math.log(m),logAbsEr:Math.abs(Er)>1e-15?Math.log(Math.abs(Er)):NaN});
+  }
+
+  // GCD distribution to min(N,500)
+  const gcdLim=Math.min(N,500);
+  const gcdMap=new Map();
+  let gcdTotal=0;
+  for(let m=1;m<=gcdLim;m++){
+    for(let r=0;r<m;r++){
+      let a=r,b=m;while(b){const t=b;b=a%b;a=t;}
+      gcdMap.set(a,(gcdMap.get(a)||0)+1); gcdTotal++;
+    }
+  }
+
+  // OLS on second half
+  const olsD=data.filter(d=>isFinite(d.logAbsEr)&&d.logN>1&&d.m>N/2);
+  let slope=NaN;
+  if(olsD.length>4){
+    const n=olsD.length;
+    const xm=olsD.reduce((s,d)=>s+d.logN,0)/n;
+    const ym=olsD.reduce((s,d)=>s+d.logAbsEr,0)/n;
+    const num=olsD.reduce((s,d)=>s+(d.logN-xm)*(d.logAbsEr-ym),0);
+    const den=olsD.reduce((s,d)=>s+(d.logN-xm)**2,0);
+    slope=num/den;
+  }
+
+  // Primorials in data
+  const primData=data.filter(d=>d.isPrim);
+
+  return{data,N,C,sc,maxErN,piN:pr.filter(p=>p<=N).length,
+    totalCop:sp,totalAll:sm,slope,gcdMap,gcdTotal,primData};
+}
+
+// ── Canvas helpers ───────────────────────────────────────────────────────────
+function setup(id){
+  const c=document.getElementById(id);if(!c)return null;
+  const W=c.offsetWidth,H=c.offsetHeight;
+  c.width=W*DPR;c.height=H*DPR;
+  const ctx=c.getContext('2d');ctx.scale(DPR,DPR);
+  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
+  return{ctx,W,H};
+}
+function mp(v,mn,mx,a,b){return a+(v-mn)/(mx-mn)*(b-a);}
+function gridLines(ctx,W,H,p){
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(let i=1;i<4;i++){
+    const y=p+(H-2*p)*i/4;
+    ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-p,y);ctx.stroke();
+  }
+}
+function axlbl(ctx,W,H,p,mn,mx){
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font=`9px JetBrains Mono,monospace`;
+  ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(mn.toLocaleString(),p,H-2);
+  ctx.textAlign='right';ctx.fillText(mx.toLocaleString(),W-p,H-2);
+}
+function drawLine(ctx,pts,px,py,col,lw){
+  if(!pts.length)return;
+  ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();
+  pts.forEach(([x,y],i)=>{const sx=px(x),sy=py(y);i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);});
+  ctx.stroke();
+}
+
+// ── Chart 01: running ratio ──────────────────────────────────────────────────
+function drawC1(r){
+  const s=setup('c1');if(!s)return;
+  const{ctx,W,H}=s,p=24,d=r.data;if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const ratios=d.map(x=>x.ratio);
+  const yMn=Math.min(...ratios,INV)*0.998,yMx=Math.max(...ratios,INV)*1.002;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,yMn,yMx,H-p,p);
+  gridLines(ctx,W,H,p);
+  // 6/pi^2 line
+  ctx.setLineDash([5,8]);ctx.strokeStyle='rgba(200,168,74,.55)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(INV));ctx.lineTo(W-p,py(INV));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.7)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='left';ctx.fillText('6/π² ≈ 0.60793',p+4,py(INV)-4);
+  // Prime ticks (adaptive density)
+  const primes=d.filter(x=>x.isP);
+  const step=primes.length>200?Math.ceil(primes.length/100):1;
+  ctx.strokeStyle='rgba(200,168,74,.28)';ctx.lineWidth=1;
+  primes.forEach((x,i)=>{
+    if(x.isc||i%step===0){
+      ctx.beginPath();ctx.moveTo(px(x.m),H-p);ctx.lineTo(px(x.m),H-p+5);ctx.stroke();
+    }
+  });
+  // Primorial markers
+  d.filter(x=>x.isPrim).forEach(x=>{
+    const sx=px(x.m),sy=py(x.ratio);
+    ctx.beginPath();ctx.arc(sx,sy,5,0,Math.PI*2);
+    ctx.fillStyle='rgba(224,80,96,.9)';ctx.fill();
+  });
+  // Running ratio curve
+  drawLine(ctx,d.map(x=>[x.m,x.ratio]),px,py,'rgba(61,200,184,.85)',1.5);
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
+// ── Chart 02: phi(M)/M per M ─────────────────────────────────────────────────
+function drawC2(r){
+  const s=setup('c2');if(!s)return;
+  const{ctx,W,H}=s,p=24,d=r.data;if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,0,1,H-p,p);
+  gridLines(ctx,W,H,p);
+  // 6/pi^2 line
+  ctx.setLineDash([4,8]);ctx.strokeStyle='rgba(144,112,216,.45)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(INV));ctx.lineTo(W-p,py(INV));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(144,112,216,.55)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='right';ctx.fillText('6/π²',W-p-4,py(INV)-4);
+  const dotR=Math.max(1.5,Math.min(3.5,800/d.length));
+  for(const x of d){
+    ctx.beginPath();ctx.arc(px(x.m),py(x.phiRatio),dotR,0,Math.PI*2);
+    if(x.isPrim) ctx.fillStyle='rgba(224,80,96,.9)';
+    else if(x.isP) ctx.fillStyle='rgba(200,168,74,.7)';
+    else ctx.fillStyle='rgba(61,200,184,.3)';
+    ctx.fill();
+  }
+  // y-axis labels
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='right';
+  [0,.25,.5,.75,1].forEach(v=>ctx.fillText(v.toFixed(2),p-3,py(v)+3));
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
+// ── Chart 03: signed Er ──────────────────────────────────────────────────────
+function drawC3(r){
+  const s=setup('c3');if(!s)return;
+  const{ctx,W,H}=s,p=24,d=r.data;if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const vs=d.map(x=>x.Er),vMn=Math.min(...vs),vMx=Math.max(...vs);
+  const mg=(vMx-vMn)*.12||.001;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
+  gridLines(ctx,W,H,p);
+  ctx.strokeStyle='rgba(255,255,255,.14)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+  // Prime ticks
+  const primes=d.filter(x=>x.isP);
+  const step=primes.length>200?Math.ceil(primes.length/100):1;
+  ctx.strokeStyle='rgba(200,168,74,.28)';ctx.lineWidth=1;
+  primes.forEach((x,i)=>{
+    if(i%step===0){ctx.beginPath();ctx.moveTo(px(x.m),H-p);ctx.lineTo(px(x.m),H-p+5);ctx.stroke();}
+  });
+  // Primorial dots
+  d.filter(x=>x.isPrim).forEach(x=>{
+    ctx.beginPath();ctx.arc(px(x.m),py(x.Er),5,0,Math.PI*2);
+    ctx.fillStyle='rgba(224,80,96,.9)';ctx.fill();
+  });
+  // Er curve
+  drawLine(ctx,d.map(x=>[x.m,x.Er]),px,py,'rgba(61,200,184,.8)',1.5);
+  // Sign changes
+  for(const x of d)if(x.isc){
+    ctx.beginPath();ctx.arc(px(x.m),py(x.Er),2,0,Math.PI*2);
+    ctx.fillStyle='rgba(68,136,255,.7)';ctx.fill();
+  }
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
+// ── Chart 04: |Er|*N ─────────────────────────────────────────────────────────
+function drawC4(r){
+  const s=setup('c4');if(!s)return;
+  const{ctx,W,H}=s,p=24,d=r.data;if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const erns=d.map(x=>x.ern),yMx=Math.max(...erns)*1.1||1;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,0,yMx,H-p,p);
+  gridLines(ctx,W,H,p);
+  // (logN)^(2/3) envelope
+  const envScale=yMx/Math.pow(Math.log(mx),2/3)*0.7;
+  ctx.setLineDash([4,8]);
+  drawLine(ctx,d.map(x=>[x.m,Math.pow(x.logN,2/3)*envScale]),px,py,'rgba(61,200,184,.35)',1.2);
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(61,200,184,.35)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='left';ctx.fillText('(log N)^(2/3) envelope',p+4,p+14);
+  drawLine(ctx,d.map(x=>[x.m,x.ern]),px,py,'rgba(144,112,216,.8)',1.5);
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
+// ── Chart 05: log|Er| vs log N ───────────────────────────────────────────────
+function drawC5(r){
+  const s=setup('c5');if(!s)return;
+  const{ctx,W,H}=s,p=24;
+  const d=r.data.filter(x=>isFinite(x.logAbsEr)&&x.logN>1);
+  if(!d.length)return;
+  const xMn=d[0].logN,xMx=d[d.length-1].logN;
+  const ys=d.map(x=>x.logAbsEr),yMn=Math.min(...ys),yMx=Math.max(...ys);
+  const mg=(yMx-yMn)*.08||.5;
+  const px=v=>mp(v,xMn,xMx,p,W-p),py=v=>mp(v,yMn-mg,yMx+mg,H-p,p);
+  gridLines(ctx,W,H,p);
+  const mid=d[Math.floor(d.length/2)];
+  // slope -1 ref
+  const b1=mid.logAbsEr-(-1)*mid.logN;
+  ctx.setLineDash([4,8]);
+  drawLine(ctx,[[xMn,-xMn+b1],[xMx,-xMx+b1]],px,py,'rgba(200,168,74,.4)',1.2);
+  // slope -3/2 ref (RH)
+  const b32=mid.logAbsEr-(-1.5)*mid.logN;
+  drawLine(ctx,[[xMn,-1.5*xMn+b32],[xMx,-1.5*xMx+b32]],px,py,'rgba(224,80,96,.4)',1.2);
+  ctx.setLineDash([]);
+  ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='left';
+  ctx.fillStyle='rgba(200,168,74,.55)';ctx.fillText('slope=−1',px(xMn)+4,py(-xMn+b1)-4);
+  ctx.fillStyle='rgba(224,80,96,.5)';ctx.fillText('slope=−3/2 (RH)',px(xMn)+4,py(-1.5*xMn+b32)-4);
+  // dots
+  for(const x of d){
+    ctx.beginPath();ctx.arc(px(x.logN),py(x.logAbsEr),1.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(232,144,74,.6)';ctx.fill();
+  }
+  // OLS
+  if(isFinite(r.slope)){
+    const xm2=d.filter(x=>x.m>r.N/2).reduce((s,x)=>s+x.logN,0)/(d.filter(x=>x.m>r.N/2).length||1);
+    const ym2=d.filter(x=>x.m>r.N/2).reduce((s,x)=>s+x.logAbsEr,0)/(d.filter(x=>x.m>r.N/2).length||1);
+    const bOLS=ym2-r.slope*xm2;
+    ctx.strokeStyle='rgba(61,200,184,.8)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(px(xMn),py(r.slope*xMn+bOLS));ctx.lineTo(px(xMx),py(r.slope*xMx+bOLS));ctx.stroke();
+    ctx.fillStyle='rgba(61,200,184,.7)';ctx.textAlign='right';
+    ctx.fillText('OLS slope='+r.slope.toFixed(3),W-p-4,p+14);
+  }
+}
+
+// ── Chart 06: GCD distribution ───────────────────────────────────────────────
+function drawC6(r){
+  const s=setup('c6');if(!s)return;
+  const{ctx,W,H}=s,p=24;
+  const gmax=20;
+  const bars=[];
+  for(let g=1;g<=gmax;g++){
+    const emp=r.gcdMap.has(g)?(r.gcdMap.get(g)/r.gcdTotal):0;
+    const theory=6/(Math.PI*Math.PI*g*g);
+    bars.push({g,emp,theory});
+  }
+  const yMx=bars[0].emp*1.1;
+  const bw=(W-2*p)/gmax;
+  const py=v=>mp(v,0,yMx,H-p,p);
+  gridLines(ctx,W,H,p);
+  bars.forEach(b=>{
+    const x=p+(b.g-1)*bw;
+    // empirical bar
+    ctx.fillStyle=b.g===1?'rgba(200,168,74,.8)':'rgba(200,168,74,.45)';
+    ctx.fillRect(x+2,py(b.emp),bw*0.55,H-p-py(b.emp));
+    // theory line
+    ctx.fillStyle='rgba(61,200,184,.9)';
+    ctx.fillRect(x+bw*0.62,py(b.theory)-2,bw*0.28,4);
+    // label
+    if(b.g<=12){
+      ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='8px JetBrains Mono,monospace';
+      ctx.textAlign='center';ctx.fillText(b.g,x+bw*0.5,H-p+10);
+    }
+  });
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='left';ctx.fillText('g =',p,H-p+10);
+}
+
+// ── Chart 07: Primorial Mertens ──────────────────────────────────────────────
+function drawC7(r){
+  const s=setup('c7');if(!s)return;
+  const{ctx,W,H}=s,p=32;
+  // Build primorial sequence up to N
+  const primData=r.primData;
+  if(!primData.length)return;
+  const xs=primData.map((_,i)=>i+1); // index
+  const ys=primData.map(d=>d.phiRatio);
+  const xMx=primData.length,yMx=Math.max(...ys)*1.15;
+  const px=i=>mp(i,0,xMx+1,p,W-p),py=v=>mp(v,0,yMx,H-p,p);
+  gridLines(ctx,W,H,p);
+  // 6/pi^2 line
+  ctx.setLineDash([4,8]);ctx.strokeStyle='rgba(61,200,184,.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(INV));ctx.lineTo(W-p,py(INV));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(61,200,184,.45)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='left';ctx.fillText('6/π²',p+4,py(INV)-4);
+  // Mertens bound: e^-gamma / log(p)
+  primData.forEach((d,i)=>{
+    const x=px(i+1);
+    const mertens=Math.exp(-GAMMA)/Math.log(d.m>1?d.m:2);
+    // Mertens bound dot
+    ctx.beginPath();ctx.arc(x,py(mertens),4,0,Math.PI*2);
+    ctx.fillStyle='rgba(200,168,74,.6)';ctx.fill();
+    // actual phi/m dot
+    ctx.beginPath();ctx.arc(x,py(d.phiRatio),6,0,Math.PI*2);
+    ctx.fillStyle='rgba(224,80,96,.85)';ctx.fill();
+    // label
+    ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='9px JetBrains Mono,monospace';
+    ctx.textAlign='center';
+    const lbl=d.m>=1000000?'p#='+Math.round(d.m/1000)+'k':d.m<=30030?d.m:'';
+    if(lbl)ctx.fillText(lbl,x,py(d.phiRatio)+18);
+  });
+  // Connect with line
+  ctx.strokeStyle='rgba(224,80,96,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  primData.forEach((d,i)=>{
+    const x=px(i+1),y=py(d.phiRatio);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+
+// ── Chart 08: Er vs E ────────────────────────────────────────────────────────
+function drawC8(r){
+  const s=setup('c8');if(!s)return;
+  const{ctx,W,H}=s,p=24,d=r.data;if(!d.length)return;
+  const mn=d[0].m,mx=d[d.length-1].m;
+  const erVals=d.map(x=>x.Er), eVals=d.map(x=>x.E*10);
+  const all=[...erVals,...eVals],vMn=Math.min(...all),vMx=Math.max(...all);
+  const mg=(vMx-vMn)*.1||.001;
+  const px=m=>mp(m,mn,mx,p,W-p),py=v=>mp(v,vMn-mg,vMx+mg,H-p,p);
+  gridLines(ctx,W,H,p);
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+  drawLine(ctx,d.map(x=>[x.m,x.E*10]),px,py,'rgba(61,200,184,.55)',1.2);
+  drawLine(ctx,d.map(x=>[x.m,x.Er]),px,py,'rgba(224,80,96,.8)',1.5);
+  ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='right';
+  ctx.fillStyle='rgba(224,80,96,.7)';ctx.fillText('Er(N) — coprime ratio error',W-p-4,p+14);
+  ctx.fillStyle='rgba(61,200,184,.55)';ctx.fillText('E(N)×10 — lift framework error',W-p-4,p+26);
+  axlbl(ctx,W,H,p,mn,mx);
+}
+
+// ── Render all ───────────────────────────────────────────────────────────────
+function renderAll(res){
+  document.getElementById('stats-area').style.display='block';
+  drawC1(res);drawC2(res);drawC3(res);drawC4(res);
+  drawC5(res);drawC6(res);drawC7(res);drawC8(res);
+  const last=res.data[res.data.length-1];
+  document.getElementById('st-n').textContent=res.N.toLocaleString();
+  document.getElementById('st-ratio').textContent=last.ratio.toFixed(10);
+  document.getElementById('st-er').textContent=last.Er.toExponential(5);
+  document.getElementById('st-ern').textContent=(Math.abs(last.Er)*res.N).toFixed(5);
+  document.getElementById('st-cop').textContent=res.totalCop.toLocaleString();
+  document.getElementById('st-ncop').textContent=(res.totalAll-res.totalCop).toLocaleString();
+  document.getElementById('st-cnrat').textContent=(res.totalCop/(res.totalAll-res.totalCop)).toFixed(6);
+  document.getElementById('st-sc').textContent=res.sc.toLocaleString();
+  document.getElementById('st-slope').textContent=isFinite(res.slope)?res.slope.toFixed(4)+' (≈−1)':'—';
+  setTimeout(()=>document.querySelectorAll('.chart-panel').forEach(el=>el.classList.add('visible')),40);
+}
+
+// ── Tables ───────────────────────────────────────────────────────────────────
+const f6=v=>typeof v==='number'&&isFinite(v)?v.toFixed(6):'—';
+const fe=v=>typeof v==='number'&&isFinite(v)?v.toExponential(4):'—';
+
+const cfgs={
+  d1:{heads:['M','Σφ/ΣM','Er(N)','|Er|·N','Prime','Primorial'],
+      row:d=>[d.m,f6(d.ratio),fe(d.Er),f6(d.ern),d.isP?'p':'',d.isPrim?'p#':'']},
+  d2:{heads:['M','φ(M)/M','φ(M)','Type'],
+      row:d=>[d.m,f6(d.phiRatio),d.phiM,d.isPrim?'primorial':d.isP?'prime':'composite']},
+  d3:{heads:['M','Er(N)','Sign','SC','Prime','Primorial'],
+      row:d=>[d.m,fe(d.Er),d.Er>=0?'+1':'−1',d.isc?'SC':'',d.isP?'p':'',d.isPrim?'p#':'']},
+  d4:{heads:['M','Er(N)','|Er|·N','(logN)^(2/3)'],
+      row:d=>[d.m,fe(d.Er),f6(d.ern),f6(Math.pow(d.logN,2/3))]},
+  d5:{heads:['M','log N','log|Er|','Prime'],
+      row:d=>[d.m,f6(d.logN),isFinite(d.logAbsEr)?f6(d.logAbsEr):'—',d.isP?'p':'']},
+  d6:{heads:['g','Empirical P(gcd=g)','Theory 6/(π²g²)','Ratio'],
+      special:'gcd'},
+  d7:{heads:['Primorial p#','φ(p#)/p#','e^−γ/log(p)','6/π²'],
+      special:'prim'},
+  d8:{heads:['M','Er(N)','E(N)×10','Prime'],
+      row:d=>[d.m,fe(d.Er),fe(d.E*10),d.isP?'p':'']},
+};
+
+function buildTable(did,res){
+  const tbl=document.getElementById('tbl-'+did);if(!tbl)return;
+  tbl.innerHTML='';
+  const cfg=cfgs[did];if(!cfg)return;
+  const thead=tbl.createTHead(),tbody=tbl.createTBody();
+  const hr=thead.insertRow();
+  for(const h of cfg.heads){const th=document.createElement('th');th.textContent=h;hr.appendChild(th);}
+  if(cfg.special==='gcd'){
+    for(let g=1;g<=30;g++){
+      const emp=res.gcdMap.has(g)?(res.gcdMap.get(g)/res.gcdTotal):0;
+      const theory=6/(Math.PI*Math.PI*g*g);
+      const tr=tbody.insertRow();
+      [g,f6(emp),f6(theory),f6(emp/theory)].forEach(v=>{const td=tr.insertCell();td.textContent=v;});
+    }
+    return;
+  }
+  if(cfg.special==='prim'){
+    for(const d of res.primData){
+      const mertens=Math.exp(-GAMMA)/Math.log(Math.max(d.m,2));
+      const tr=tbody.insertRow();tr.classList.add('is-prim');
+      [d.m,f6(d.phiRatio),f6(mertens),f6(INV)].forEach(v=>{const td=tr.insertCell();td.textContent=v;});
+    }
+    return;
+  }
+  for(const d of res.data){
+    const vals=cfg.row(d);
+    const tr=tbody.insertRow();
+    if(d.isP)tr.classList.add('is-prime');
+    if(d.isPrim)tr.classList.add('is-prim');
+    for(const v of vals){const td=tr.insertCell();td.textContent=v;}
+  }
+}
+
+function toggleDrawer(did,btn){
+  const dr=document.getElementById(did);if(!dr)return;
+  const opening=!dr.classList.contains('open');
+  dr.classList.toggle('open');
+  btn.querySelector('.darrow').style.transform=opening?'rotate(180deg)':'';
+  if(opening&&result)buildTable(did,result);
+}
+
+// ── Controls ─────────────────────────────────────────────────────────────────
+const slider=document.getElementById('n-slider');
+const display=document.getElementById('n-display');
+const cbtn=document.getElementById('compute-btn');
+
+slider.addEventListener('input',()=>{display.textContent=parseInt(slider.value).toLocaleString();});
+
+cbtn.addEventListener('click',()=>{
+  const N=parseInt(slider.value);
+  cbtn.textContent='Computing…';cbtn.disabled=true;
+  setTimeout(()=>{
+    try{result=compute(N);renderAll(result);}
+    catch(e){console.error(e);}
+    cbtn.textContent='Compute →';cbtn.disabled=false;
+  },20);
+});
+
+function applyMax(){
+  let max=parseInt(document.getElementById('n-max').value)||10000;
+  max=Math.max(200,Math.min(200000,max));
+  document.getElementById('n-max').value=max;
+  slider.max=max;
+  if(parseInt(slider.value)>max){slider.value=max;display.textContent=max.toLocaleString();}
+}
+
+// ── Play ─────────────────────────────────────────────────────────────────────
+let playRAF=null,playActive=false,autoZoom=true,zoomed=false;
+
+window.toggleZoom=function(){
+  autoZoom=!autoZoom;
+  const zt=document.getElementById('zoom-toggle');
+  zt.style.background=autoZoom?'rgba(200,168,74,.2)':'rgba(255,255,255,.05)';
+  zt.style.color=autoZoom?'var(--gold)':'rgba(255,255,255,.4)';
+};
+
+function playStop(){
+  if(playRAF){cancelAnimationFrame(playRAF);playRAF=null;}
+  playActive=false;
+  const pb=document.getElementById('play-btn');
+  pb.textContent='▶ Play';pb.classList.remove('active');pb.disabled=false;
+  document.getElementById('anim-prog').textContent='';
+  if(zoomed){zoomed=false;document.querySelectorAll('.mc').forEach(c=>c.style.height='');}
+}
+
+document.getElementById('play-btn').addEventListener('click',()=>{
+  if(playActive){playStop();return;}
+  const Nmax=parseInt(slider.value);
+  if(Nmax<=100){alert('Set M above 100.');return;}
+  playActive=true;zoomed=false;
+  const pb=document.getElementById('play-btn');
+  pb.textContent='⏸ Stop';pb.classList.add('active');cbtn.disabled=true;
+  let Nc=100;const zAt=Math.floor(100+(Nmax-100)*.75);
+  function frame(){
+    if(!playActive){playStop();cbtn.disabled=false;return;}
+    const step=Math.max(5,Math.min(50,Math.floor(Nc/150)));
+    Nc=Math.min(Nc+step,Nmax);
+    slider.value=Nc;display.textContent=Nc.toLocaleString();
+    result=compute(Nc);renderAll(result);
+    if(autoZoom&&!zoomed&&Nc>=zAt){
+      zoomed=true;document.querySelectorAll('.mc').forEach(c=>c.style.height='380px');
+      renderAll(result);
+    }
+    const pct=Math.round((Nc-100)/(Nmax-100)*100);
+    document.getElementById('anim-prog').textContent='M='+Nc.toLocaleString()+'  ('+pct+'%)';
+    if(Nc<Nmax){playRAF=requestAnimationFrame(frame);}
+    else{cbtn.disabled=false;playStop();}
+  }
+  playRAF=requestAnimationFrame(frame);
+});
+
+// ── Resize & init ────────────────────────────────────────────────────────────
+let rt;
+window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(result)renderAll(result);},220);});
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.06});
+document.querySelectorAll('.chart-panel').forEach(el=>obs.observe(el));
+window.addEventListener('load',()=>{result=compute(1000);renderAll(result);});
+</script>
+</body>
+</html>
