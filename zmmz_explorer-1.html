@@ -335,11 +335,332 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 .thm-btn.violet:hover{background:rgba(144,112,216,.2);border-color:#9070d8;color:#b090f0;}
 
 
+
+/* ── OPENER ── */
+body.op-active{overflow:hidden;}
+#opener{
+  position:fixed;inset:0;z-index:1000;background:#020205;
+  overflow-y:auto;
+  transition:opacity 1s ease,visibility 1s ease;
+}
+#opener.gone{opacity:0;visibility:hidden;pointer-events:none;}
+
+/* Canvas takes full viewport on desktop, fixed height on mobile */
+#opener-canvas-wrap{
+  position:relative;
+  width:100%;
+  height:100vh;
+  min-height:320px;
+  flex-shrink:0;
+}
+@media(max-width:600px){
+  #opener-canvas-wrap{ height:56vh; min-height:260px; }
+}
+#opener-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+
+/* Centered text content — absolute over canvas on desktop, hidden on mobile when adv open */
+.op-content{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:2;text-align:center;
+  padding:36px clamp(28px,6vw,64px) 32px;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;
+  /* Circular frosted backdrop */
+  background:radial-gradient(ellipse at center, rgba(2,2,8,0.72) 0%, rgba(2,2,8,0.55) 55%, rgba(2,2,8,0) 100%);
+  border-radius:50%;
+  aspect-ratio:1/1;
+  width:min(90vw, 70vh);
+  justify-content:center;
+  transition:opacity .3s ease, visibility .3s ease;
+}
+.op-rule{
+  width:0;height:1px;background:var(--gold);
+  animation:rule-grow 1.4s cubic-bezier(.22,1,.36,1) 1.2s forwards;
+  margin-bottom:22px;margin-top:18px;
+}
+@keyframes rule-grow{to{width:64px;}}
+.op-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gold);opacity:0;margin-bottom:16px;
+  animation:fade-up 1s ease 1.5s forwards;
+}
+.op-title{
+  font-family:var(--disp);font-size:clamp(1.4rem,4.5vw,4rem);font-weight:400;
+  line-height:1.08;color:var(--cream);letter-spacing:.04em;
+  opacity:0;margin-bottom:8px;
+  animation:fade-up 1s ease 1.7s forwards;
+}
+.op-sub{
+  font-family:var(--disp);font-size:clamp(.78rem,1.4vw,1rem);font-style:italic;
+  color:rgba(255,255,255,.38);font-weight:300;
+  opacity:0;margin-bottom:28px;
+  animation:fade-up .9s ease 1.9s forwards;
+}
+.op-eq{
+  font-family:var(--mono);font-size:clamp(9px,1.1vw,12px);
+  color:var(--gold2);opacity:0;margin-bottom:0;
+  letter-spacing:.04em;line-height:2.2;
+  animation:fade-up .9s ease 2.1s forwards;
+}
+.op-enter{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);
+  padding:11px 40px;cursor:pointer;background:transparent;pointer-events:auto;
+  opacity:0;animation:fade-up .9s ease 2.4s forwards;
+  transition:color .25s,border-color .25s,background .25s;
+  margin-top:36px;
+}
+.op-enter:hover{color:var(--gold);border-color:rgba(200,168,74,.5);background:rgba(200,168,74,.05);}
+.op-corner{
+  position:absolute;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(255,255,255,.22);
+  opacity:0;animation:fade-in 1s ease 2.4s forwards;
+  pointer-events:none;
+}
+.op-corner.bl{bottom:8px;left:12px;}
+.op-corner.br{bottom:8px;right:12px;}
+.op-corner.tl{top:8px;left:12px;}
+@keyframes fade-up{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fade-in{from{opacity:0;}to{opacity:1;}}
+#nav{transition:opacity .5s ease;}
+#nav.hidden{opacity:0;pointer-events:none;}
+
+/* Controls — below canvas in document flow, not overlaid */
+#op-controls{
+  position:relative;
+  background:rgba(2,2,8,0.95);
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:12px 14px;
+  pointer-events:auto;z-index:3;
+  opacity:0;animation:fade-in 1s ease 2.6s forwards;
+}
+@media(min-width:601px){
+  /* On desktop: float controls bottom-left over canvas */
+  #op-controls{
+    position:absolute;bottom:0;left:0;
+    max-width:260px;
+    border:1px solid rgba(255,255,255,.08);
+    border-top:none;
+    border-bottom:none;
+  }
+}
+.opc-title{
+  font-family:var(--mono);font-size:7.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(255,255,255,.3);
+  margin-bottom:8px;
+}
+.opc-row{
+  display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;
+}
+.opc-btn{
+  font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 9px;cursor:pointer;background:transparent;
+  border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.3);
+  transition:color .15s,border-color .15s,background .15s;
+}
+.opc-btn.active{
+  border-color:rgba(200,168,74,.4);color:var(--gold);
+  background:rgba(200,168,74,.06);
+}
+.opc-val{
+  font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.25);white-space:nowrap;
+}
+.opc-sep{height:1px;background:rgba(255,255,255,.07);margin:6px 0;}
+.opc-label{font-family:var(--mono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:5px;}
+.opc-btn.ring-sel{border-color:rgba(61,200,184,.5);color:#3dc8b8;background:rgba(61,200,184,.07);}
+
 </style>
 </head>
-<body>
+<body class="op-active">
 
-<nav id="tab-nav">
+<div id="opener">
+  <div id="opener-canvas-wrap">
+    <canvas id="opener-canvas"></canvas>
+
+    <!-- Text overlay — centered over canvas -->
+    <div class="op-content" id="op-all-text">
+      <div class="op-rule"></div>
+      <div class="op-label" id="op-label">math.NT &nbsp;&middot;&nbsp; 2025&ndash;2026</div>
+      <div class="op-title" id="op-title">Modular Lifting Rings<br>and Prime Geometry</div>
+      <div class="op-sub" id="op-sub">The Analytic Lift Function &middot; Zero Spectrum &middot; Constants</div>
+      <div class="op-eq" id="op-eq">
+        F(u) = &#8719;<sub>p</sub> (p&sup2;&minus;u)/(p&sup2;&minus;1)<br>
+        F(0) = &zeta;(2) &nbsp;&middot;&nbsp; F(1) = 1 &nbsp;&middot;&nbsp; F(2) = C<br>
+        C = &zeta;(2) &middot; (2C<sub>FT</sub>&minus;1) &nbsp;&middot;&nbsp; J = P(2) + T
+      </div>
+      <button class="op-enter" onclick="enterSite()">Enter</button>
+    </div>
+
+    <!-- Corner details -->
+    <div class="op-corner tl" id="op-author">Wessen Getachew</div>
+    <div class="op-corner bl" id="op-rings">M = 30 &middot; 60 &middot; 120 &middot; 240</div>
+    <div class="op-corner br" id="op-c">C &asymp; 0.530711&hellip;</div>
+  </div>
+
+  <!-- Controls — in document flow below canvas on mobile, overlaid on desktop -->
+  <div id="op-controls">
+    <div class="opc-row" style="margin-bottom:5px;">
+      <button class="opc-btn active" id="op-text-btn" onclick="opToggleAllText(this)">Text</button>
+      <button class="opc-btn active" id="op-bg-alpha-btn" onclick="opCycleBgAlpha(this)">Lift α 20%</button>
+      <button class="opc-btn" id="op-pause-btn" onclick="if(window._opPauseToggle)window._opPauseToggle(this)">Pause</button>
+      <button class="opc-btn active" id="op-nongcd-btn" onclick="opToggleNonGcd(this)">χ=0</button>
+    </div>
+    <div class="opc-row" style="margin-bottom:5px;">
+      <button class="opc-btn active" id="op-lift-direct-btn" onclick="opToggleLiftDirect(this)">r→r</button>
+      <button class="opc-btn active" id="op-lift-btn" onclick="opToggleLiftLines(this)">r+M·2ⁿ</button>
+      <button class="opc-btn" id="op-lift-curve-btn" onclick="opToggleLiftCurve(this)" title="Switch between straight and curved lift lines">Straight</button>
+      <button class="opc-btn" onclick="if(window._opResetAnchor)window._opResetAnchor()" title="Stop rotation and return all rings to 0°">↺ 0°</button>
+    </div>
+
+    <div class="opc-sep"></div>
+
+    <!-- Gap dynamics -->
+    <div class="opc-label" style="margin-top:7px;">Gap Lines A(g,M) — all even 2n ≤ g</div>
+    <div class="opc-row" style="align-items:center;gap:7px;margin-bottom:4px;">
+      <span class="opc-val">g=</span>
+      <input type="range" id="op-gap-sl" min="0" max="100" step="2" value="0"
+        oninput="opUpdateGap(+this.value)" style="flex:1;accent-color:var(--gold);">
+      <span class="opc-val" id="op-gap-val" style="width:30px;text-align:right;">off</span>
+    </div>
+    <div id="op-gap-result" style="font-family:var(--mono);font-size:8px;max-height:110px;overflow-y:auto;"></div>
+
+    <div class="opc-sep" style="margin-top:7px;"></div>
+
+    <div class="opc-label" style="margin-top:7px;">Ring</div>
+    <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">
+      <div class="opc-row" id="op-ring-btns" style="flex:1;flex-wrap:wrap;margin-bottom:0;gap:4px;">
+        <button class="opc-btn active" onclick="opSelectRing(this,0)">1</button>
+        <button class="opc-btn" onclick="opSelectRing(this,1)">2</button>
+        <button class="opc-btn" onclick="opSelectRing(this,2)">3</button>
+        <button class="opc-btn" onclick="opSelectRing(this,3)">4</button>
+      </div>
+      <button class="opc-btn" onclick="opAddRing()" style="padding:3px 7px;font-size:13px;line-height:1;">+</button>
+      <button class="opc-btn" onclick="opRemoveRing()" style="padding:3px 7px;font-size:13px;line-height:1;">−</button>
+    </div>
+    <div class="opc-row" style="align-items:center;gap:7px;">
+      <span class="opc-val">M=</span>
+      <input type="number" id="op-mod-input" min="1" max="9999" value="30"
+        style="width:54px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--gold);font-family:var(--mono);font-size:11px;padding:2px 5px;text-align:center;"
+        onchange="opSetMod(this.value)" onkeydown="if(event.key==='Enter')opSetMod(this.value)">
+      <span class="opc-val" id="op-mod-pts">—</span>
+    </div>
+    <div class="opc-row" style="align-items:center;gap:7px;margin-top:5px;">
+      <span class="opc-val">Spd</span>
+      <input type="range" id="op-ring-speed" min="-200" max="200" value="30"
+        oninput="opSetRingSpeed(this.value)" style="flex:1;accent-color:var(--gold);">
+      <span class="opc-val" id="op-ring-speed-val" style="width:20px;">+</span>
+    </div>
+
+    <div class="opc-sep" style="margin-top:7px;"></div>
+
+    <div class="opc-row" style="align-items:center;gap:7px;margin-top:5px;">
+      <span class="opc-val">Trail</span>
+      <input type="range" id="op-trail" min="5" max="70" value="22"
+        oninput="opTrail(this.value)" style="flex:1;accent-color:var(--gold);">
+    </div>
+    <div class="opc-row" style="align-items:center;gap:7px;margin-top:5px;">
+      <span class="opc-val">BG size</span>
+      <input type="range" id="op-bg-scale" min="30" max="200" value="100"
+        oninput="window._opBgScale=+this.value/100" style="flex:1;accent-color:var(--gold);">
+    </div>
+
+    <div class="opc-sep" style="margin-top:7px;"></div>
+    <button class="opc-btn" id="op-adv-btn" onclick="opToggleAdvanced()" style="width:100%;margin-top:6px;letter-spacing:.15em;">Advanced ▾</button>
+  </div>
+
+  <!-- Advanced Panel — slides down below controls -->
+  <div id="op-advanced" style="display:none;background:rgba(2,4,12,0.98);border-top:1px solid rgba(255,255,255,.1);padding:14px 16px;font-family:var(--mono);">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;max-width:900px;">
+
+      <!-- Background -->
+      <div>
+        <div class="opc-label" style="margin-bottom:8px;">Background</div>
+        <div class="opc-row" style="align-items:center;gap:8px;margin-bottom:7px;">
+          <span class="opc-val">Max mod</span>
+          <input type="range" id="adv-bg-mod" min="1" max="512" value="128"
+            oninput="window._opBgMod=+this.value;document.getElementById('adv-bg-mod-val').textContent=this.value"
+            style="flex:1;accent-color:var(--gold);">
+          <span class="opc-val" id="adv-bg-mod-val">128</span>
+        </div>
+        <div class="opc-row" style="align-items:center;gap:8px;margin-bottom:7px;">
+          <span class="opc-val">Lift lines</span>
+          <input type="range" id="adv-bg-lift" min="0" max="10" value="2" step="0.5"
+            oninput="window._opBgLiftThick=+this.value;document.getElementById('adv-bg-lift-val').textContent=this.value"
+            style="flex:1;accent-color:var(--gold);">
+          <span class="opc-val" id="adv-bg-lift-val">2</span>
+        </div>
+        <div class="opc-row" style="align-items:center;gap:8px;">
+          <span class="opc-val">BG size</span>
+          <input type="range" id="adv-bg-scale" min="30" max="200" value="100"
+            oninput="window._opBgScale=+this.value/100"
+            style="flex:1;accent-color:var(--gold);">
+        </div>
+      </div>
+
+      <!-- Display -->
+      <div>
+        <div class="opc-label" style="margin-bottom:8px;">Display</div>
+        <div class="opc-row" style="gap:6px;margin-bottom:6px;">
+          <button class="opc-btn active" id="adv-nongcd2" onclick="opToggleNonGcd(this)">χ(r)=0 pts</button>
+          <button class="opc-btn active" id="adv-direct2" onclick="opToggleLiftDirect(this)">r→r lines</button>
+          <button class="opc-btn active" id="adv-mod2" onclick="opToggleLiftLines(this)">r+M·2ⁿ</button>
+        </div>
+        <div class="opc-row" style="align-items:center;gap:8px;margin-bottom:6px;">
+          <span class="opc-val">Trail</span>
+          <input type="range" min="0" max="80" value="0"
+            oninput="window._opTrail=+this.value/100"
+            style="flex:1;accent-color:var(--gold);">
+        </div>
+        <div class="opc-row" style="align-items:center;gap:8px;">
+          <span class="opc-val">Lift line α</span>
+          <input type="range" id="adv-lift-alpha" min="0" max="10" step="0.5" value="5"
+            oninput="window._opLiftAlpha=+this.value/10;document.getElementById('adv-lift-alpha-val').textContent=this.value"
+            style="flex:1;accent-color:var(--gold);">
+          <span class="opc-val" id="adv-lift-alpha-val">5</span>
+        </div>
+      </div>
+
+      <!-- Rings -->
+      <div>
+        <div class="opc-label" style="margin-bottom:8px;">Active rings</div>
+        <div class="opc-row" style="gap:6px;margin-bottom:8px;">
+          <button class="opc-btn" onclick="opAddRing()">+ Ring</button>
+          <button class="opc-btn" onclick="opRemoveRing()">− Ring</button>
+        </div>
+        <div class="opc-row" style="align-items:center;gap:8px;margin-bottom:6px;">
+          <span class="opc-val">All speed</span>
+          <input type="range" min="0" max="300" value="100"
+            oninput="opScaleAllSpeeds(+this.value/100)"
+            style="flex:1;accent-color:var(--gold);">
+        </div>
+        <div class="opc-row" style="align-items:center;gap:8px;">
+          <span class="opc-val">Lift style</span>
+          <button class="opc-btn" id="adv-curve" onclick="opToggleLiftCurve(this)">Straight</button>
+        </div>
+      </div>
+
+      <!-- Prime Sieve -->
+      <div>
+        <div class="opc-label" style="margin-bottom:8px;">Prime Sieve</div>
+        <div class="opc-row" style="align-items:center;gap:8px;margin-bottom:7px;">
+          <span class="opc-val">Up to</span>
+          <input type="number" id="adv-sieve-n" value="1000" min="10" max="100000"
+            style="width:70px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--gold);font-family:var(--mono);font-size:10px;padding:2px 5px;">
+        </div>
+        <div class="opc-row" style="gap:6px;">
+          <button class="opc-btn" onclick="opRunSieve()">Run</button>
+          <button class="opc-btn" onclick="opClearSieve()">Clear</button>
+        </div>
+        <div id="adv-sieve-result" style="font-size:9px;color:rgba(255,255,255,.4);margin-top:6px;min-height:180px;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+
+<nav id="tab-nav" style="opacity:0;pointer-events:none;transition:opacity .5s ease">
   <div class="tabs">
     <a href="index.html" class="tab tab-opener"><span class="tab-dot"></span>Opener</a>
     <a href="EN_explorer-1-2.html" class="tab tab-explorer"><span class="tab-dot"></span>Explorer</a>
@@ -347,6 +668,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <div class="tab tab-canvas active"><span class="tab-dot"></span>Geometric Canvas</div>
     <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&#950;(2) Explorer</a>
     <a href="gcd_explorer.html" class="tab"><span class="tab-dot"></span>GCD Explorer</a>
+    <a href="lift_paper.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
   </div>
   <span class="nav-right">(ℤ/Mℤ)*</span>
 </nav>
@@ -3325,7 +3647,824 @@ try {
 
 
 </script>
+
+<!-- ═══ LIFT PAPER OPENER ═══ -->
+<script>
+window._selectedRing = 0;
+window._opSpeed = 1.0;
+window._opTrail = 0.22;
+window._opGhosts = true;
+window._opBgAlpha = 0.2;
+
+window._opLiftLines = true;
+window._opLiftCurve = false; // straight lines by default
+window._opLiftDirect = true;
+
+// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// OPENER
+// ═══════════════════════════════════════════════════════════
+(function(){
+  const canvas = document.getElementById('opener-canvas');
+  let af, t = 0, paused = false;
+
+  /* ── utils ── */
+  function gcd(a,b){while(b){const x=b;b=a%b;a=x;}return a;}
+  function makePts(m){
+    const pts=[];
+    for(let r=0;r<m;r++) pts.push({r,cop:gcd(r||m,m)===1});
+    return pts;
+  }
+  /* Consistent color per residue value r (same r = same hue across all mods) */
+  function rColor(r,cop,alpha){
+    if(!cop) return `rgba(220,60,60,${alpha*0.5})`;
+    const h=(r*53+17)%360;
+    return `hsla(${h},80%,65%,${alpha})`;
+  }
+  /* Angle: r=0 (≡ mod) placed at 0° right, going counterclockwise */
+  function ang(r,m,offset){ return (r/m)*Math.PI*2 + (offset||0); }
+
+  /* ── background lattice state ── */
+  const BG_MAX = 512;
+  window._opBgMod = 128;
+  window._opLockBg = false;
+  window._opBgRotations = {}; // per-mod rotation offsets when locked
+  window._opBgLiftThick = 2;
+  window._opLiftAlpha = 0.5; // Lift line α default (slider value 5 → 5/10)
+
+  /* ── active rings ── */
+  const DIRS=[1,-1,1,-1,1,-1,1,-1,1,-1];
+  function makeRing(mod,idx,total){
+    const rf=0.10+(0.44-0.10)*(idx/Math.max(total-1,1));
+    const bgScale=window._opBgScale||1;
+    const liftFrom=(mod/130)*0.46*bgScale;
+    return {mod,rf,speed:0,dir:DIRS[idx%2],pts:makePts(mod),liftProgress:0,liftFrom,_anchor:0};
+  }
+  const DEF=[30,60,120,240];
+  const RINGS=DEF.map((m,i)=>makeRing(m,i,DEF.length));
+  window._opMakePts = makePts;
+  window._opAnimLift = animLift;
+  window._opRings=RINGS;
+  function animLift(ring){
+    if(ring.liftProgress>=1){ring.liftProgress=1;return;}
+    ring.liftProgress=Math.min(1,ring.liftProgress+0.022);
+    requestAnimationFrame(()=>animLift(ring));
+  }
+  // All 4 initial rings lift in simultaneously — smooth, no stagger
+  RINGS.forEach(ring=>animLift(ring));
+
+  /* ── anchor / reset ── */
+  window._opAnchor=function(){
+    const spd=window._opSpeed||1;
+    window._opRings.forEach(ring=>{ ring._anchor=t*ring.speed*ring.dir*spd; });
+  };
+  window._opResetAnchor=function(){
+    t=0;
+    window._opRings.forEach(ring=>{ ring._anchor=0; });
+    // Draw exactly one frame at t=0, then respect current pause state
+    const wasPaused=paused;
+    paused=false;   // temporarily allow draw()
+    draw();         // draw() will do t++ then call rAF(draw)
+    t=0;            // reset t back since draw() just incremented it
+    paused=wasPaused; // restore pause — if paused, next rAF will return immediately
+  };
+  window._opPauseToggle=function(btn){
+    paused=!paused;
+    if(!paused) draw();
+    if(btn) btn.classList.toggle('active',paused);
+  };
+
+  /* ── ghost equations ── */
+  const GHOSTS=['\u03b6(2)=\u03c0\u00b2/6','F(1)=1','C\u22480.5307','J=P(2)+T',
+    'gcd(r,M)=1','S=\u03a3P(2k)','\u03c6=(1+\u221a5)/2','A(6)/A(2)=2',
+    "F'(1)=\u2212S",'Q=S\u2212P(2)','zeros@p\u00b2','M\u00f6bius@u=1'];
+  const ghosts=GHOSTS.map(txt=>({txt,x:Math.random(),y:0.05+Math.random()*0.9,
+    vx:(Math.random()-0.5)*0.00009,vy:(Math.random()-0.5)*0.00004,
+    a:0.02+Math.random()*0.03,sz:9+Math.random()*4}));
+
+  /* ── resize ── */
+  let W=0,H=0,cx=0,cy=0,minD=0;
+  function resize(){
+    W=canvas.clientWidth||window.innerWidth;
+    H=canvas.clientHeight||window.innerHeight;
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    canvas.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    cx=W/2;cy=H/2;minD=Math.min(W,H);
+    selectedPoints=[];tooltip=null;
+  }
+
+  /* ── click interaction ── */
+  let selectedPoints=[];
+  let tooltip=null;
+  function canvasXY(e){
+    const rect=canvas.getBoundingClientRect();
+    return {x:(e.clientX-rect.left)*(W/rect.width),
+            y:(e.clientY-rect.top)*(H/rect.height)};
+  }
+
+  canvas.addEventListener('click',function(e){
+    const {x:mx,y:my}=canvasXY(e);
+    const spd=window._opSpeed||1;
+    const showNonGcd=window._opShowNonGcd;
+    let hit=null,bestD=14;
+
+    /* check active rings */
+    window._opRings.forEach((ring,ri)=>{
+      const prog=ring.liftProgress||1;
+      const lF2=(ring.mod/130)*0.46*(window._opBgScale||1);
+      const r=(lF2+(ring.rf-lF2)*prog)*minD;
+      const a0=t*ring.speed*ring.dir*spd-(ring._anchor||0);
+      ring.pts.forEach(({r:rv,cop})=>{
+        if(!cop&&!showNonGcd) return;
+        const a=ang(rv,ring.mod,a0);
+        const px=cx+r*Math.cos(a),py=cy+r*Math.sin(a);
+        const d=Math.hypot(mx-px,my-py);
+        if(d<bestD){bestD=d;hit={src:'ring',ri,rv,cop,mod:ring.mod,px,py,deg:(a%(Math.PI*2)+Math.PI*2)%(Math.PI*2)*180/Math.PI};}
+      });
+    });
+
+    /* check background if lock mode */
+    if(!hit && window._opLockBg){
+      const bgMax=window._opBgMod||128;
+      for(let m=1;m<=Math.min(bgMax,BG_MAX);m++){
+        const isActive=window._opRings.some(r=>r.mod===m&&r.liftProgress>0.9);
+        if(isActive) continue;
+        const r=(m/130)*minD*0.46; if(r<3) continue;
+        const a0=(window._opBgRotations[m]||0);
+        const pts=makePts(m);
+        pts.forEach(({r:rv,cop})=>{
+          const a=ang(rv,m,a0);
+          const px=cx+r*Math.cos(a),py=cy+r*Math.sin(a);
+          const d=Math.hypot(mx-px,my-py);
+          if(d<bestD){bestD=d;hit={src:'bg',m,rv,cop,mod:m,px,py,deg:(a%(Math.PI*2)+Math.PI*2)%(Math.PI*2)*180/Math.PI};}
+        });
+      }
+      /* add bg ring to active rings if clicked and lock is on */
+      if(hit&&hit.src==='bg'){
+        const existing=window._opRings.find(r=>r.mod===hit.m);
+        if(!existing){
+          const nr=makeRing(hit.m,window._opRings.length,window._opRings.length+1);
+          nr.liftFrom=(hit.m/130)*0.46;
+          nr.liftProgress=0;
+          window._opRings.push(nr);
+          _autoSpaceRings();
+          _rebuildRingButtons();
+          _updateCornerLabel();
+          animLift(nr);
+        }
+      }
+    }
+
+    if(hit){
+      const key=hit.src==='bg'?`bg:${hit.mod}:${hit.rv}`:`ring:${hit.ri}:${hit.rv}`;
+      const idx=selectedPoints.findIndex(p=>p.key===key);
+      if(idx>=0) selectedPoints.splice(idx,1);
+      else selectedPoints.push({...hit,key});
+      const deg=hit.deg.toFixed(1);
+      const liftStr=hit.cop?(gcd(hit.rv||hit.mod,hit.mod+1)===1?'lifts':'stays'):'non-coprime';
+      tooltip={text:`M=${hit.mod}  r=${hit.rv}  ${liftStr}  ${deg}°`,x:hit.px,y:hit.py-14};
+    } else {
+      tooltip=null;
+    }
+  });
+
+  /* ── main draw ── */
+  function draw(){
+    if(!W) resize();
+    if(paused) return;
+    const ctx=canvas.getContext('2d');
+    const spd=window._opSpeed||1;
+    const showNonGcd=window._opShowNonGcd;
+    const showDirect=window._opLiftDirect;
+    const showModular=window._opLiftLines;
+    const bgLiftThick=window._opBgLiftThick||0;
+    const bgMax=Math.min(window._opBgMod||128,BG_MAX);
+    const liftAlpha=window._opLiftAlpha!==undefined?window._opLiftAlpha:0.5;
+
+    // Full clear — no trail blur on background
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#020205';
+    ctx.fillRect(0,0,W,H);
+
+    /* ── background lattice: FIXED positions, never rotates ── */
+    const bgScale=window._opBgScale||1;
+    const bgAlpha=window._opBgAlpha||0;
+    function bgRadius(m){ return (m/130)*minD*0.46*bgScale; }
+
+    for(let m=1;m<=bgMax;m++){
+      const isActive=window._opRings.some(r=>r.mod===m);
+      if(isActive) continue;
+      const r=bgRadius(m); if(r<2) continue;
+      const a0=0;
+
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle='rgba(200,168,74,0.035)';ctx.lineWidth=0.5;ctx.stroke();
+
+      const pts=makePts(m);
+      pts.forEach(({r:rv,cop})=>{
+        if(!cop&&!showNonGcd) return;
+        const a=ang(rv,m,a0);
+        const x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
+        ctx.beginPath();ctx.arc(x,y,1,0,Math.PI*2);
+        ctx.fillStyle=rColor(rv,cop,cop?0.10:0.05);
+        ctx.fill();
+      });
+
+      if(bgLiftThick>0&&showDirect&&m<bgMax){
+        const nm=m+1;
+        if(nm<=bgMax&&!window._opRings.some(r=>r.mod===nm)){
+          const nr2=bgRadius(nm);
+          const pts2=makePts(nm);
+          pts.forEach(({r:rv,cop})=>{
+            if(!cop) return;
+            const a1=ang(rv,m,a0);
+            const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+            if(pts2.find(p=>p.r===rv&&p.cop)){
+              const a2=ang(rv,nm,0);
+              ctx.beginPath();ctx.moveTo(x1,y1);
+              ctx.lineTo(cx+nr2*Math.cos(a2),cy+nr2*Math.sin(a2));
+              ctx.strokeStyle=`rgba(61,200,184,${Math.min(bgLiftThick*0.04*liftAlpha*2,0.6)})`;
+              ctx.lineWidth=Math.max(0.3, bgLiftThick*0.4*liftAlpha*2);ctx.stroke();
+            }
+          });
+        }
+      }
+    }
+    
+
+    /* Trail overlay — motion blur on active rings only, drawn before rings */
+    const trail=window._opTrail||0;
+    if(trail>0){
+      ctx.fillStyle=`rgba(2,2,5,${trail})`;
+      ctx.fillRect(0,0,W,H);
+    }
+
+    /* ── ghost text ── */
+    if(window._opGhosts){
+      ctx.save();
+      ghosts.forEach(g=>{
+        g.x+=g.vx*spd;g.y+=g.vy*spd;
+        if(g.x<-0.15)g.x=1.05;if(g.x>1.05)g.x=-0.15;
+        if(g.y<0.02)g.vy=Math.abs(g.vy);if(g.y>0.98)g.vy=-Math.abs(g.vy);
+        ctx.globalAlpha=g.a;ctx.fillStyle='#c8a84a';
+        ctx.font=`${g.sz}px JetBrains Mono,monospace`;
+        ctx.fillText(g.txt,g.x*W,g.y*H);
+      });
+      ctx.restore();
+    }
+
+    /* ── active rings ── */
+    /* collect selected point screen positions */
+    const selScreen={};
+    window._opRings.forEach((ring,ri)=>{
+      const prog=ring.liftProgress||1;
+      // liftFrom scaled to match current bgRadius (so lift starts at exact bg position)
+      const liftFromR=(ring.mod/130)*0.46*bgScale;
+      const r=(liftFromR+(ring.rf-liftFromR)*prog)*minD;
+      const a0=t*ring.speed*ring.dir*spd-(ring._anchor||0);
+      ring.pts.forEach(({r:rv})=>{
+        const key=`ring:${ri}:${rv}`;
+        if(selectedPoints.some(p=>p.key===key)){
+          selScreen[key]={x:cx+r*Math.cos(ang(rv,ring.mod,a0)),y:cy+r*Math.sin(ang(rv,ring.mod,a0))};
+        }
+      });
+    });
+    /* connection lines */
+    if(selectedPoints.length>1){
+      const pts2=selectedPoints.map(p=>{
+        const k=p.key; if(selScreen[k]) return selScreen[k];
+        /* bg point — compute current pos */
+        const m=p.mod,rv=p.rv,a0=(window._opBgRotations[m]||0);
+        const r=(m/130)*minD*0.46;
+        return {x:cx+r*Math.cos(ang(rv,m,a0)),y:cy+r*Math.sin(ang(rv,m,a0))};
+      }).filter(Boolean);
+      ctx.beginPath();
+      pts2.forEach((p,i)=>{if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+      ctx.strokeStyle='rgba(200,130,255,0.75)';ctx.lineWidth=1.4;ctx.stroke();
+    }
+
+    window._opRings.forEach((ring,ri)=>{
+      const prog=ring.liftProgress||1;
+      const liftFromR=(ring.mod/130)*0.46*bgScale;
+      const r=(liftFromR+(ring.rf-liftFromR)*prog)*minD;
+      const a0=t*ring.speed*ring.dir*spd-(ring._anchor||0);
+      const isSel=ri===(window._selectedRing||0);
+
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle=isSel?`rgba(61,200,184,${(0.24)*prog})`:`rgba(200,168,74,${0.07*prog})`;
+      ctx.lineWidth=isSel?1.6:0.8;ctx.stroke();
+
+      /* ── Gap pair lines: all even gaps 2n ≤ g within this ring ── */
+      const g=window._opGapSize||0;
+      if(g>0&&prog>0.5){
+        const copSet=new Set(ring.pts.filter(p=>p.cop).map(p=>p.r));
+        for(let eg=2;eg<=g;eg+=2){
+          const hue=Math.round(160+eg*16)%360;
+          ring.pts.forEach(({r:rv,cop})=>{
+            if(!cop) return;
+            const partner=(rv+eg)%ring.mod||ring.mod;
+            if(!copSet.has(partner)) return;
+            const a1=ang(rv,ring.mod,a0);
+            const a2=ang(partner,ring.mod,a0);
+            const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+            const x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+            ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+            ctx.strokeStyle=`hsla(${hue},88%,62%,${0.26*prog})`;
+            ctx.lineWidth=0.7;ctx.stroke();
+          });
+        }
+      }
+
+      ring.pts.forEach(({r:rv,cop})=>{
+        if(!cop&&!showNonGcd) return;
+        const a=ang(rv,ring.mod,a0);
+        const x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
+        const isSelected=selectedPoints.some(p=>p.key===`ring:${ri}:${rv}`);
+        const sz=(cop?2.2:1.4)*(0.5+0.5*prog);
+
+        if(cop){
+          if(!isSelected){
+            const g2=ctx.createRadialGradient(x,y,0,x,y,sz*4);
+            g2.addColorStop(0,`rgba(61,200,184,${0.15*prog})`);
+            g2.addColorStop(1,'rgba(61,200,184,0)');
+            ctx.beginPath();ctx.arc(x,y,sz*4,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();
+          }
+          ctx.beginPath();ctx.arc(x,y,isSelected?sz*2:sz,0,Math.PI*2);
+          ctx.fillStyle=isSelected?'rgba(200,130,255,0.95)':rColor(rv,true,0.85*prog);
+          ctx.fill();
+          if(isSelected){
+            ctx.beginPath();ctx.arc(x,y,sz*3,0,Math.PI*2);
+            ctx.strokeStyle='rgba(200,130,255,0.4)';ctx.lineWidth=1;ctx.stroke();
+          }
+
+          if(prog>0.7&&ri<window._opRings.length-1){
+            const nr=window._opRings[ri+1];
+            const nA0=t*nr.speed*nr.dir*spd-(nr._anchor||0);
+            // Use same bgScale-corrected radius formula as everywhere else
+            const nLiftFrom=(nr.mod/130)*0.46*bgScale;
+            const nrR=(nLiftFrom+(nr.rf-nLiftFrom)*(nr.liftProgress||1))*minD;
+            const useCurve=window._opLiftCurve; // straight by default
+
+            /* ── Lift 1: Direct r → r ──
+               Connect residue rv on ring M to residue rv on ring M_next.
+               Same r value, different ring. Angle = rv/M_next * 2π + rotation.  */
+            if(showDirect){
+              const na=ang(rv,nr.mod,nA0);
+              const tx=cx+nrR*Math.cos(na), ty=cy+nrR*Math.sin(na);
+              ctx.beginPath();ctx.moveTo(x,y);
+              if(useCurve){
+                const mx2=(x+tx)/2-(y-ty)*0.12,my2=(y+ty)/2+(x-tx)*0.12;
+                ctx.quadraticCurveTo(mx2,my2,tx,ty);
+              } else {
+                ctx.lineTo(tx,ty);
+              }
+              ctx.strokeStyle=`rgba(61,200,184,${0.18*prog*liftAlpha*2})`;
+              ctx.lineWidth=0.8;ctx.stroke();
+            }
+
+            /* ── Lift 2: r → r + M (modular lift) ──
+               Residue rv on ring M maps to rv + M on ring M_next.
+               For mod30→mod60: 1→31, 7→37, 11→41, 13→43, 17→47, 19→49, 23→53, 29→59.
+               The target must be ≤ M_next; if rv+M > M_next, take mod.           */
+            if(showModular){
+              const gc2=(a,b)=>{while(b){const xx=b;b=a%b;a=xx;}return a;};
+              // target = rv + ring.mod, reduced into [1..nr.mod] if needed
+              let target = rv + ring.mod;
+              if(target > nr.mod) target = target % nr.mod || nr.mod;
+              const tL=gc2(target,nr.mod)===1;
+              const tA=ang(target,nr.mod,nA0);
+              const tx=cx+nrR*Math.cos(tA), ty=cy+nrR*Math.sin(tA);
+              ctx.beginPath();ctx.moveTo(x,y);
+              if(useCurve){
+                const mx2=(x+tx)/2-(y-ty)*0.15,my2=(y+ty)/2+(x-tx)*0.15;
+                ctx.quadraticCurveTo(mx2,my2,tx,ty);
+              } else {
+                ctx.lineTo(tx,ty);
+              }
+              ctx.strokeStyle=tL?`rgba(232,180,60,${0.22*prog*liftAlpha*2})`:`rgba(224,80,96,${0.16*prog*liftAlpha*2})`;
+              ctx.lineWidth=0.85;ctx.stroke();
+              // Target dot
+              ctx.beginPath();ctx.arc(tx,ty,1.8,0,Math.PI*2);
+              ctx.fillStyle=tL?`rgba(232,180,60,0.7)`:`rgba(224,80,96,0.5)`;ctx.fill();
+            }
+          }
+        } else {
+          ctx.beginPath();ctx.arc(x,y,isSelected?sz*2:sz*0.85,0,Math.PI*2);
+          ctx.fillStyle=isSelected?'rgba(200,130,255,0.9)':`rgba(220,60,60,${0.35*prog})`;
+          ctx.fill();
+        }
+      });
+    });
+
+    /* tooltip */
+    if(tooltip){
+      ctx.save();
+      ctx.font='10px JetBrains Mono,monospace';
+      const tw=ctx.measureText(tooltip.text).width+16;
+      ctx.fillStyle='rgba(2,2,8,0.85)';
+      ctx.fillRect(tooltip.x-tw/2,tooltip.y-17,tw,20);
+      ctx.fillStyle='rgba(200,130,255,0.95)';
+      ctx.textAlign='center';
+      ctx.fillText(tooltip.text,tooltip.x,tooltip.y-3);
+      ctx.textAlign='left';
+      ctx.restore();
+    }
+
+    t += (window._opSpeed||1) > 0 ? 1 : 0;
+    af=requestAnimationFrame(draw);
+  }
+
+  resize();draw();
+  window.addEventListener('resize',()=>{resize();},{passive:true});
+  setTimeout(()=>{const r0=window._opRings[0];if(r0)_updateModPts(r0);},100);
+})();
+
+
+
+
+// ── OPENER CONTROL STATE ──
+function opMakePts(mod){
+  const g=(a,b)=>{while(b){const x=b;b=a%b;a=x;}return a;};
+  const pts=[];
+  for(let r=0;r<mod;r++) pts.push({r, cop:g(r||mod,mod)===1});
+  return pts;
+}
+const _TEXT_IDS=['op-label','op-title','op-sub','op-eq','op-author','op-rings','op-c'];
+let _textVisible=true;
+
+// Initialize global flags
+window._opShowNonGcd = false;
+window._opLockBg = false;
+window._opBgMod = 128;
+window._opBgLiftThick = 2;
+window._opLiftAlpha = 0.5;
+window._opColorMode = 'r_hue';
+window._opCoord = 'polar';
+window._opGapHighlight = 0;
+window._opSmith = false;
+window._opAxes = false;
+window._opUnit = false;
+window._opZoom = 1;
+window._opChiSupport = true;
+window._opChiVanish = false;
+window._opLabels = false;
+
+
+function opToggleAllText(btn){
+  _textVisible = !_textVisible;
+  const wrapper = document.getElementById('op-all-text');
+  if(wrapper){
+    wrapper.style.opacity = _textVisible ? '' : '0';
+    wrapper.style.visibility = _textVisible ? '' : 'hidden';
+  }
+  // also corners
+  ['op-author','op-rings','op-c'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.style.opacity=_textVisible?'':'0';
+    el.style.visibility=_textVisible?'':'hidden';
+  });
+  btn.classList.toggle('active',_textVisible);
+}
+
+let _bgAlphaStep = 1;
+function opCycleBgAlpha(btn){
+  _bgAlphaStep = (_bgAlphaStep + 1) % 6;
+  window._opBgAlpha = _bgAlphaStep * 0.2;
+  // Also drive lift line thickness: 0→0, 1→1, 2→2, 3→3, 4→4, 5→5
+  window._opBgLiftThick = _bgAlphaStep * 2;
+  const pct = _bgAlphaStep * 20;
+  btn.textContent = `Lift α ${pct}%`;
+  btn.classList.toggle('active', _bgAlphaStep > 0);
+  // Sync the advanced slider
+  const sl = document.getElementById('adv-bg-lift');
+  const lbl = document.getElementById('adv-bg-lift-val');
+  if(sl) sl.value = window._opBgLiftThick;
+  if(lbl) lbl.textContent = window._opBgLiftThick;
+}
+function opToggleGhosts(btn){
+  window._opGhosts=!window._opGhosts;
+  btn.classList.toggle('active',window._opGhosts);
+}
+
+function opToggleCurve(btn){
+  window._opCurve=!window._opCurve;
+  btn.classList.toggle('active',window._opCurve);
+}
+function opToggleLiftDirect(btn){
+  window._opLiftDirect=!window._opLiftDirect;
+  btn.classList.toggle('active',window._opLiftDirect);
+}
+function opToggleLiftCurve(btn){
+  window._opLiftCurve=!window._opLiftCurve;
+  btn.textContent=window._opLiftCurve?'Curved':'Straight';
+  btn.classList.toggle('active',window._opLiftCurve);
+  // sync the other button too
+  const b2=document.getElementById('op-lift-curve-btn');
+  if(b2){b2.textContent=btn.textContent;b2.classList.toggle('active',window._opLiftCurve);}
+}
+
+function opScaleAllSpeeds(scale){
+  window._opRings&&window._opRings.forEach(r=>{r.speed=Math.abs(r.speed*scale)||0.00005;});
+}
+function opToggleLiftLines(btn){
+  window._opLiftLines=!window._opLiftLines;
+  btn.classList.toggle('active',window._opLiftLines);
+}
+
+function _rebuildRingButtons(){
+  const container = document.getElementById('op-ring-btns');
+  container.innerHTML = '';
+  window._opRings.forEach((ring, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opc-btn' + (i === window._selectedRing ? ' active ring-sel' : '');
+    btn.textContent = i + 1;
+    btn.onclick = () => opSelectRing(btn, i);
+    container.appendChild(btn);
+  });
+}
+
+function opSelectRing(btn, idx){
+  window._selectedRing = Math.min(idx, window._opRings.length - 1);
+  _rebuildRingButtons();
+  const ring = window._opRings[window._selectedRing];
+  if(!ring) return;
+  const BASE = 0.0001;
+  const sliderVal = Math.round(ring.dir * ring.speed / BASE);
+  const slider = document.getElementById('op-ring-speed');
+  slider.value = Math.max(-200, Math.min(200, sliderVal));
+  _updateRingSpeedLabel(slider.value);
+  document.getElementById('op-mod-input').value = ring.mod;
+  _updateModPts(ring);
+}
+
+function _autoSpaceRings(){
+  const n = window._opRings.length;
+  const bgScale = window._opBgScale||1;
+  window._opRings.forEach((ring, i) => {
+    ring.rf = 0.10 + (0.44 - 0.10) * (i / Math.max(n - 1, 1));
+    ring.liftFrom = (ring.mod/130)*0.46*bgScale;
+  });
+  if(n === 1){ window._opRings[0].rf = 0.22; }
+}
+
+function opAddRing(){
+  const rings=window._opRings;
+  if(!rings) return;
+  const lastMod=rings[rings.length-1].mod;
+  const newMod=Math.min(9999,lastMod*2);
+  const DIRS=[1,-1,1,-1,1,-1,1,-1,1,-1];
+  const bgScale=window._opBgScale||1;
+  const liftFrom=(newMod/130)*0.46*bgScale;
+  const newRing={
+    mod:newMod,
+    rf:0.44,
+    speed:Math.max(0.00003,rings[rings.length-1].speed*0.6),
+    dir:DIRS[rings.length%2],
+    pts:(window._opMakePts||opMakePts)(newMod),
+    liftProgress:0,
+    liftFrom,
+    _anchor:0,
+  };
+  rings.push(newRing);
+  _autoSpaceRings();
+  window._selectedRing=rings.length-1;
+  _rebuildRingButtons();
+  document.getElementById('op-mod-input').value=newMod;
+  _updateModPts(newRing);
+  _updateCornerLabel();
+  // Animate lift-in
+  const animFn=window._opAnimLift;
+  if(animFn){ animFn(newRing); }
+  else {
+    (function anim(){
+      if(newRing.liftProgress>=1){newRing.liftProgress=1;return;}
+      newRing.liftProgress=Math.min(1,newRing.liftProgress+0.022);
+      requestAnimationFrame(anim);
+    })();
+  }
+}
+
+function opRemoveRing(){
+  const rings = window._opRings;
+  if(rings.length <= 1) return; // keep at least one
+  rings.pop();
+  _autoSpaceRings();
+  window._selectedRing = Math.min(window._selectedRing, rings.length - 1);
+  _rebuildRingButtons();
+  const ring = rings[window._selectedRing];
+  document.getElementById('op-mod-input').value = ring.mod;
+  _updateModPts(ring);
+  _updateCornerLabel();
+}
+
+function _updateCornerLabel(){
+  const el = document.getElementById('op-rings');
+  if(el) el.textContent = 'M = ' + window._opRings.map(r=>r.mod).join(' · ');
+}
+
+function _updateRingSpeedLabel(v){
+  const el = document.getElementById('op-ring-speed-val');
+  const n = +v;
+  el.textContent = n===0 ? '0' : (n>0?'+':'')+n;
+}
+
+function opSetRingSpeed(v){
+  _updateRingSpeedLabel(v);
+  const ring = window._opRings[window._selectedRing];
+  const n = +v;
+  const BASE = 0.0001;
+  ring.dir = n >= 0 ? 1 : -1;
+  ring.speed = Math.abs(n) * BASE;
+}
+
+function opSetMod(v){
+  const m = Math.max(1, Math.min(9999, parseInt(v)||1));
+  document.getElementById('op-mod-input').value = m;
+  const ring = window._opRings[window._selectedRing];
+  if(!ring) return;
+  ring.mod = m;
+  ring.pts = opMakePts(m);
+  _updateModPts(ring);
+  _updateCornerLabel();
+}
+
+function _updateModPts(ring){
+  const el = document.getElementById('op-mod-pts');
+  if(el) el.textContent = ring.pts.length + ' pts';
+}
+
+function opTrail(v){ window._opTrail=v/100; }
+
+function opToggleNonGcd(btn){
+  window._opShowNonGcd=!window._opShowNonGcd;
+  btn.classList.toggle('active',window._opShowNonGcd);
+}
+
+window._opBgScale = 1.0;
+window._opGapSize = 0;
+
+function opUpdateGap(g){
+  g = g||0;
+  window._opGapSize = g;
+  const valEl=document.getElementById('op-gap-val');
+  if(valEl) valEl.textContent=g===0?'off':g;
+  const resEl=document.getElementById('op-gap-result');
+  if(g===0){ if(resEl) resEl.innerHTML=''; return; }
+  const rings=window._opRings;
+  if(!rings||!rings.length) return;
+  const m=rings[0].mod;
+  if(m>5000){
+    if(resEl) resEl.innerHTML='<span style="color:rgba(255,255,255,.3)">M too large</span>';
+    return;
+  }
+  const gcdfn=(a,b)=>{while(b){const x=b;b=a%b;a=x;}return a;};
+  const cp=(gap,M)=>{let c=0;for(let r=1;r<=M;r++)if(gcdfn(r,M)===1&&gcdfn((r+gap)%M||M,M)===1)c++;return c;};
+  const a2=cp(2,m);
+  let rows='';
+  for(let eg=2;eg<=g;eg+=2){
+    const ag=cp(eg,m);
+    const ratio=a2>0?ag/a2:NaN;
+    let theory=1,tmp=eg,oddPs=[];
+    for(let p=3;p<=tmp;p+=2) if(tmp%p===0){oddPs.push(p);while(tmp%p===0)tmp=Math.floor(tmp/p);}
+    oddPs.forEach(q=>{theory*=(q-1)/(q-2);});
+    const hue=Math.round(160+eg*16)%360;
+    const match=!isNaN(ratio)&&Math.abs(ratio-theory)<0.05;
+    rows+=`<tr>
+      <td style="color:hsla(${hue},85%,65%,1);padding:1px 5px">g=${eg}</td>
+      <td style="text-align:right;padding:1px 5px;color:rgba(255,255,255,.7)">${ag}</td>
+      <td style="text-align:right;padding:1px 5px;color:${match?'#3dc8b8':'#c8a84a'}">${!isNaN(ratio)?ratio.toFixed(3):'—'}</td>
+      <td style="text-align:right;padding:1px 5px;color:rgba(255,255,255,.3)">${theory.toFixed(3)}</td>
+    </tr>`;
+  }
+  if(resEl) resEl.innerHTML=
+    `<table style="width:100%;border-collapse:collapse;">
+      <tr style="color:rgba(255,255,255,.25);border-bottom:1px solid rgba(255,255,255,.07)">
+        <th style="text-align:left;padding:1px 5px;font-weight:400">gap</th>
+        <th style="text-align:right;padding:1px 5px;font-weight:400">A(g)</th>
+        <th style="text-align:right;padding:1px 5px;font-weight:400">÷A(2)</th>
+        <th style="text-align:right;padding:1px 5px;font-weight:400">theory</th>
+      </tr>${rows}</table>`;
+}
+
+function opToggleLockBg(btn){
+  window._opLockBg=!window._opLockBg;
+  btn.classList.toggle('active',window._opLockBg);
+}
+
+function opToggleAdvanced(){
+  const panel=document.getElementById('op-advanced');
+  const btn=document.getElementById('op-adv-btn');
+  const open=panel.style.display==='none';
+  panel.style.display=open?'block':'none';
+  btn.textContent=open?'Advanced ▴':'Advanced ▾';
+}
+
+function opAdvToggle(btn,flag){
+  window[flag]=!window[flag];
+  btn.classList.toggle('active',window[flag]);
+}
+
+function opSetCoord(btn,mode){
+  window._opCoord=mode;
+  document.querySelectorAll('[id^="adv-coord-"]').forEach(b=>b.classList.remove('active','ring-sel'));
+  btn.classList.add('active');
+}
+
+function opGapHighlight(g){
+  window._opGapHighlight=g;
+}
+
+function opRunSieve(){
+  const n=parseInt(document.getElementById('adv-sieve-n').value)||1000;
+  const el=document.getElementById('adv-sieve-result');
+  el.textContent='Running…';
+  setTimeout(()=>{
+    const s=new Uint8Array(n+1).fill(1);s[0]=s[1]=0;
+    for(let i=2;i*i<=n;i++) if(s[i]) for(let j=i*i;j<=n;j+=i) s[j]=0;
+
+    const primes=[];for(let i=2;i<=n;i++) if(s[i]) primes.push(i);
+    const cnt=primes.length;
+    const largest=primes[cnt-1]??0;
+    let twins=0;
+    for(let i=0;i<cnt-1;i++) if(primes[i+1]-primes[i]===2) twins++;
+    const density=cnt/n;
+
+    // ── 8 framework constants (partial sums/products up to p ≤ n) ──
+    let zeta2=1, C=1, cftProd=1;
+    let P2=0, J=0, T=0, S=0, Q=0, U=0;
+    for(const p of primes){
+      const p2=p*p;
+      zeta2  *= p2/(p2-1);
+      C      *= (p2-2)/(p2-1);
+      cftProd*= (1-2/p2);
+      P2 += 1/p2;
+      J  += 1/(p*(p-1));
+      T  += 1/(p2*(p-1));
+      S  += 1/(p2-1);
+      Q  += 1/(p2*(p2-1));
+      U  += 1/(p*(p-1)*(p+1));
+    }
+    const CFT=0.5*(1+cftProd);
+
+    window._opSievePrimes=s;
+
+    const row=(sym,val,col,def)=>
+      `<tr>
+        <td style="color:${col};padding:2px 5px;white-space:nowrap">${sym}</td>
+        <td style="color:rgba(255,255,255,.65);font-size:8px;padding:2px 5px">${def}</td>
+        <td style="color:${col};text-align:right;padding:2px 5px;letter-spacing:.02em">${val}</td>
+      </tr>`;
+
+    el.innerHTML=
+      `<div style="margin-bottom:5px;color:rgba(255,255,255,.3);font-size:7.5px;letter-spacing:.15em">
+        π(${n})=${cnt.toLocaleString()} &nbsp;·&nbsp; largest p=${largest.toLocaleString()} &nbsp;·&nbsp; twins=${twins.toLocaleString()} &nbsp;·&nbsp; density=${density.toFixed(5)}
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:9px;">
+        <tr style="color:rgba(255,255,255,.22);border-bottom:1px solid rgba(255,255,255,.08)">
+          <th style="text-align:left;padding:2px 5px;font-weight:400">const</th>
+          <th style="text-align:left;padding:2px 5px;font-weight:400">definition</th>
+          <th style="text-align:right;padding:2px 5px;font-weight:400">partial (p≤${n})</th>
+        </tr>
+        ${row('ζ(2)', zeta2.toFixed(8), '#e8cb6a',       '∏ p²/(p²−1)')}
+        ${row('C',    C.toFixed(8),     '#c8a84a',       '∏ (p²−2)/(p²−1)')}
+        ${row('C&#x209B;&#x209C;',CFT.toFixed(8),'#3dc8b8','½(1+∏(1−2/p²))')}
+        ${row('P(2)', P2.toFixed(8),    '#4898e8',       '∑ 1/p²')}
+        ${row('J',    J.toFixed(8),     '#9070d8',       '∑ 1/(p(p−1))')}
+        ${row('T',    T.toFixed(8),     '#80c860',       '∑ 1/(p²(p−1))')}
+        ${row('S ★',  S.toFixed(8),     '#80c860',       '∑ 1/(p²−1)')}
+        ${row('Q ★',  Q.toFixed(8),     '#58b8e8',       '∑ 1/(p²(p²−1))')}
+        ${row('U ★',  U.toFixed(8),     '#e8a840',       '∑ 1/(p(p−1)(p+1))')}
+      </table>`;
+  },10);
+}
+function opClearSieve(){
+  window._opSievePrimes=null;
+  document.getElementById('adv-sieve-result').textContent='';
+}
+
+
+
+function enterSite(){
+  document.body.classList.remove('op-active');
+  document.getElementById('opener').classList.add('gone');
+  document.getElementById('nav').classList.remove('hidden');
+  setTimeout(()=>{ drawLandmark(); }, 900);
+}
+
+function enterSite(){
+  document.body.classList.remove('op-active');
+  const op = document.getElementById('opener');
+  if(op) op.classList.add('gone');
+  const nav = document.getElementById('tab-nav');
+  if(nav){ nav.style.opacity='1'; nav.style.pointerEvents='auto'; }
+}
+</script>
+
 </body>
 </html>
 
-                                                   </html>
+  </html>
