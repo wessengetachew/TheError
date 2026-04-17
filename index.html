@@ -730,6 +730,7 @@ footer {
 #pc-spec-canvas { width:100%; height:60px; display:block; }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 <nav id="tab-nav"><div class="tabs"><div class="tab active"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Opener</div><a href="EN_explorer-1-2.html" class="tab "><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Explorer</a><a href="EN_explorer-updated.html" class="tab "><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Deep Analysis</a><a href="zmmz_explorer-1.html" class="tab tab-canvas"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>Geometric Canvas</a><a href="zeta_explorer.html" class="tab"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>&#950;(2) Explorer</a><a href="gcd_explorer.html" class="tab"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7;display:inline-block"></span>GCD Explorer</a></div><span class="nav-right">C ≈ 0.530711806246</span></nav>
@@ -740,7 +741,8 @@ footer {
 
 <!-- ═══════════ HERO ═══════════ -->
 <section id="hero">
-  <canvas id="lift-canvas"></canvas>
+  <canvas id="wave-hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.2s ease;pointer-events:none;z-index:1;"></canvas>
+  <canvas id="lift-canvas" style="position:absolute;inset:0;width:100%;height:100%;opacity:.55;pointer-events:none;z-index:0;"></canvas>
 
   <div class="hero-inner">
     <div class="eyebrow">Number Theory · 2026 · Wessen Getachew</div>
@@ -765,6 +767,7 @@ footer {
       <a href="#what" class="cta cta-ghost">Learn the Mathematics</a>
       <a href="zmmz_explorer-1.html" class="cta" id="cta-mobile-hide" style="border:1px solid rgba(224,80,96,.45);color:#e05060;background:rgba(224,80,96,.08);">Geometric Canvas ◈</a>
       <a href="#checker" class="cta" id="cta-mobile-hide2" style="border:1px solid rgba(200,168,74,.4);color:rgba(200,168,74,.85);background:rgba(200,168,74,.07);">Prime Checker ↓</a>
+      <button onclick="document.getElementById('prime-light-section').scrollIntoView({behavior:'smooth'})" class="cta" style="border:1px solid rgba(144,112,216,.45);color:rgba(144,112,216,.85);background:rgba(144,112,216,.08);">&#9672; Prime Light Wave</button>
     </div>
   </div>
 
@@ -910,6 +913,206 @@ footer {
     </div>
   </div>
 </div>
+
+
+<!-- ═══════════ PRIME LIGHT WAVE ═══════════ -->
+<div class="section-divider" id="prime-light-divider">
+  <div class="div-line"></div>
+  <div class="div-glyph">Prime Light — Wave Structure of E(N)</div>
+  <div class="div-line"></div>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;padding:0 40px 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+  <p style="font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:rgba(255,255,255,.35);max-width:620px;line-height:1.7;">
+    E(N) oscillates like a coherent optical wave. Its sign changes are nodes, its amplitude decays as O(1/N), and its spectral structure mirrors the imaginary parts of the Riemann zeros. The 3D wave below is computed live from the Euler-product sieve.
+  </p>
+  <button id="prime-light-toggle" onclick="togglePrimeLight()"
+    style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    background:rgba(144,112,216,.12);border:1px solid rgba(144,112,216,.4);
+    color:rgba(144,112,216,.85);padding:8px 18px;cursor:pointer;transition:all .2s;white-space:nowrap;"
+    onmouseover="this.style.background='rgba(144,112,216,.22)'" onmouseout="this.style.background='rgba(144,112,216,.12)'">
+    &#9660; Expand Wave Section
+  </button>
+</div>
+
+<div id="prime-light-section" style="display:none;max-width:1100px;margin:0 auto;padding:0 40px 40px;">
+
+  <!-- Wave canvas + controls -->
+  <div style="background:var(--bg1);border:1px solid rgba(144,112,216,.2);border-radius:2px;overflow:hidden;margin-bottom:20px;">
+
+    <!-- 3D Wave canvas -->
+    <div style="position:relative;height:420px;background:#04040a;">
+      <canvas id="pl-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+      <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(4,4,10,.6) 100%);z-index:2;"></div>
+      <!-- Stats overlay -->
+      <div style="position:absolute;bottom:14px;left:16px;z-index:3;display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;">
+          <span style="color:rgba(255,255,255,.3);">N=</span><span id="pl-stat-n" style="color:var(--teal);">650</span>
+          <span style="color:rgba(255,255,255,.3);margin-left:10px;">E(N)=</span><span id="pl-stat-e" style="color:var(--violet);">—</span>
+          <span style="color:rgba(255,255,255,.3);margin-left:10px;">nodes=</span><span id="pl-stat-sc" style="color:var(--gold);">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animation controls -->
+    <div style="padding:16px 20px;background:rgba(0,0,0,.3);border-top:1px solid rgba(144,112,216,.15);">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px;">Wave Animation Controls</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+
+        <!-- Play/pause -->
+        <button id="pl-play-btn" onclick="plTogglePlay()"
+          style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;background:rgba(144,112,216,.15);
+          border:1px solid rgba(144,112,216,.4);color:rgba(144,112,216,.9);padding:6px 14px;cursor:pointer;">
+          &#9646;&#9646; Pause
+        </button>
+
+        <!-- Camera speed -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);">CAM SPEED</span>
+          <input type="range" id="pl-cam-speed" min="0" max="30" value="7" step="1"
+            style="-webkit-appearance:none;width:110px;height:3px;background:rgba(144,112,216,.3);outline:none;border-radius:2px;cursor:pointer;"
+            oninput="plCamSpeed=this.value/10000;document.getElementById('pl-cam-speed-v').textContent=this.value">
+          <span id="pl-cam-speed-v" style="font-family:var(--mono);font-size:9px;color:var(--violet);min-width:22px;">7</span>
+        </div>
+
+        <!-- Wave amplitude -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);">AMPLITUDE</span>
+          <input type="range" id="pl-amp" min="50" max="800" value="350" step="10"
+            style="-webkit-appearance:none;width:110px;height:3px;background:rgba(61,200,184,.3);outline:none;border-radius:2px;cursor:pointer;"
+            oninput="plRebuildWave(+this.value);document.getElementById('pl-amp-v').textContent=this.value">
+          <span id="pl-amp-v" style="font-family:var(--mono);font-size:9px;color:var(--teal);min-width:32px;">350</span>
+        </div>
+
+        <!-- N range -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);">N RANGE</span>
+          <input type="range" id="pl-n-range" min="100" max="1200" value="650" step="50"
+            style="-webkit-appearance:none;width:110px;height:3px;background:rgba(200,168,74,.3);outline:none;border-radius:2px;cursor:pointer;"
+            oninput="plRebuildAll(+this.value);document.getElementById('pl-n-v').textContent=this.value">
+          <span id="pl-n-v" style="font-family:var(--mono);font-size:9px;color:var(--gold);min-width:36px;">650</span>
+        </div>
+
+        <!-- Camera elevation -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);">ELEVATION</span>
+          <input type="range" id="pl-elevation" min="-20" max="80" value="26" step="1"
+            style="-webkit-appearance:none;width:110px;height:3px;background:rgba(232,144,74,.3);outline:none;border-radius:2px;cursor:pointer;"
+            oninput="plBaseY=+this.value;document.getElementById('pl-elev-v').textContent=this.value">
+          <span id="pl-elev-v" style="font-family:var(--mono);font-size:9px;color:var(--orange);min-width:22px;">26</span>
+        </div>
+
+        <!-- Orbit radius -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);">ORBIT R</span>
+          <input type="range" id="pl-orbit-r" min="20" max="250" value="85" step="5"
+            style="-webkit-appearance:none;width:110px;height:3px;background:rgba(224,80,96,.3);outline:none;border-radius:2px;cursor:pointer;"
+            oninput="plOrbitR=+this.value;document.getElementById('pl-orbit-v').textContent=this.value">
+          <span id="pl-orbit-v" style="font-family:var(--mono);font-size:9px;color:var(--coral);min-width:22px;">85</span>
+        </div>
+
+        <!-- Glow toggle -->
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.35);">
+          <input type="checkbox" id="pl-glow" checked onchange="if(plGlowMesh)plGlowMesh.visible=this.checked;"
+            style="accent-color:var(--teal);">
+          GLOW
+        </label>
+
+        <!-- Nodes toggle -->
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.35);">
+          <input type="checkbox" id="pl-nodes" checked onchange="if(plSignGroup)plSignGroup.visible=this.checked;"
+            style="accent-color:var(--violet);">
+          NODES
+        </label>
+
+        <!-- Stars toggle -->
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.35);">
+          <input type="checkbox" id="pl-stars" checked onchange="if(plStarMesh)plStarMesh.visible=this.checked;"
+            style="accent-color:var(--gold);">
+          STARS
+        </label>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave properties table -->
+  <div style="background:var(--bg1);border:1px solid rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:20px;">
+    <div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.05);">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Wave Analogy Framework</div>
+      <h3 style="font-family:var(--disp);font-size:1.3rem;font-weight:400;color:var(--cream);">E(N) as a <em style="color:var(--teal);font-style:italic;font-family:var(--serif);">Coherent Optical Wave</em></h3>
+    </div>
+    <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="padding:14px;background:rgba(0,0,0,.2);border-left:2px solid rgba(144,112,216,.4);">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);margin-bottom:6px;">Destructive / Constructive</div>
+        <p style="font-family:var(--serif);font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.6;">A large prime gap acts like destructive interference — a deep trough in E(N). The system immediately produces a compensating prime cluster, snapping the wave back toward the carrier.</p>
+      </div>
+      <div style="padding:14px;background:rgba(0,0,0,.2);border-left:2px solid rgba(61,200,184,.4);">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;">Damped Standing Wave</div>
+        <p style="font-family:var(--serif);font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.6;">The O(1/N) decay conjecture means the oscillation amplitude shrinks. The system behaves like a damped standing wave — stable, self-correcting, and coherent even as gaps between sign changes grow astronomically.</p>
+      </div>
+      <div style="padding:14px;background:rgba(0,0,0,.2);border-left:2px solid rgba(200,168,74,.4);">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Wave Nodes</div>
+        <p style="font-family:var(--serif);font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.6;">Points where R(N) = C exactly. Under RH, these nodes occur infinitely often with increasing gaps — mirroring the Skewes phenomenon for π(x) − li(x).</p>
+      </div>
+      <div style="padding:14px;background:rgba(0,0,0,.2);border-left:2px solid rgba(232,144,74,.4);">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;">Riemann Zero Harmonics</div>
+        <p style="font-family:var(--serif);font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.6;">The imaginary parts γ<sub>k</sub> of the non-trivial zeros ρ<sub>k</sub> = ½ + iγ<sub>k</sub> are conjectured to govern the oscillation frequencies. This is the explicit formula analogy — not yet proved for R(N). <span style="color:rgba(224,80,96,.7);font-size:.85rem;">(Speculative)</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Harmonics chart -->
+  <div style="background:var(--bg1);border:1px solid rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:20px;">
+    <div style="padding:14px 20px 10px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--cream3);">H · 01</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--gold2);flex:1;">Riemann Zero Harmonic Decomposition</span>
+      <span style="font-family:var(--mono);font-size:8px;background:rgba(61,200,184,.12);border:1px solid rgba(61,200,184,.3);color:var(--teal);padding:2px 8px;">LIVE · INTERACTIVE</span>
+    </div>
+    <div style="padding:10px 20px;background:rgba(0,0,0,.2);display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);">ZEROS k</span>
+      <input type="range" id="pl-zeros-slider" min="1" max="20" value="6" step="1"
+        style="-webkit-appearance:none;width:160px;height:3px;background:rgba(200,168,74,.3);outline:none;border-radius:2px;cursor:pointer;"
+        oninput="document.getElementById('pl-zeros-val').textContent=this.value;plDrawHarmonics()">
+      <span id="pl-zeros-val" style="font-family:var(--mono);font-size:9px;color:var(--gold);min-width:20px;">6</span>
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);margin-left:8px;">N RANGE</span>
+      <input type="range" id="pl-harm-n" min="100" max="800" value="400" step="50"
+        style="-webkit-appearance:none;width:160px;height:3px;background:rgba(144,112,216,.3);outline:none;border-radius:2px;cursor:pointer;"
+        oninput="document.getElementById('pl-harm-n-val').textContent=this.value;plDrawHarmonics()">
+      <span id="pl-harm-n-val" style="font-family:var(--mono);font-size:9px;color:var(--violet);min-width:32px;">400</span>
+    </div>
+    <canvas id="pl-harmonics-cv" style="display:block;width:100%;height:240px;background:#050510;"></canvas>
+    <div style="padding:8px 20px;font-family:var(--mono);font-size:8px;letter-spacing:.06em;color:rgba(255,255,255,.3);line-height:1.7;border-top:1px solid rgba(255,255,255,.04);">
+      Gold: actual E(N) from the Euler-product sieve. &nbsp;Teal→Violet: partial harmonic sum S<sub>k</sub>(N) = Σ A<sub>j</sub>·cos(γ<sub>j</sub>·log N). &nbsp;Each zero refines the approximation. &nbsp;<span style="color:rgba(224,80,96,.6);">Note: the explicit formula connection for R(N) is conjectural, not proved.</span>
+    </div>
+  </div>
+
+  <!-- E(N) wave explorer -->
+  <div style="background:var(--bg1);border:1px solid rgba(255,255,255,.06);border-radius:2px;overflow:hidden;">
+    <div style="padding:14px 20px 10px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:12px;">
+      <span style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--cream3);">E · 01</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--gold2);">E(N) Wave — Interference Pattern</span>
+    </div>
+    <div style="padding:10px 20px;background:rgba(0,0,0,.2);display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.35);">N</span>
+      <input type="range" id="pl-exp-n" min="50" max="2000" value="800" step="25"
+        style="-webkit-appearance:none;width:200px;height:3px;background:rgba(61,200,184,.3);outline:none;border-radius:2px;cursor:pointer;"
+        oninput="document.getElementById('pl-exp-n-val').textContent=this.value;plDrawWaveExplorer(+this.value)">
+      <span id="pl-exp-n-val" style="font-family:var(--mono);font-size:9px;color:var(--teal);min-width:36px;">800</span>
+      <div style="display:flex;gap:12px;margin-left:8px;flex-wrap:wrap;">
+        <span id="pl-exp-rn" style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.5);">R(N): —</span>
+        <span id="pl-exp-en" style="font-family:var(--mono);font-size:9px;color:var(--teal);">E(N): —</span>
+        <span id="pl-exp-sc" style="font-family:var(--mono);font-size:9px;color:var(--violet);">nodes: —</span>
+      </div>
+    </div>
+    <canvas id="pl-wave-cv" style="display:block;width:100%;height:260px;background:#050510;"></canvas>
+    <div style="padding:8px 20px;font-family:var(--mono);font-size:8px;letter-spacing:.06em;color:rgba(255,255,255,.3);border-top:1px solid rgba(255,255,255,.04);">
+      Violet: E(N) &gt; 0 (prime cluster ahead of expectation). &nbsp;Teal: E(N) &lt; 0 (gap larger than mean). &nbsp;Teal verticals: sign-change nodes. &nbsp;Faint gold: prime positions.
+    </div>
+  </div>
+
+</div>
+<!-- ═══════════ END PRIME LIGHT ═══════════ -->
 
 <!-- ═══════════ EIGHT CHARTS ═══════════ -->
 <div class="section-divider">
@@ -2977,6 +3180,494 @@ window.runBenchmarkLive = function(){
     btn.disabled=false; btn.textContent='▶ Run live verification (N ≤ 5,000)';
   }, 30);
 };
+
+</script>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// PRIME LIGHT WAVE — Three.js hero + section JS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Toggle collapse ──────────────────────────────────────────────────────────
+window.togglePrimeLight = function() {
+  const sec = document.getElementById('prime-light-section');
+  const btn = document.getElementById('prime-light-toggle');
+  const open = sec.style.display === 'block';
+  sec.style.display = open ? 'none' : 'block';
+  btn.innerHTML = open ? '&#9660; Expand Wave Section' : '&#9650; Collapse Wave Section';
+  if (!open && !plInitialized) plInit();
+};
+
+// ── Math core ────────────────────────────────────────────────────────────────
+function plSieve(n) {
+  const a = new Uint8Array(n + 2).fill(1); a[0] = a[1] = 0;
+  for (let i = 2; i * i <= n; i++) if (a[i]) for (let j = i * i; j <= n; j += i) a[j] = 0;
+  const p = []; for (let i = 2; i <= n; i++) if (a[i]) p.push(i); return p;
+}
+function plPhi(m, primes) {
+  let r = m, n = m;
+  for (const p of primes) { if (p * p > n) break; if (n % p === 0) { r -= Math.floor(r / p); while (n % p === 0) n = Math.floor(n / p); } }
+  if (n > 1) r -= Math.floor(r / n);
+  return r;
+}
+function plComputeEN(maxN) {
+  const primes = plSieve(maxN + 2);
+  const phiArr = new Map();
+  for (let m = 1; m <= maxN + 1; m++) phiArr.set(m, plPhi(m, primes));
+  let sumL = 0, sumPh = 0;
+  let C = 1;
+  for (const p of primes) C *= (p * p - 2) / (p * p - 1);
+  const data = [];
+  for (let m = 1; m <= maxN; m++) {
+    const pm = phiArr.get(m), pm1 = phiArr.get(m + 1);
+    sumL += pm * pm1 / (m + 1); sumPh += pm;
+    const R = sumPh > 0 ? sumL / sumPh : 0;
+    if (m >= 5) data.push({ n: m, R, E: R - C, ip: primes.includes(m) });
+  }
+  return { data, C };
+}
+
+// ── THREE.JS HERO WAVE (background of index hero) ──────────────────────────
+let plHeroRenderer = null, plHeroScene = null, plHeroCam = null;
+let plHeroAngle = 0, plHeroT = 0, plHeroAnimOn = false;
+
+function initHeroWave() {
+  if (typeof THREE === 'undefined' || plHeroRenderer) return;
+  const canvas = document.getElementById('wave-hero-canvas');
+  if (!canvas) return;
+
+  plHeroRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  plHeroRenderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  plHeroRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+  plHeroRenderer.setClearColor(0x000000, 0);
+
+  plHeroScene = new THREE.Scene();
+  plHeroScene.fog = new THREE.FogExp2(0x04040a, 0.006);
+
+  plHeroCam = new THREE.PerspectiveCamera(54, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1800);
+  plHeroCam.position.set(18, 28, 105);
+  plHeroCam.lookAt(0, 4, 0);
+
+  // Stars
+  const N = 3000, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const r = 200 + Math.random() * 500, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+    pos[i*3] = r * Math.sin(ph) * Math.cos(th);
+    pos[i*3+1] = r * Math.sin(ph) * Math.sin(th);
+    pos[i*3+2] = r * Math.cos(ph);
+    const t = Math.random();
+    if (t < 0.08)      { col[i*3]=0.78; col[i*3+1]=0.66; col[i*3+2]=0.29; }
+    else if (t < 0.18) { col[i*3]=0.24; col[i*3+1]=0.78; col[i*3+2]=0.72; }
+    else               { col[i*3]=0.68; col[i*3+1]=0.68; col[i*3+2]=0.78; }
+  }
+  const sgeo = new THREE.BufferGeometry();
+  sgeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  sgeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  plHeroScene.add(new THREE.Points(sgeo, new THREE.PointsMaterial({ size: 0.5, vertexColors: true, transparent: true, opacity: 0.7 })));
+
+  // Wave tube
+  const { data: hd } = plComputeEN(400);
+  const SPAN = 260, AMP = 200, Nmax = hd[hd.length - 1].n;
+  const stride = Math.max(1, Math.floor(hd.length / 300));
+  const pts = [];
+  for (let i = 0; i < hd.length; i += stride) {
+    const d = hd[i];
+    pts.push(new THREE.Vector3((d.n / Nmax) * SPAN - SPAN / 2, d.E * AMP, 0));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+  const tgeo = new THREE.TubeGeometry(curve, 400, 0.28, 6, false);
+  const tarr = tgeo.attributes.position.array;
+  const tcol = new Float32Array(tarr.length);
+  for (let i = 0; i < tarr.length / 3; i++) {
+    const y = tarr[i * 3 + 1];
+    if (y >= 0) { tcol[i*3]=0.56; tcol[i*3+1]=0.44; tcol[i*3+2]=0.85; }
+    else        { tcol[i*3]=0.24; tcol[i*3+1]=0.78; tcol[i*3+2]=0.72; }
+  }
+  tgeo.setAttribute('color', new THREE.BufferAttribute(tcol, 3));
+  plHeroScene.add(new THREE.Mesh(tgeo, new THREE.MeshPhongMaterial({ vertexColors: true, emissive: 0x090916, shininess: 80 })));
+
+  // Carrier axis
+  const ax = new THREE.CatmullRomCurve3([new THREE.Vector3(-132, 0, 0), new THREE.Vector3(132, 0, 0)]);
+  plHeroScene.add(new THREE.Mesh(new THREE.TubeGeometry(ax, 60, 0.10, 4, false),
+    new THREE.MeshBasicMaterial({ color: 0xc8a84a, transparent: true, opacity: 0.4 })));
+
+  // Riemann rings
+  [14.134, 21.022, 25.010, 30.424, 32.935].forEach((z, i) => {
+    const rad = 28 + i * 8;
+    const geo = new THREE.TorusGeometry(rad, 0.25, 4, 60);
+    const mat = new THREE.MeshBasicMaterial({ color: [0x3dc8b8, 0x9070d8, 0xe8904a, 0x3dc8b8, 0x9070d8][i],
+      transparent: true, opacity: 0.07 - i * 0.01 });
+    const t = new THREE.Mesh(geo, mat);
+    t.rotation.x = Math.PI / 2; t.position.z = -60 - i * 12;
+    t.userData.speed = 0.0012 * (i % 2 === 0 ? 1 : -1);
+    plHeroScene.add(t);
+  });
+
+  plHeroScene.add(new THREE.AmbientLight(0x0d0d22, 4));
+  const gl = new THREE.PointLight(0xc8a84a, 4, 220); gl.position.set(0, 55, 80); plHeroScene.add(gl);
+  const tl = new THREE.PointLight(0x3dc8b8, 3, 180); tl.position.set(-70, -25, 60); plHeroScene.add(tl);
+  const vl = new THREE.PointLight(0x9070d8, 2.5, 180); vl.position.set(70, 15, 50); plHeroScene.add(vl);
+
+  // Fade in canvas
+  setTimeout(() => { canvas.style.opacity = '0.6'; }, 200);
+  plHeroAnimOn = true;
+
+  const heroEl = document.getElementById('hero');
+  if (heroEl) {
+    const obs = new IntersectionObserver(en => { plHeroAnimOn = en[0].isIntersecting; }, { threshold: 0.05 });
+    obs.observe(heroEl);
+  }
+
+  window.addEventListener('resize', () => {
+    plHeroCam.aspect = canvas.offsetWidth / canvas.offsetHeight;
+    plHeroCam.updateProjectionMatrix();
+    plHeroRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+  });
+
+  (function heroLoop() {
+    requestAnimationFrame(heroLoop);
+    if (!plHeroAnimOn) return;
+    plHeroT += 0.007; plHeroAngle += 0.0007;
+    plHeroCam.position.x = Math.sin(plHeroAngle) * 85;
+    plHeroCam.position.z = Math.cos(plHeroAngle) * 85 + 65;
+    plHeroCam.position.y = 26 + Math.sin(plHeroT * 0.22) * 14;
+    plHeroCam.lookAt(0, 4, 0);
+    plHeroScene.children.forEach(c => { if (c.userData.speed) { c.rotation.y += c.userData.speed; c.rotation.z += c.userData.speed * 0.3; } });
+    plHeroRenderer.render(plHeroScene, plHeroCam);
+  })();
+}
+
+// Init hero wave after Three.js loads
+if (typeof THREE !== 'undefined') {
+  initHeroWave();
+} else {
+  document.querySelector('script[src*="three"]').addEventListener('load', initHeroWave);
+  window.addEventListener('load', initHeroWave);
+}
+
+// ── SECTION WAVE (pl-canvas, full controls) ──────────────────────────────────
+let plInitialized = false;
+let plRenderer, plScene, plCam;
+let plWaveMesh, plGlowMesh, plSignGroup, plStarMesh;
+let plCamAngle = 0, plT = 0, plAnimOn = true;
+let plCamSpeed = 0.0007, plOrbitR = 85, plBaseY = 26;
+let plCurrentAmp = 350, plCurrentN = 650;
+
+function plInit() {
+  if (plInitialized || typeof THREE === 'undefined') return;
+  plInitialized = true;
+
+  const canvas = document.getElementById('pl-canvas');
+  if (!canvas) return;
+
+  plRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  plRenderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  plRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+  plRenderer.setClearColor(0x04040a, 1);
+
+  plScene = new THREE.Scene();
+  plScene.fog = new THREE.FogExp2(0x04040a, 0.0045);
+
+  plCam = new THREE.PerspectiveCamera(54, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1800);
+  plCam.position.set(18, 28, 105);
+  plCam.lookAt(0, 4, 0);
+
+  plBuildStars();
+  plBuildWave(plCurrentAmp, plCurrentN);
+  plBuildLights();
+  plBuildRiemannRings();
+  plUpdateStats(plCurrentN);
+  plDrawHarmonics();
+  plDrawWaveExplorer(800);
+
+  window.addEventListener('resize', () => {
+    plCam.aspect = canvas.offsetWidth / canvas.offsetHeight;
+    plCam.updateProjectionMatrix();
+    plRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+  });
+
+  (function loop() {
+    requestAnimationFrame(loop);
+    if (!plAnimOn) return;
+    plT += 0.007;
+    plCamAngle += plCamSpeed;
+    plCam.position.x = Math.sin(plCamAngle) * plOrbitR;
+    plCam.position.z = Math.cos(plCamAngle) * plOrbitR + 65;
+    plCam.position.y = plBaseY + Math.sin(plT * 0.22) * 14;
+    plCam.lookAt(0, 4, 0);
+    if (plSignGroup) plSignGroup.children.forEach((c, si) => {
+      if (c.geometry && c.geometry.type === 'SphereGeometry') c.scale.setScalar(1 + 0.22 * Math.sin(plT * 2.1 + si * 0.55));
+    });
+    plScene.children.forEach(c => { if (c.userData && c.userData.rSpeed) { c.rotation.y += c.userData.rSpeed; c.rotation.z += c.userData.rSpeed * 0.28; } });
+    const gl = plScene.getObjectByName('gLight');
+    if (gl) gl.intensity = 4.2 + 1.8 * Math.sin(plT * 0.55);
+    plRenderer.render(plScene, plCam);
+  })();
+}
+
+function plBuildStars() {
+  if (plStarMesh) { plScene.remove(plStarMesh); }
+  const N = 6000, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const r = 250 + Math.random() * 650, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+    pos[i*3]=r*Math.sin(ph)*Math.cos(th); pos[i*3+1]=r*Math.sin(ph)*Math.sin(th); pos[i*3+2]=r*Math.cos(ph);
+    const t = Math.random();
+    if (t<0.07){col[i*3]=0.78;col[i*3+1]=0.66;col[i*3+2]=0.29;}
+    else if(t<0.16){col[i*3]=0.24;col[i*3+1]=0.78;col[i*3+2]=0.72;}
+    else if(t<0.23){col[i*3]=0.56;col[i*3+1]=0.44;col[i*3+2]=0.85;}
+    else{col[i*3]=0.68;col[i*3+1]=0.68;col[i*3+2]=0.78;}
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  plStarMesh = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.55, vertexColors: true, transparent: true, opacity: 0.82 }));
+  plScene.add(plStarMesh);
+}
+
+function plBuildWave(amp, maxN) {
+  plCurrentAmp = amp; plCurrentN = maxN;
+  if (plWaveMesh) plScene.remove(plWaveMesh);
+  if (plGlowMesh) plScene.remove(plGlowMesh);
+  if (plSignGroup) plScene.remove(plSignGroup);
+
+  const { data: ld, C } = plComputeEN(maxN);
+  const SPAN = 380, Nmax = ld[ld.length - 1].n;
+  const stride = Math.max(1, Math.floor(ld.length / 500));
+  const pts = [];
+  for (let i = 0; i < ld.length; i += stride) {
+    const d = ld[i];
+    pts.push(new THREE.Vector3((d.n / Nmax) * SPAN - SPAN / 2, d.E * amp, 0));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+
+  // Main tube
+  const geo = new THREE.TubeGeometry(curve, 600, 0.38, 8, false);
+  const posArr = geo.attributes.position.array;
+  const colors = new Float32Array(posArr.length);
+  for (let i = 0; i < posArr.length / 3; i++) {
+    const y = posArr[i * 3 + 1];
+    if (y >= 0) { colors[i*3]=0.56; colors[i*3+1]=0.44; colors[i*3+2]=0.85; }
+    else        { colors[i*3]=0.24; colors[i*3+1]=0.78; colors[i*3+2]=0.72; }
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  plWaveMesh = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({ vertexColors: true, emissive: 0x090916, shininess: 90 }));
+  plScene.add(plWaveMesh);
+
+  // Glow
+  const gGeo = new THREE.TubeGeometry(curve, 300, 1.8, 6, false);
+  const gPos = gGeo.attributes.position.array;
+  const gCol = new Float32Array(gPos.length);
+  for (let i = 0; i < gPos.length / 3; i++) {
+    const y = gPos[i * 3 + 1];
+    if (y >= 0) { gCol[i*3]=0.56; gCol[i*3+1]=0.44; gCol[i*3+2]=0.85; }
+    else        { gCol[i*3]=0.24; gCol[i*3+1]=0.78; gCol[i*3+2]=0.72; }
+  }
+  gGeo.setAttribute('color', new THREE.BufferAttribute(gCol, 3));
+  plGlowMesh = new THREE.Mesh(gGeo, new THREE.MeshBasicMaterial({
+    vertexColors: true, transparent: true, opacity: 0.07,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  const glowChk = document.getElementById('pl-glow');
+  plGlowMesh.visible = glowChk ? glowChk.checked : true;
+  plScene.add(plGlowMesh);
+
+  // Sign-change nodes
+  plSignGroup = new THREE.Group();
+  let prev = Math.sign(ld[0].E);
+  for (let i = 1; i < ld.length; i++) {
+    const cur = Math.sign(ld[i].E);
+    if (cur !== 0 && cur !== prev) {
+      const x = (ld[i].n / Nmax) * SPAN - SPAN / 2;
+      const sg = new THREE.SphereGeometry(0.95, 16, 16);
+      const s = new THREE.Mesh(sg, new THREE.MeshPhongMaterial({ color: 0x3dc8b8, emissive: 0x1a5858, shininess: 130 }));
+      s.position.set(x, 0, 0); plSignGroup.add(s);
+      const rg = new THREE.TorusGeometry(1.9, 0.09, 6, 28);
+      const r = new THREE.Mesh(rg, new THREE.MeshBasicMaterial({ color: 0x3dc8b8, transparent: true, opacity: 0.5 }));
+      r.position.set(x, 0, 0); r.rotation.y = Math.PI / 2; plSignGroup.add(r);
+      prev = cur;
+    }
+  }
+  const nodeChk = document.getElementById('pl-nodes');
+  plSignGroup.visible = nodeChk ? nodeChk.checked : true;
+  plScene.add(plSignGroup);
+
+  plUpdateStats(maxN, ld, C);
+}
+
+function plBuildLights() {
+  const al = new THREE.AmbientLight(0x0d0d22, 4); plScene.add(al);
+  const gl = new THREE.PointLight(0xc8a84a, 5, 280); gl.position.set(0, 65, 90); gl.name = 'gLight'; plScene.add(gl);
+  const tl = new THREE.PointLight(0x3dc8b8, 3.5, 220); tl.position.set(-90, -35, 70); plScene.add(tl);
+  const vl = new THREE.PointLight(0x9070d8, 3, 220); vl.position.set(90, 20, 50); plScene.add(vl);
+  // Carrier axis
+  const ax = new THREE.CatmullRomCurve3([new THREE.Vector3(-192, 0, 0), new THREE.Vector3(192, 0, 0)]);
+  plScene.add(new THREE.Mesh(new THREE.TubeGeometry(ax, 100, 0.13, 6, false),
+    new THREE.MeshBasicMaterial({ color: 0xc8a84a, transparent: true, opacity: 0.5 })));
+}
+
+function plBuildRiemannRings() {
+  const zeros = [14.134, 21.022, 25.010, 30.424, 32.935, 37.586, 40.918, 43.327];
+  const cols = [0x3dc8b8, 0x9070d8, 0xe8904a, 0x3dc8b8, 0x9070d8, 0xe8904a, 0x3dc8b8, 0x9070d8];
+  zeros.forEach((z, i) => {
+    const rad = 38 + i * 11;
+    const geo = new THREE.TorusGeometry(rad, 0.38, 6, 90);
+    const mat = new THREE.MeshBasicMaterial({ color: cols[i], transparent: true, opacity: 0.09 - i * 0.007 });
+    const t = new THREE.Mesh(geo, mat);
+    t.rotation.x = Math.PI / 2; t.position.z = -90 - i * 16;
+    t.userData.rSpeed = 0.0014 * (i % 2 === 0 ? 1 : -1);
+    plScene.add(t);
+  });
+}
+
+window.plRebuildWave = function(amp) { if (!plInitialized) return; plBuildWave(amp, plCurrentN); };
+window.plRebuildAll  = function(n)   { if (!plInitialized) return; plBuildWave(plCurrentAmp, n); };
+window.plTogglePlay  = function() {
+  plAnimOn = !plAnimOn;
+  const btn = document.getElementById('pl-play-btn');
+  if (btn) btn.innerHTML = plAnimOn ? '&#9646;&#9646; Pause' : '&#9654; Play';
+};
+
+function plUpdateStats(maxN, data, C) {
+  const el_n = document.getElementById('pl-stat-n');
+  const el_e = document.getElementById('pl-stat-e');
+  const el_sc = document.getElementById('pl-stat-sc');
+  if (!data) { const r = plComputeEN(maxN); data = r.data; C = r.C; }
+  const last = data[data.length - 1];
+  let sc = 0, prev = Math.sign(data[0].E);
+  for (const d of data) { const s = Math.sign(d.E); if (s !== 0 && s !== prev) { sc++; prev = s; } }
+  if (el_n) el_n.textContent = maxN;
+  if (el_e) el_e.textContent = last.E.toExponential(4);
+  if (el_sc) el_sc.textContent = sc;
+}
+
+// ── Harmonics chart ──────────────────────────────────────────────────────────
+const PL_RIEMANN_ZEROS = [14.134,21.022,25.010,30.424,32.935,37.586,40.918,43.327,48.005,49.773,52.970,54.676,56.446,59.347,60.831,65.112,67.079,69.545,72.067,75.704];
+
+window.plDrawHarmonics = function() {
+  const cv = document.getElementById('pl-harmonics-cv');
+  if (!cv) return;
+  const k = parseInt(document.getElementById('pl-zeros-slider').value) || 6;
+  const maxN = parseInt(document.getElementById('pl-harm-n').value) || 400;
+  const DPR2 = Math.min(devicePixelRatio, 2);
+  const W = cv.parentElement.clientWidth || 800, H = 240;
+  cv.width = W * DPR2; cv.height = H * DPR2;
+  cv.style.width = '100%'; cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d'); ctx.scale(DPR2, DPR2);
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+
+  const { data: ld, C } = plComputeEN(maxN);
+  const En = ld.map(d => d.E);
+  const maxAbsE = Math.max(...En.map(Math.abs), 1e-8);
+  const p = 28;
+  const px = n => p + (n - ld[0].n) / (ld[ld.length-1].n - ld[0].n) * (W - 2*p);
+  const py = v => H/2 - v / maxAbsE * (H/2 - p) * 0.9;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) { const y = p + (H - 2*p) * i / 4; ctx.beginPath(); ctx.moveTo(p, y); ctx.lineTo(W-p, y); ctx.stroke(); }
+  // Zero line
+  ctx.strokeStyle = 'rgba(200,168,74,.25)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(p, py(0)); ctx.lineTo(W-p, py(0)); ctx.stroke();
+
+  // Actual E(N)
+  ctx.strokeStyle = 'rgba(200,168,74,.8)'; ctx.lineWidth = 1.5; ctx.beginPath();
+  ld.forEach((d, i) => { const x = px(d.n), y = py(d.E); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.stroke();
+
+  // Partial harmonic sum
+  const Amps = PL_RIEMANN_ZEROS.slice(0, k).map((g, j) => {
+    let dot = 0;
+    for (const d of ld) dot += d.E * Math.cos(g * Math.log(d.n));
+    return dot / ld.length * 2;
+  });
+
+  ctx.lineWidth = 1.5;
+  ld.forEach((d, i) => {
+    const t = i / ld.length;
+    const r = Math.round(61 + t * (144-61)), g2 = Math.round(200 + t * (112-200)), b = Math.round(184 + t * (216-184));
+    let S = 0;
+    for (let j = 0; j < k; j++) S += Amps[j] * Math.cos(PL_RIEMANN_ZEROS[j] * Math.log(d.n));
+    const x = px(d.n), y = py(S);
+    if (i === 0) { ctx.beginPath(); ctx.strokeStyle = `rgba(${r},${g2},${b},.7)`; ctx.moveTo(x, y); }
+    else { ctx.lineTo(x, y); if (i % 30 === 0) { ctx.stroke(); ctx.beginPath(); ctx.strokeStyle=`rgba(${r},${g2},${b},.7)`; ctx.moveTo(x,y); } }
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(200,168,74,.6)'; ctx.font = '8px JetBrains Mono,monospace';
+  ctx.fillText('Gold: actual E(N)   Teal→Violet: ' + k + ' Riemann zero harmonics', p+4, p-8);
+};
+
+// ── E(N) wave explorer chart ─────────────────────────────────────────────────
+window.plDrawWaveExplorer = function(maxN) {
+  const cv = document.getElementById('pl-wave-cv');
+  if (!cv) return;
+  const DPR2 = Math.min(devicePixelRatio, 2);
+  const W = cv.parentElement.clientWidth || 800, H = 260;
+  cv.width = W * DPR2; cv.height = H * DPR2;
+  cv.style.width = '100%'; cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d'); ctx.scale(DPR2, DPR2);
+  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+
+  const { data: ld, C } = plComputeEN(maxN);
+  const En = ld.map(d => d.E);
+  const maxAbsE = Math.max(...En.map(Math.abs), 1e-8);
+  const p = 24;
+  const px = n => p + (n - ld[0].n) / (ld[ld.length-1].n - ld[0].n) * (W - 2*p);
+  const py = v => H/2 - v / maxAbsE * (H/2 - p) * 0.85;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) { const y = p + (H-2*p)*i/4; ctx.beginPath(); ctx.moveTo(p,y); ctx.lineTo(W-p,y); ctx.stroke(); }
+
+  // Prime positions
+  ld.filter(d => d.ip).forEach(d => {
+    ctx.strokeStyle = 'rgba(200,168,74,.06)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px(d.n), p); ctx.lineTo(px(d.n), H-p); ctx.stroke();
+  });
+
+  // Zero line
+  ctx.strokeStyle = 'rgba(255,255,255,.15)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(p, py(0)); ctx.lineTo(W-p, py(0)); ctx.stroke();
+
+  // Bars
+  const bw = Math.max(1, (W - 2*p) / ld.length);
+  for (const d of ld) {
+    const x = px(d.n), y0 = py(0), y1 = py(d.E);
+    ctx.fillStyle = d.E >= 0 ? 'rgba(144,112,216,.55)' : 'rgba(61,200,184,.5)';
+    ctx.fillRect(x, Math.min(y0,y1), bw, Math.abs(y1-y0));
+  }
+
+  // Sign-change nodes
+  let prev = Math.sign(ld[0].E), sc = 0;
+  for (let i = 1; i < ld.length; i++) {
+    const cur = Math.sign(ld[i].E);
+    if (cur !== 0 && cur !== prev) {
+      sc++;
+      ctx.strokeStyle = 'rgba(61,200,184,.8)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(px(ld[i].n), p); ctx.lineTo(px(ld[i].n), H-p); ctx.stroke();
+      prev = cur;
+    }
+  }
+
+  const last = ld[ld.length - 1];
+  const e_rn = document.getElementById('pl-exp-rn'); if (e_rn) e_rn.textContent = 'R(N): ' + last.R.toFixed(8);
+  const e_en = document.getElementById('pl-exp-en'); if (e_en) e_en.textContent = 'E(N): ' + last.E.toExponential(5);
+  const e_sc = document.getElementById('pl-exp-sc'); if (e_sc) e_sc.textContent = 'nodes: ' + sc;
+};
+
+// Init on section expand (already wired), also draw harmonics on load
+document.addEventListener('DOMContentLoaded', () => {
+  // Draw harmonics/wave once section exists (don't wait for expand)
+  setTimeout(plDrawHarmonics, 800);
+});
+window.addEventListener('resize', () => {
+  if (plInitialized) {
+    const cv = document.getElementById('pl-canvas');
+    if (cv) { plCam.aspect = cv.offsetWidth / cv.offsetHeight; plCam.updateProjectionMatrix(); plRenderer.setSize(cv.offsetWidth, cv.offsetHeight); }
+  }
+  plDrawHarmonics();
+});
 
 </script>
 
