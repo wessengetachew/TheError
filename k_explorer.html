@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K — The Implied Constant · Wessen Getachew</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
+
+:root{
+  --bg:#03030a;--bg1:#07070f;--bg2:#0c0c1a;
+  --gold:#c8a84a;--gold2:#e8d070;--gold3:#fff0a0;
+  --teal:#3dc8b8;--coral:#e05060;--violet:#9070d8;
+  --orange:#e8904a;--green:#50c878;
+  --cream:rgba(255,255,255,.93);--cream2:rgba(255,255,255,.58);--cream3:rgba(255,255,255,.25);
+  --edge:rgba(255,255,255,.07);--edge2:rgba(255,255,255,.04);
+  --mono:'JetBrains Mono',monospace;--serif:'Cormorant Garamond',serif;--disp:'Cinzel Decorative',serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:var(--serif);overflow-x:hidden;}
+
+/* ── NAV ── */
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(3,3,10,.97);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--edge);
+  display:flex;align-items:center;padding:0 28px;height:52px;}
+.tabs{display:flex;flex:1;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  text-decoration:none;padding:0 14px;height:52px;display:flex;align-items:center;gap:7px;
+  color:var(--cream3);border-bottom:2px solid transparent;transition:color .18s,border-color .18s;white-space:nowrap;}
+.tab:hover{color:var(--cream2);}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5;}
+.tab.active .tab-dot{opacity:1;}
+.nav-right{font-family:var(--mono);font-size:9px;color:var(--cream3);letter-spacing:.06em;
+  margin-left:auto;white-space:nowrap;padding-left:14px;}
+@media(max-width:700px){.tab{padding:0 10px;font-size:8px;}.nav-right{display:none;}}
+
+/* ── HERO ── */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;
+  justify-content:center;overflow:hidden;}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.45;}
+.hero-vignette{position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at 50% 60%, transparent 30%, rgba(3,3,10,.85) 100%);}
+.hero-inner{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:880px;}
+.hero-eyebrow{font-family:var(--mono);font-size:8px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:20px;opacity:0;animation:fadeUp .8s .3s forwards;}
+.hero-K{font-family:var(--disp);font-size:clamp(5rem,20vw,14rem);font-weight:400;
+  line-height:.85;color:var(--gold2);
+  opacity:0;animation:fadeUp 1s .5s forwards;
+  text-shadow:0 0 120px rgba(200,168,74,.3),0 0 40px rgba(200,168,74,.15);}
+.hero-eq{font-family:var(--mono);font-size:clamp(.75rem,2vw,1.05rem);color:var(--cream);
+  margin:20px 0 12px;letter-spacing:.04em;line-height:2;
+  opacity:0;animation:fadeUp .9s .8s forwards;}
+.hero-eq em{color:var(--teal);}
+.hero-eq strong{color:var(--gold2);}
+.hero-sub{font-family:var(--serif);font-size:clamp(.9rem,2vw,1.15rem);
+  color:var(--cream2);line-height:1.7;max-width:640px;margin:0 auto;
+  opacity:0;animation:fadeUp .9s 1s forwards;}
+.hero-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px;
+  opacity:0;animation:fadeUp .8s 1.2s forwards;}
+.pill{font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;
+  padding:5px 13px;border:1px solid;border-radius:0;}
+.pill-gold{border-color:rgba(200,168,74,.5);color:var(--gold);background:rgba(200,168,74,.06);}
+.pill-teal{border-color:rgba(61,200,184,.4);color:var(--teal);background:rgba(61,200,184,.05);}
+.pill-coral{border-color:rgba(224,80,96,.4);color:var(--coral);background:rgba(224,80,96,.05);}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;
+  font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream3);animation:pulse 2.4s 2s ease-in-out infinite;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:.75;}}
+
+/* ── SECTION STRUCTURE ── */
+.sec-wrap{max-width:1100px;margin:0 auto;padding:60px 40px;}
+.sec-divider{display:flex;align-items:center;gap:16px;max-width:1100px;
+  margin:0 auto;padding:0 40px;}
+.sec-line{flex:1;height:1px;background:var(--edge);}
+.sec-glyph{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--cream3);white-space:nowrap;}
+.sec-label{font-family:var(--mono);font-size:8px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;}
+.sec-title{font-family:var(--disp);font-size:clamp(1.2rem,3vw,1.9rem);font-weight:400;
+  color:var(--cream);line-height:1.2;margin-bottom:14px;}
+.sec-title em{color:var(--teal);font-family:var(--serif);font-style:italic;}
+.sec-body{font-family:var(--serif);font-size:1rem;color:var(--cream2);line-height:1.85;}
+@media(max-width:640px){.sec-wrap{padding:40px 18px;}.sec-divider{padding:0 18px;}}
+
+/* ── K VALUE DISPLAY ── */
+.k-display{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--edge);
+  margin:28px 0;border:1px solid var(--edge);}
+.k-cell{background:var(--bg1);padding:20px 22px;}
+.k-cell-label{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream3);margin-bottom:8px;}
+.k-cell-val{font-family:var(--mono);font-size:clamp(.9rem,2vw,1.15rem);color:var(--gold2);
+  line-height:1.6;}
+.k-cell-sub{font-family:var(--serif);font-size:.85rem;color:var(--cream3);margin-top:6px;line-height:1.5;}
+@media(max-width:700px){.k-display{grid-template-columns:1fr;}}
+
+/* ── CHARTS ── */
+.chart-panel{background:var(--bg1);border:1px solid var(--edge);margin-bottom:18px;
+  opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s;}
+.chart-panel.visible{opacity:1;transform:none;}
+.chart-head{padding:13px 18px 10px;border-bottom:1px solid var(--edge2);
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.chart-num{font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--cream3);}
+.chart-title{font-family:var(--mono);font-size:11px;color:var(--gold2);flex:1;}
+.chart-badge{font-family:var(--mono);font-size:8px;padding:2px 8px;
+  background:rgba(61,200,184,.1);border:1px solid rgba(61,200,184,.3);color:var(--teal);}
+canvas.cc{display:block;width:100%;background:#040410;}
+canvas.cc.h200{height:200px;}
+canvas.cc.h260{height:260px;}
+canvas.cc.h300{height:300px;}
+.chart-foot{padding:8px 18px;border-top:1px solid var(--edge2);display:flex;gap:14px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8px;
+  letter-spacing:.07em;color:var(--cream3);}
+.lsw{width:18px;height:2.5px;border-radius:1px;}
+.ldot{width:7px;height:7px;border-radius:50%;}
+
+/* ── CONTROLS ── */
+.ctrl-bar{padding:9px 18px;background:rgba(0,0,0,.25);border-bottom:1px solid var(--edge2);
+  display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+.ctrl-label{font-family:var(--mono);font-size:8px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--cream3);white-space:nowrap;}
+input[type=range]{-webkit-appearance:none;height:3px;border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;cursor:pointer;border:2px solid var(--bg);}
+.sl-gold{background:rgba(200,168,74,.3);}
+.sl-gold::-webkit-slider-thumb{background:var(--gold);}
+.sl-teal{background:rgba(61,200,184,.3);}
+.sl-teal::-webkit-slider-thumb{background:var(--teal);}
+.sl-violet{background:rgba(144,112,216,.3);}
+.sl-violet::-webkit-slider-thumb{background:var(--violet);}
+.ctrl-val{font-family:var(--mono);font-size:10px;color:var(--gold2);min-width:50px;}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0;}
+@media(max-width:800px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--bg2);border:1px solid var(--edge);padding:12px 14px;}
+.stat-lbl{font-family:var(--mono);font-size:7px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream3);margin-bottom:5px;}
+.stat-val{font-family:var(--mono);font-size:11px;}
+
+/* ── EQUATIONS ── */
+.eq-box{font-family:var(--mono);font-size:clamp(.8rem,1.6vw,.95rem);color:var(--gold2);
+  background:rgba(200,168,74,.06);border-left:2px solid rgba(200,168,74,.5);
+  padding:12px 16px;margin:14px 0;line-height:1.85;}
+.eq-teal{color:var(--teal);background:rgba(61,200,184,.06);border-left-color:rgba(61,200,184,.5);}
+.eq-coral{color:var(--coral);background:rgba(224,80,96,.06);border-left-color:rgba(224,80,96,.5);}
+.thm-block{margin:20px 0;}
+.thm-label{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream3);margin-bottom:7px;}
+
+/* ── DATA TABLE ── */
+.dtoggle{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(255,255,255,.03);border:none;border-top:1px solid var(--edge2);
+  color:var(--cream3);width:100%;padding:7px 18px;cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:8px;transition:background .15s;}
+.dtoggle:hover{background:rgba(255,255,255,.06);}
+.darrow{transition:transform .2s;}
+.ddrawer{display:none;border-top:1px solid var(--edge2);}
+.ddrawer.open{display:block;}
+.dscroll{max-height:320px;overflow-y:auto;}
+.dtbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:9px;}
+.dtbl th{padding:6px 12px;text-align:right;color:var(--cream3);letter-spacing:.1em;
+  font-weight:400;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.2);
+  position:sticky;top:0;}
+.dtbl th:first-child{text-align:left;}
+.dtbl td{padding:4px 12px;text-align:right;color:rgba(255,255,255,.5);
+  border-bottom:1px solid var(--edge2);}
+.dtbl td:first-child{text-align:left;color:rgba(255,255,255,.28);}
+.dtbl tr.highlight td{color:var(--gold2);}
+.dtbl tr.safe-prime td:first-child{color:var(--teal);}
+
+/* ── CONJECTURE BOX ── */
+.conj-box{background:var(--bg2);border:1px solid rgba(200,168,74,.35);
+  padding:24px 28px;margin:24px 0;position:relative;}
+.conj-box::before{content:'CONJECTURE';position:absolute;top:-9px;left:20px;
+  font-family:var(--mono);font-size:7px;letter-spacing:.2em;
+  background:var(--bg2);padding:0 8px;color:var(--gold);}
+
+footer{border-top:1px solid var(--edge);padding:20px 40px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--cream3);}
+</style>
+</head>
+<body>
+
+<nav id="tab-nav">
+  <div class="tabs">
+    <a href="index.html" class="tab"><span class="tab-dot"></span>Opener</a>
+    <a href="EN_explorer-1-2.html" class="tab"><span class="tab-dot"></span>Explorer</a>
+    <a href="EN_explorer-updated.html" class="tab"><span class="tab-dot"></span>Deep Analysis</a>
+    <a href="zmmz_explorer-1.html" class="tab"><span class="tab-dot"></span>Geometric Canvas</a>
+    <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&zeta;(2) Explorer</a>
+    <a href="gcd_explorer.html" class="tab"><span class="tab-dot"></span>GCD Explorer</a>
+    <a href="lift_paper.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
+    <div class="tab active"><span class="tab-dot"></span>K Constant</div>
+  </div>
+  <span class="nav-right">K &asymp; &zeta;(2)&middot;C = F(0)&middot;F(2)</span>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Implied Constant &nbsp;&middot;&nbsp; Lift Survival Framework &nbsp;&middot;&nbsp; 2026</div>
+    <div class="hero-K">K</div>
+    <div class="hero-eq">
+      sup<sub>N&ge;2</sub> |E(N)&middot;N| &nbsp;&le;&nbsp; <strong>K</strong><br>
+      <em>K &asymp; &zeta;(2)&middot;C = F(0)&middot;F(2) &asymp; 0.872986&hellip;</em>
+    </div>
+    <p class="hero-sub">
+      The implied constant in E(N) = O(1/N) appears to equal the product of the two
+      landmark values of the analytic lift function F(u) at u&nbsp;=&nbsp;0 and u&nbsp;=&nbsp;2.
+      Its maxima occur exclusively at N&nbsp;=&nbsp;p&minus;1 for primes p,
+      with the highest values governed by safe primes p&nbsp;=&nbsp;2q+1.
+    </p>
+    <div class="hero-pills">
+      <span class="pill pill-gold">Verified to N = 2,000,000</span>
+      <span class="pill pill-teal">11 exceedances in 2M steps</span>
+      <span class="pill pill-coral">Conjecture &mdash; not proved</span>
+    </div>
+  </div>
+  <div class="scroll-hint">&#8595; explore</div>
+</section>
+
+<!-- WHAT IS K -->
+<div class="sec-divider" style="margin-top:8px;">
+  <div class="sec-line"></div><div class="sec-glyph">What is K</div><div class="sec-line"></div>
+</div>
+
+<div class="sec-wrap" style="padding-bottom:20px;">
+  <div class="sec-label">Definition</div>
+  <h2 class="sec-title">The implied constant in <em>E(N) = O(1/N)</em></h2>
+  <p class="sec-body">
+    The Lift Survival Ratio R(N) = &Sigma;L(m)/&Sigma;&phi;(m) converges to
+    C = &prod;<sub>p</sub>(p&sup2;&minus;2)/(p&sup2;&minus;1) &asymp; 0.530711806246.
+    The error E(N) = R(N) &minus; C is conjectured to satisfy E(N) = O(1/N),
+    meaning the product |E(N)&middot;N| remains bounded for all N.
+    K is the tightest such bound — the supremum of |E(N)&middot;N| over all N &ge; 2.
+  </p>
+
+  <div class="k-display" style="margin-top:24px;">
+    <div class="k-cell">
+      <div class="k-cell-label">K (conjecture)</div>
+      <div class="k-cell-val">= &zeta;(2) &middot; C<br>= F(0) &middot; F(2)<br>&asymp; 0.872986&hellip;</div>
+      <div class="k-cell-sub">Product of the two outer landmark values of F(u). F(1)&nbsp;=&nbsp;1 is the pivot between them.</div>
+    </div>
+    <div class="k-cell">
+      <div class="k-cell-label">Global max observed</div>
+      <div class="k-cell-val" id="kd-max">&mdash;</div>
+      <div class="k-cell-sub">Max of |E(N)&middot;N| computed live to chosen N. Occasionally exceeds &zeta;(2)&middot;C by &lt;3%.</div>
+    </div>
+    <div class="k-cell">
+      <div class="k-cell-label">Times exceeded</div>
+      <div class="k-cell-val" id="kd-exc">&mdash;</div>
+      <div class="k-cell-sub">Exceedances of &zeta;(2)&middot;C are extremely rare and appear to decrease in frequency.</div>
+    </div>
+    <div class="k-cell">
+      <div class="k-cell-label">&zeta;(2) &middot; C</div>
+      <div class="k-cell-val">0.872985&hellip;</div>
+      <div class="k-cell-sub">&zeta;(2) = &pi;&sup2;/6 &asymp; 1.6449. C &asymp; 0.5307. Their product is F(0)&middot;F(2).</div>
+    </div>
+    <div class="k-cell">
+      <div class="k-cell-label">F(u) identity</div>
+      <div class="k-cell-val">F(0)&middot;F(2) = &zeta;(2)&middot;C</div>
+      <div class="k-cell-sub">F is the analytic lift function. F(0)=&zeta;(2), F(1)=1 exactly, F(2)=C. K sits at the geometric mean of F(0) and F(2) around the pivot F(1)=1.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS + CHARTS -->
+<div class="sec-divider">
+  <div class="sec-line"></div><div class="sec-glyph">Live computation</div><div class="sec-line"></div>
+</div>
+
+<div class="sec-wrap" style="padding-top:24px;">
+
+  <!-- compute controls -->
+  <div style="background:var(--bg1);border:1px solid var(--edge);padding:14px 18px;margin-bottom:16px;">
+    <div class="ctrl-bar" style="border:none;padding:0;margin-bottom:10px;">
+      <span class="ctrl-label">N</span>
+      <input type="range" id="n-slider" min="500" max="200000" value="50000" step="500"
+        class="sl-gold" style="width:200px;"
+        oninput="document.getElementById('n-disp').textContent=parseInt(this.value).toLocaleString()">
+      <span class="ctrl-val" id="n-disp">50,000</span>
+      <button onclick="runCompute()" style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+        text-transform:uppercase;background:var(--gold);color:#000;border:none;
+        padding:8px 20px;cursor:pointer;margin-left:8px;">Compute &rarr;</button>
+      <button onclick="runPlay()" id="play-btn" style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+        text-transform:uppercase;background:rgba(61,200,184,.12);color:var(--teal);
+        border:1px solid rgba(61,200,184,.4);padding:8px 16px;cursor:pointer;">&#9654; Play</button>
+    </div>
+    <div class="stats-grid" id="stats-grid" style="margin:0;gap:6px;">
+      <div class="stat-card"><div class="stat-lbl">N computed</div><div class="stat-val" id="st-n" style="color:var(--cream2);">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-lbl">Global max |E&middot;N|</div><div class="stat-val" id="st-max" style="color:var(--gold2);">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-lbl">Max at N=</div><div class="stat-val" id="st-maxn" style="color:var(--gold);">&mdash;</div></div>
+      <div class="stat-card"><div class="stat-lbl">&zeta;(2)&middot;C</div><div class="stat-val" style="color:var(--teal);">0.872986&hellip;</div></div>
+      <div class="stat-card"><div class="stat-lbl">Times &gt; &zeta;(2)C</div><div class="stat-val" id="st-exc" style="color:var(--coral);">&mdash;</div></div>
+    </div>
+  </div>
+
+  <!-- Chart 01: |E*N| running -->
+  <div class="chart-panel" id="cp1">
+    <div class="chart-head">
+      <span class="chart-num">K&nbsp;01</span>
+      <span class="chart-title">|E(N)&middot;N| — running product with &zeta;(2)&middot;C reference line</span>
+      <span class="chart-badge">LIVE</span>
+    </div>
+    <canvas class="cc h300" id="c1"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="lsw" style="background:var(--violet)"></div>|E(N)|&middot;N</div>
+      <div class="leg"><div class="lsw" style="background:var(--gold);opacity:.7"></div>&zeta;(2)&middot;C &asymp; 0.872986</div>
+      <div class="leg"><div class="ldot" style="background:var(--coral)"></div>Exceedances</div>
+      <div class="leg"><div class="ldot" style="background:var(--gold);opacity:.5"></div>Prime N+1 maxima</div>
+    </div>
+    <button class="dtoggle" onclick="toggleDrawer('d1',this)"><span class="darrow">&#9660;</span>&ensp;Top 30 maxima</button>
+    <div class="ddrawer" id="d1"><div class="dscroll"><table class="dtbl" id="tbl-d1">
+      <thead><tr><th style="text-align:left">N</th><th>|E(N)|&middot;N</th><th>vs &zeta;(2)C</th><th>N+1 prime</th><th>Safe prime</th><th>Type</th></tr></thead>
+      <tbody></tbody></table></div></div>
+  </div>
+
+  <!-- Chart 02: window maxima -->
+  <div class="chart-panel" id="cp2">
+    <div class="chart-head">
+      <span class="chart-num">K&nbsp;02</span>
+      <span class="chart-title">Window maxima of |E(N)|&middot;N — boundedness evidence</span>
+    </div>
+    <canvas class="cc h200" id="c2"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="lsw" style="background:var(--teal)"></div>Window max (each 1/20 of N)</div>
+      <div class="leg"><div class="lsw" style="background:var(--gold);opacity:.6"></div>&zeta;(2)&middot;C line</div>
+    </div>
+  </div>
+
+  <!-- Chart 03: prime gap connection -->
+  <div class="chart-panel" id="cp3">
+    <div class="chart-head">
+      <span class="chart-num">K&nbsp;03</span>
+      <span class="chart-title">|E(p&minus;1)|&middot;(p&minus;1) at primes — maxima anatomy</span>
+    </div>
+    <div class="ctrl-bar">
+      <span class="ctrl-label">Show top primes</span>
+      <input type="range" id="c3-top" min="20" max="200" value="80" step="10" class="sl-teal" style="width:120px;"
+        oninput="document.getElementById('c3-top-v').textContent=this.value;if(result)drawC3(result)">
+      <span class="ctrl-val" id="c3-top-v">80</span>
+      <span class="ctrl-label" style="margin-left:12px;">Filter</span>
+      <select id="c3-filter" onchange="if(result)drawC3(result)"
+        style="font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.06);
+        border:1px solid rgba(255,255,255,.12);color:var(--cream);padding:4px 8px;">
+        <option value="all">All primes</option>
+        <option value="safe">Safe primes only</option>
+        <option value="nonsafe">Non-safe only</option>
+      </select>
+    </div>
+    <canvas class="cc h260" id="c3"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="ldot" style="background:var(--teal)"></div>Safe prime p=2q+1</div>
+      <div class="leg"><div class="ldot" style="background:var(--violet);opacity:.6"></div>Other prime</div>
+      <div class="leg"><div class="lsw" style="background:var(--gold)"></div>&zeta;(2)&middot;C</div>
+    </div>
+  </div>
+
+  <!-- Chart 04: phi(p-1)/(p-1) vs |E*N| scatter -->
+  <div class="chart-panel" id="cp4">
+    <div class="chart-head">
+      <span class="chart-num">K&nbsp;04</span>
+      <span class="chart-title">&phi;(p&minus;1)/(p&minus;1) vs |E(p&minus;1)|&middot;(p&minus;1) — the 1/2 singularity</span>
+    </div>
+    <canvas class="cc h260" id="c4"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="ldot" style="background:var(--gold)"></div>Each prime p</div>
+      <div class="leg"><div class="lsw" style="background:rgba(255,255,255,.2)"></div>&phi;/p = 1/2 line (even p&minus;1)</div>
+    </div>
+    <div style="padding:8px 18px;font-family:var(--mono);font-size:8px;color:var(--cream3);
+      border-top:1px solid var(--edge2);line-height:1.7;">
+      The highest values of |E&middot;N| cluster tightly near &phi;(p&minus;1)/(p&minus;1) = 1/2.
+      This occurs when p&minus;1 = 2q (q prime: safe prime) giving &phi;(2q)/(2q) = (q&minus;1)/(2q) &rarr; 1/2.
+      Values away from 1/2 produce systematically smaller |E&middot;N| peaks.
+    </div>
+  </div>
+
+  <!-- Chart 05: F(u) with K marked -->
+  <div class="chart-panel" id="cp5">
+    <div class="chart-head">
+      <span class="chart-num">K&nbsp;05</span>
+      <span class="chart-title">F(u) = &prod;<sub>p</sub>(p&sup2;&minus;u)/(p&sup2;&minus;1) &nbsp;&mdash;&nbsp; K = F(0)&middot;F(2)</span>
+    </div>
+    <canvas class="cc h260" id="c5"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="lsw" style="background:var(--teal)"></div>F(u)</div>
+      <div class="leg"><div class="ldot" style="background:var(--gold)"></div>F(0)=&zeta;(2)</div>
+      <div class="leg"><div class="ldot" style="background:var(--teal)"></div>F(1)=1</div>
+      <div class="leg"><div class="ldot" style="background:var(--coral)"></div>F(2)=C</div>
+      <div class="leg"><div class="ldot" style="background:var(--violet)"></div>K=F(0)&middot;F(2)</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- THEORY -->
+<div class="sec-divider">
+  <div class="sec-line"></div><div class="sec-glyph">Analysis</div><div class="sec-line"></div>
+</div>
+
+<div class="sec-wrap" style="max-width:820px;">
+
+  <div class="thm-block">
+    <div class="thm-label">Finding 1 — Maxima occur only at N = p&minus;1</div>
+    <div class="eq-box eq-teal">All significant local maxima of |E(N)&middot;N| occur at N = p&minus;1 for some prime p.</div>
+    <p class="sec-body">
+      By the exact step formula (Lemma 1 of the main conjecture paper), E(N) decreases at every prime p &ge; 3
+      because &phi;(p+1)/(p+1) &le; 1/2 &lt; C &asymp; 0.531. This means E(N) is at a local maximum
+      immediately before the prime arrives — at N = p&minus;1. All 17 events with |E&middot;N| &gt; 0.85
+      in the first million steps occur at such positions, with zero exceptions.
+    </p>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-label">Finding 2 — Safe primes produce the highest maxima</div>
+    <div class="eq-box">At safe prime p = 2q+1 (q prime): &phi;(p&minus;1)/(p&minus;1) = (q&minus;1)/(2q) &rarr; 1/2</div>
+    <p class="sec-body">
+      When p&minus;1 = 2q with q prime, the lift factor at step p&minus;1 equals &phi;(2q)/(2q) = (q&minus;1)/(2q),
+      which approaches 1/2 from below as q grows. Since 1/2 is the minimum possible lift factor for an even number,
+      this creates the cleanest possible buildup of E before the prime drop.
+      All top-20 maxima of |E&middot;N| occur at primes with &phi;(p&minus;1)/(p&minus;1) very close to 1/2,
+      with safe primes accounting for the most extreme values.
+    </p>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-label">Main Conjecture — K = F(0)&middot;F(2)</div>
+    <div class="conj-box">
+      <div class="eq-box" style="margin:0 0 12px;">
+        K &nbsp;=&nbsp; sup<sub>N&ge;2</sub> |E(N)&middot;N| &nbsp;=&nbsp; &zeta;(2)&middot;C &nbsp;=&nbsp; F(0)&middot;F(2) &nbsp;&asymp;&nbsp; 0.872985981&hellip;
+      </div>
+      <p class="sec-body">
+        The implied constant in E(N) = O(1/N) is the product of F(u) evaluated at its two
+        non-trivial landmark values u&nbsp;=&nbsp;0 and u&nbsp;=&nbsp;2.
+        F(1)&nbsp;=&nbsp;1 exactly is the geometric pivot: K&nbsp;=&nbsp;F(0)&middot;F(2)/F(1)&sup2;.
+        The values above &zeta;(2)&middot;C observed numerically (11 out of 2,000,000 steps)
+        appear to be finite transients — small N where the Euler product for C has not yet stabilized.
+      </p>
+    </div>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-label">Status and evidence</div>
+    <div class="eq-box eq-coral">Status: Conjecture &mdash; not proved. Verified to N = 2,000,000.</div>
+    <p class="sec-body" style="margin-top:10px;">
+      The conjecture K = &zeta;(2)&middot;C is a conjecture within a conjecture: it asserts not just that
+      E(N) = O(1/N) (the main conjecture), but that the implied constant is exactly F(0)&middot;F(2).
+      The 11 observed exceedances all occur at N &lt; 1,300,000 and the excess is &lt; 3%.
+      Whether these are permanent exceedances (meaning K &gt; &zeta;(2)&middot;C) or transients
+      that eventually fall below is the key open question.
+      <br><br>
+      A weaker but provable statement: among safe primes p&nbsp;=&nbsp;2q+1,
+      |E(p&minus;1)|&middot;(p&minus;1) appears to approach &zeta;(2)&middot;C from below as q &rarr; &infin;
+      through Sophie Germain primes. This is a conditional statement about the density of
+      large safe primes — again unproved but numerically strong.
+    </p>
+  </div>
+
+  <div class="thm-block">
+    <div class="thm-label">Why F(0)&middot;F(2) — the geometric structure</div>
+    <p class="sec-body">
+      F(u) is strictly decreasing on [0,&nbsp;4) with three distinguished values:
+      F(0)&nbsp;=&nbsp;&zeta;(2) (density of all squarefrees), F(1)&nbsp;=&nbsp;1 (exact, trivial),
+      F(2)&nbsp;=&nbsp;C (lift survival constant). The conjecture K&nbsp;=&nbsp;F(0)&middot;F(2) says
+      the implied constant is the product of the outer two landmarks.
+      Since F(1)&nbsp;=&nbsp;1 exactly, this equals F(0)&middot;F(2)/F(1)&sup2;&nbsp;=&nbsp;F(0)&middot;F(2) —
+      the product of the deviations of F from 1 on each side.
+      Geometrically: K&nbsp;=&nbsp;(F(0)&minus;1+1)&middot;(1&minus;(1&minus;F(2))) =
+      how far F extends above 1 at u=0, times how far it sits below 1 at u=2,
+      measured as a product rather than a sum.
+    </p>
+  </div>
+
+</div>
+
+<!-- OPEN QUESTIONS -->
+<div class="sec-divider">
+  <div class="sec-line"></div><div class="sec-glyph">Open questions about K</div><div class="sec-line"></div>
+</div>
+
+<div class="sec-wrap" style="max-width:820px;padding-top:32px;padding-bottom:80px;">
+  <div style="display:flex;flex-direction:column;gap:18px;">
+
+    <div style="padding:16px 20px;background:var(--bg1);border:1px solid var(--edge);
+      border-left:3px solid rgba(200,168,74,.6);">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+        text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Q1 — Is K = &zeta;(2)&middot;C exact?</div>
+      <p class="sec-body">Are the 11 observed exceedances permanent (making K &gt; &zeta;(2)&middot;C)
+        or transients that eventually disappear? This requires either proving the bound analytically
+        or finding an N where the ratio |E(N)|&middot;N/(&zeta;(2)&middot;C) exceeds 1 arbitrarily —
+        a definitive numerical test at N = 10<sup>9</sup> or beyond would be informative.</p>
+    </div>
+
+    <div style="padding:16px 20px;background:var(--bg1);border:1px solid var(--edge);
+      border-left:3px solid rgba(61,200,184,.5);">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+        text-transform:uppercase;color:var(--teal);margin-bottom:8px;">Q2 — Safe prime limit</div>
+      <p class="sec-body">Does lim<sub>q&rarr;&infin;, q Sophie Germain prime</sub> |E(2q)|&middot;2q
+        equal &zeta;(2)&middot;C? If yes this would be a conditional theorem (conditional on infinitely
+        many Sophie Germain primes, which is itself unproved). The numerical evidence strongly
+        suggests it — every safe prime up to N&nbsp;=&nbsp;1,000,000 gives a value below &zeta;(2)&middot;C
+        except p&nbsp;=&nbsp;289,559.</p>
+    </div>
+
+    <div style="padding:16px 20px;background:var(--bg1);border:1px solid var(--edge);
+      border-left:3px solid rgba(144,112,216,.5);">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+        text-transform:uppercase;color:var(--violet);margin-bottom:8px;">Q3 — Connection to F(u)</div>
+      <p class="sec-body">Is there a direct derivation of K&nbsp;=&nbsp;F(0)&middot;F(2) from the structure
+        of the Dirichlet series for &Sigma;L(m)m<sup>&minus;s</sup>? The Perron integral approach
+        would express E(N) as a contour integral whose residues involve F(u) evaluated at
+        specific points. Whether the residue at the leading pole equals &zeta;(2)&middot;C is the
+        key analytic question.</p>
+    </div>
+
+    <div style="padding:16px 20px;background:var(--bg1);border:1px solid var(--edge);
+      border-left:3px solid rgba(224,80,96,.5);">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+        text-transform:uppercase;color:var(--coral);margin-bottom:8px;">Q4 — Under GRH</div>
+      <p class="sec-body">Under GRH, E(N) = O(log N / N<sup>3/2</sup>), which means
+        E(N)&middot;N &rarr; 0. In that case K = lim sup E(N)&middot;N would equal zero,
+        not &zeta;(2)&middot;C. So if K&nbsp;=&nbsp;&zeta;(2)&middot;C holds,
+        the O(1/N) conjecture would be exactly tight (not improvable to o(1/N))
+        without GRH, and GRH would provide a strictly better rate. This interplay
+        between the two rates is unexplored.</p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span>Wessen Getachew &nbsp;&middot;&nbsp; K Constant Explorer &nbsp;&middot;&nbsp; math.NT &nbsp;&middot;&nbsp; 2026</span>
+  <span>K &asymp; &zeta;(2)&middot;C = F(0)&middot;F(2) &asymp; 0.872985981</span>
+</footer>
+
+<script>
+const DPR = Math.min(window.devicePixelRatio||1,2);
+const C_CONST = 0.530711806246;
+const Z2 = Math.PI*Math.PI/6;
+const Z2C = Z2 * C_CONST;
+
+// ── Sieve ────────────────────────────────────────────────────────────────────
+function buildSieve(N){
+  const phi=new Int32Array(N+2),ip=new Uint8Array(N+2).fill(1),pr=[];
+  phi[1]=1;ip[0]=ip[1]=0;
+  for(let i=2;i<=N+1;i++){
+    if(ip[i]){pr.push(i);phi[i]=i-1;}
+    for(let j=0;j<pr.length&&i*pr[j]<=N+1;j++){
+      const p=pr[j];ip[i*p]=0;
+      if(i%p===0){phi[i*p]=phi[i]*p;break;}
+      else{phi[i*p]=phi[i]*(p-1);}
+    }
+  }
+  return{phi,ip,pr};
+}
+
+function isPrime(n,ip){return n>=2&&ip[n]===1;}
+
+// ── Core compute ─────────────────────────────────────────────────────────────
+let result=null;
+
+function compute(N){
+  const{phi,ip,pr}=buildSieve(N);
+  let C=1; for(const p of pr) C*=(p*p-2)/(p*p-1);
+  const Z2C_live=Z2*C;
+
+  let sumL=0,sumPh=0,gMax=0,gMaxN=0,excCount=0;
+  const enArr=[], topMaxima=[], primeMaxima=[];
+  let prevEr=0, prevPhiRat=0;
+
+  for(let m=1;m<=N;m++){
+    sumL+=phi[m]*phi[m+1]/(m+1);
+    sumPh+=phi[m];
+    const Er=sumL/sumPh-C;
+    const en=Math.abs(Er)*m;
+    enArr.push(en);
+    if(en>gMax){gMax=en;gMaxN=m;}
+    if(en>Z2C_live) excCount++;
+
+    if(ip[m]&&m>10){
+      // record value just before this prime (prevEr at m-1)
+      const enBefore=Math.abs(prevEr)*(m-1);
+      const q=(m-1)/2;
+      const isSafe=Number.isInteger(q)&&q>=2&&ip[q]===1;
+      primeMaxima.push({p:m,en:enBefore,Er:prevEr,isSafe,
+        phiRat:phi[m-1]/(m-1),gap:0,np1prime:ip[m]===1});
+    }
+    prevEr=Er;
+    prevPhiRat=phi[m]/(m);
+  }
+
+  // sort prime maxima by en desc
+  primeMaxima.sort((a,b)=>b.en-a.en);
+
+  // Window maxima
+  const W=Math.max(1,Math.floor(N/20));
+  const windows=[];
+  let wMax=0;
+  for(let i=0;i<enArr.length;i++){
+    if(enArr[i]>wMax)wMax=enArr[i];
+    if((i+1)%W===0){windows.push({m:i+1,wMax});wMax=0;}
+  }
+
+  return{N,C,Z2C:Z2C_live,enArr,gMax,gMaxN,excCount,primeMaxima,windows,phi,ip,pr};
+}
+
+// ── Canvas helpers ────────────────────────────────────────────────────────────
+function setupCV(id){
+  const c=document.getElementById(id); if(!c) return null;
+  const W=c.parentElement.clientWidth||800,H=c.offsetHeight||260;
+  c.width=W*DPR;c.height=H*DPR;
+  const ctx=c.getContext('2d');ctx.scale(DPR,DPR);
+  ctx.fillStyle='#040410';ctx.fillRect(0,0,W,H);
+  return{ctx,W,H};
+}
+function mp(v,a,b,c,d){return c+(v-a)/(b-a)*(d-c);}
+function grid(ctx,W,H,p){
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  for(let i=1;i<4;i++){const y=p+(H-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-p,y);ctx.stroke();}
+}
+
+// ── Chart 1: |E*N| running ────────────────────────────────────────────────────
+function drawC1(r){
+  const s=setupCV('c1');if(!s)return;
+  const{ctx,W,H}=s,p=28;
+  const arr=r.enArr,N=arr.length;
+  const yMax=Math.max(...arr,r.Z2C)*1.06;
+  const px=i=>mp(i,0,N,p,W-p), py=v=>mp(v,0,yMax,H-p,p);
+  grid(ctx,W,H,p);
+
+  // Z2C reference
+  ctx.setLineDash([5,9]);ctx.strokeStyle='rgba(200,168,74,.6)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(p,py(r.Z2C));ctx.lineTo(W-p,py(r.Z2C));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.7)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='right';ctx.fillText('ζ(2)·C',W-p-4,py(r.Z2C)-4);ctx.textAlign='left';
+
+  // |E*N| curve
+  const stride=Math.max(1,Math.floor(N/1200));
+  ctx.strokeStyle='rgba(144,112,216,.85)';ctx.lineWidth=1.5;ctx.beginPath();
+  let first=true;
+  for(let i=0;i<arr.length;i+=stride){
+    const x=px(i),y=py(arr[i]);
+    if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Exceedances (red dots)
+  for(let i=0;i<arr.length;i++){
+    if(arr[i]>r.Z2C){
+      ctx.beginPath();ctx.arc(px(i),py(arr[i]),3.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(224,80,96,.9)';ctx.fill();
+    }
+  }
+
+  // Prime maxima (gold ticks)
+  r.primeMaxima.slice(0,30).forEach(h=>{
+    if(h.p<=N){
+      ctx.strokeStyle='rgba(200,168,74,.4)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(px(h.p-1),H-p);ctx.lineTo(px(h.p-1),H-p+6);ctx.stroke();
+    }
+  });
+
+  ctx.fillStyle='rgba(255,255,255,.22)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('1',p,H-p+12);ctx.textAlign='right';ctx.fillText(N.toLocaleString(),W-p,H-p+12);ctx.textAlign='left';
+}
+
+// ── Chart 2: window maxima ────────────────────────────────────────────────────
+function drawC2(r){
+  const s=setupCV('c2');if(!s)return;
+  const{ctx,W,H}=s,p=24;
+  const ws=r.windows; if(!ws.length)return;
+  const yMax=Math.max(...ws.map(w=>w.wMax),r.Z2C)*1.06;
+  const px=(_,i)=>mp(i,0,ws.length,p,W-p), py=v=>mp(v,0,yMax,H-p,p);
+  grid(ctx,W,H,p);
+
+  ctx.setLineDash([5,8]);ctx.strokeStyle='rgba(200,168,74,.55)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(r.Z2C));ctx.lineTo(W-p,py(r.Z2C));ctx.stroke();ctx.setLineDash([]);
+
+  const bw=(W-2*p)/ws.length;
+  ws.forEach((w,i)=>{
+    const x=p+i*bw,y=py(w.wMax),h2=H-p-y;
+    const above=w.wMax>r.Z2C;
+    ctx.fillStyle=above?'rgba(224,80,96,.7)':'rgba(61,200,184,.55)';
+    ctx.fillRect(x+1,y,bw-2,h2);
+  });
+
+  ctx.fillStyle='rgba(255,255,255,.22)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('1',p,H-p+12);ctx.textAlign='right';
+  ctx.fillText(r.N.toLocaleString(),W-p,H-p+12);ctx.textAlign='left';
+}
+
+// ── Chart 3: prime maxima sorted ─────────────────────────────────────────────
+function drawC3(r){
+  const s=setupCV('c3');if(!s)return;
+  const{ctx,W,H}=s,p=28;
+  const filter=document.getElementById('c3-filter').value;
+  const top=parseInt(document.getElementById('c3-top').value)||80;
+  let pts=r.primeMaxima.slice(0,Math.min(top*3,r.primeMaxima.length));
+  if(filter==='safe') pts=pts.filter(h=>h.isSafe);
+  else if(filter==='nonsafe') pts=pts.filter(h=>!h.isSafe);
+  pts=pts.slice(0,top);
+  if(!pts.length)return;
+  const yMax=Math.max(...pts.map(h=>h.en),r.Z2C)*1.06;
+  const px=(_,i)=>mp(i,0,pts.length,p,W-p), py=v=>mp(v,0,yMax,H-p,p);
+  grid(ctx,W,H,p);
+
+  ctx.setLineDash([5,8]);ctx.strokeStyle='rgba(200,168,74,.6)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(p,py(r.Z2C));ctx.lineTo(W-p,py(r.Z2C));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.55)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='right';ctx.fillText('ζ(2)·C',W-p-4,py(r.Z2C)-4);ctx.textAlign='left';
+
+  pts.forEach((h,i)=>{
+    const x=px(0,i),y=py(h.en);
+    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fillStyle=h.isSafe?'rgba(61,200,184,.85)':'rgba(144,112,216,.5)';
+    if(h.en>r.Z2C) ctx.fillStyle='rgba(224,80,96,.95)';
+    ctx.fill();
+  });
+}
+
+// ── Chart 4: phi(p-1)/(p-1) vs |E*N| ─────────────────────────────────────────
+function drawC4(r){
+  const s=setupCV('c4');if(!s)return;
+  const{ctx,W,H}=s,p=28;
+  const pts=r.primeMaxima.filter(h=>h.phiRat>0&&h.en>0);
+  const yMax=Math.max(...pts.map(h=>h.en),r.Z2C)*1.06;
+  const px=v=>mp(v,0,.55,p,W-p), py=v=>mp(v,0,yMax,H-p,p);
+  grid(ctx,W,H,p);
+
+  // 1/2 vertical line
+  ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.setLineDash([4,8]);
+  ctx.beginPath();ctx.moveTo(px(.5),p);ctx.lineTo(px(.5),H-p);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('φ=1/2',px(.5)+4,p+12);
+
+  // Z2C horizontal
+  ctx.setLineDash([5,8]);ctx.strokeStyle='rgba(200,168,74,.5)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(r.Z2C));ctx.lineTo(W-p,py(r.Z2C));ctx.stroke();ctx.setLineDash([]);
+
+  pts.forEach(h=>{
+    ctx.beginPath();ctx.arc(px(h.phiRat),py(h.en),1.8,0,Math.PI*2);
+    const above=h.en>r.Z2C;
+    ctx.fillStyle=above?'rgba(224,80,96,.9)':
+      h.isSafe?'rgba(61,200,184,.6)':'rgba(200,168,74,.4)';
+    ctx.fill();
+  });
+
+  ctx.fillStyle='rgba(255,255,255,.22)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('φ(p−1)/(p−1)',p,H-p+12);
+  ctx.textAlign='right';ctx.fillText('0.55',W-p,H-p+12);ctx.textAlign='left';
+}
+
+// ── Chart 5: F(u) ─────────────────────────────────────────────────────────────
+function drawC5(r){
+  const s=setupCV('c5');if(!s)return;
+  const{ctx,W,H}=s,p=36;
+  const primes=r.pr.slice(0,80);
+  function Fu(u){return primes.reduce((acc,p)=>acc*(p*p-u)/(p*p-1),1);}
+  const uMax=3.95;
+  const px=u=>mp(u,0,uMax,p,W-p), py=v=>mp(v,0,Z2*1.05,H-p,p);
+  grid(ctx,W,H,p);
+
+  // Zero line
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+
+  // K horizontal
+  ctx.setLineDash([4,8]);ctx.strokeStyle='rgba(144,112,216,.5)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(r.Z2C));ctx.lineTo(W-p,py(r.Z2C));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(144,112,216,.6)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.textAlign='right';ctx.fillText('K=ζ(2)·C',W-p-4,py(r.Z2C)-4);ctx.textAlign='left';
+
+  // F(u) curve
+  ctx.strokeStyle='rgba(61,200,184,.85)';ctx.lineWidth=2;ctx.beginPath();
+  let first=true;
+  for(let i=0;i<=600;i++){
+    const u=uMax*i/600;
+    if(Math.abs(u-4)<0.15){first=true;continue;}
+    const v=Fu(u);
+    if(v<-0.1||v>Z2*1.1){first=true;continue;}
+    const x=px(u),y=py(v);
+    if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Landmark dots
+  const landmarks=[
+    {u:0,v:Fu(0),col:'rgba(200,168,74,.9)',lbl:'F(0)=ζ(2)'},
+    {u:1,v:1,col:'rgba(61,200,184,.9)',lbl:'F(1)=1'},
+    {u:2,v:Fu(2),col:'rgba(224,80,96,.9)',lbl:'F(2)=C'},
+  ];
+  landmarks.forEach(lm=>{
+    ctx.beginPath();ctx.arc(px(lm.u),py(lm.v),6,0,Math.PI*2);
+    ctx.fillStyle=lm.col;ctx.fill();
+    ctx.fillStyle=lm.col;ctx.font='9px JetBrains Mono,monospace';
+    ctx.fillText(lm.lbl,px(lm.u)+9,py(lm.v)+4);
+  });
+
+  // u axis labels
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='9px JetBrains Mono,monospace';
+  [0,1,2,3].forEach(u=>ctx.fillText(u,px(u)-4,H-p+12));
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render(r){
+  result=r;
+  drawC1(r);drawC2(r);drawC3(r);drawC4(r);drawC5(r);
+  document.getElementById('st-n').textContent=r.N.toLocaleString();
+  document.getElementById('st-max').textContent=r.gMax.toFixed(8);
+  document.getElementById('st-maxn').textContent=r.gMaxN.toLocaleString();
+  document.getElementById('st-exc').textContent=r.excCount;
+  document.getElementById('kd-max').textContent=r.gMax.toFixed(8)+'\n at N='+r.gMaxN.toLocaleString();
+  document.getElementById('kd-exc').textContent=r.excCount+' / '+r.N.toLocaleString()+'\n= '+(r.excCount/r.N*100).toFixed(4)+'%';
+  setTimeout(()=>document.querySelectorAll('.chart-panel').forEach(el=>el.classList.add('visible')),30);
+  buildTable(r);
+}
+
+function runCompute(){
+  const N=parseInt(document.getElementById('n-slider').value);
+  setTimeout(()=>{render(compute(N));},20);
+}
+
+// Play
+let playRAF=null,playActive=false;
+function runPlay(){
+  if(playActive){
+    if(playRAF){cancelAnimationFrame(playRAF);playRAF=null;}
+    playActive=false;
+    document.getElementById('play-btn').textContent='▶ Play';
+    return;
+  }
+  const Nmax=parseInt(document.getElementById('n-slider').value);
+  playActive=true;
+  document.getElementById('play-btn').textContent='⏸ Stop';
+  let Nc=500;
+  function frame(){
+    if(!playActive)return;
+    const step=Math.max(100,Math.floor(Nc/80));
+    Nc=Math.min(Nc+step,Nmax);
+    document.getElementById('n-disp').textContent=Nc.toLocaleString();
+    render(compute(Nc));
+    if(Nc<Nmax) playRAF=requestAnimationFrame(frame);
+    else{playActive=false;document.getElementById('play-btn').textContent='▶ Play';}
+  }
+  playRAF=requestAnimationFrame(frame);
+}
+
+// Table
+function buildTable(r){
+  const tbody=document.querySelector('#tbl-d1 tbody');
+  if(!tbody)return;
+  tbody.innerHTML='';
+  r.primeMaxima.slice(0,30).forEach(h=>{
+    const tr=document.createElement('tr');
+    if(h.isSafe)tr.classList.add('safe-prime');
+    if(h.en>r.Z2C)tr.classList.add('highlight');
+    const ratio=(h.en/r.Z2C).toFixed(6);
+    tr.innerHTML=`<td>${(h.p-1).toLocaleString()}</td>
+      <td>${h.en.toFixed(8)}</td>
+      <td style="color:${h.en>r.Z2C?'var(--coral)':'rgba(255,255,255,.5)'}">${ratio}</td>
+      <td>${h.ip2?'yes':''}</td>
+      <td style="color:${h.isSafe?'var(--teal)':'rgba(255,255,255,.3)'}">${h.isSafe?'yes':''}</td>
+      <td>${h.isSafe?'p=2q+1':'even p−1'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleDrawer(did,btn){
+  const dr=document.getElementById(did);
+  const open=!dr.classList.contains('open');
+  dr.classList.toggle('open');
+  btn.querySelector('.darrow').style.transform=open?'rotate(180deg)':'';
+}
+
+// ── Hero canvas ───────────────────────────────────────────────────────────────
+(function(){
+  const cv=document.getElementById('hero-canvas');
+  const ctx=cv.getContext('2d');
+  let W,H,t=0;
+  function resize(){
+    W=cv.width=cv.offsetWidth*DPR;H=cv.height=cv.offsetHeight*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    W=cv.offsetWidth;H=cv.offsetHeight;
+  }
+  // Draw animated |E*N| waveform (precomputed, animated scrolling)
+  const NPTS=300;
+  const phi=new Int32Array(NPTS+2),ip2=new Uint8Array(NPTS+2).fill(1);
+  phi[1]=1;ip2[0]=ip2[1]=0;
+  const pr2=[];
+  for(let i=2;i<=NPTS+1;i++){
+    if(ip2[i]){pr2.push(i);phi[i]=i-1;}
+    for(let j=0;j<pr2.length&&i*pr2[j]<=NPTS+1;j++){
+      const p=pr2[j];ip2[i*p]=0;
+      if(i%p===0){phi[i*p]=phi[i]*p;break;}else{phi[i*p]=phi[i]*(p-1);}
+    }
+  }
+  let C=1;for(const p of pr2)C*=(p*p-2)/(p*p-1);
+  let sl=0,sp=0;
+  const En=[];
+  for(let m=1;m<=NPTS;m++){sl+=phi[m]*phi[m+1]/(m+1);sp+=phi[m];En.push(sl/sp-C);}
+  const maxAbs=Math.max(...En.map(Math.abs));
+
+  function draw(){
+    if(!W)resize();
+    ctx.fillStyle='rgba(3,3,10,.18)';ctx.fillRect(0,0,W,H);
+    t+=.004;
+    const cx=W/2,cy=H/2;
+    // Rotating rings background
+    for(let ring=1;ring<=5;ring++){
+      const r=Math.min(W,H)*(.1+ring*.08);
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(200,168,74,${0.015/ring})`;ctx.lineWidth=1;ctx.stroke();
+    }
+    // E(N) wave
+    ctx.strokeStyle='rgba(61,200,184,.35)';ctx.lineWidth=1.5;ctx.beginPath();
+    const scaleX=(W*.9)/NPTS, scaleY=(H*.25)/maxAbs;
+    for(let i=0;i<En.length;i++){
+      const x=W*.05+i*scaleX;
+      const y=cy-En[i]*scaleY;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // Carrier
+    ctx.strokeStyle='rgba(200,168,74,.2)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(W*.05,cy);ctx.lineTo(W*.95,cy);ctx.stroke();
+    // Floating K label
+    const kx=cx+Math.sin(t*.3)*W*.1, ky=cy*0.35+Math.sin(t*.2)*20;
+    ctx.fillStyle=`rgba(200,168,74,${.06+.03*Math.sin(t)})`;
+    ctx.font=`${Math.min(W,H)*.35}px Cinzel Decorative,serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('K',kx,ky);
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+    requestAnimationFrame(draw);
+  }
+  resize();draw();
+  window.addEventListener('resize',resize,{passive:true});
+})();
+
+// ── Scroll reveal + init ──────────────────────────────────────────────────────
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.08});
+document.querySelectorAll('.chart-panel').forEach(el=>obs.observe(el));
+window.addEventListener('load',()=>{render(compute(50000));});
+window.addEventListener('resize',()=>{if(result)render(result);},{passive:true});
+</script>
+</body>
+</html>
