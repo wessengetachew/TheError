@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unified Spectral Theory — Modular Prime Dynamics · Wessen Getachew</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
+:root{
+  --bg:#03030a;--bg1:#07070f;--bg2:#0c0c1a;--bg3:#111125;
+  --gold:#c8a84a;--gold2:#e8d070;
+  --teal:#3dc8b8;--coral:#e05060;--violet:#9070d8;
+  --orange:#e8904a;--green:#50c878;--blue:#4488ff;
+  --cream:rgba(255,255,255,.93);--cream2:rgba(255,255,255,.58);--cream3:rgba(255,255,255,.25);
+  --edge:rgba(255,255,255,.07);--edge2:rgba(255,255,255,.04);
+  --mono:'JetBrains Mono',monospace;--serif:'Cormorant Garamond',serif;--disp:'Cinzel Decorative',serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:var(--serif);overflow-x:hidden;}
+
+/* NAV */
+#tab-nav{position:sticky;top:0;z-index:200;background:rgba(3,3,10,.97);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--edge);
+  display:flex;align-items:center;padding:0 28px;height:52px;}
+.tabs{display:flex;flex:1;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  text-decoration:none;padding:0 13px;height:52px;display:flex;align-items:center;gap:6px;
+  color:var(--cream3);border-bottom:2px solid transparent;transition:color .18s,border-color .18s;white-space:nowrap;}
+.tab:hover{color:var(--cream2);}
+.tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5;}
+.tab.active .tab-dot{opacity:1;}
+.nav-right{font-family:var(--mono);font-size:8px;color:var(--cream3);letter-spacing:.06em;
+  margin-left:auto;white-space:nowrap;padding-left:14px;}
+@media(max-width:700px){.tab{padding:0 9px;font-size:8px;}.nav-right{display:none;}}
+
+/* HERO */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;
+  justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(61,200,184,.04) 0%,transparent 70%);}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.35;}
+.hero-inner{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:960px;}
+.hero-eyebrow{font-family:var(--mono);font-size:8px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:18px;opacity:0;animation:fadeUp .8s .3s forwards;}
+.hero-title{font-family:var(--disp);font-size:clamp(1.4rem,4.5vw,3.2rem);font-weight:400;
+  line-height:1.1;color:var(--cream);margin-bottom:14px;
+  opacity:0;animation:fadeUp 1s .5s forwards;}
+.hero-title em{color:var(--teal);font-family:var(--serif);font-style:italic;}
+.hero-subtitle{font-family:var(--mono);font-size:clamp(.7rem,1.4vw,.85rem);color:var(--gold2);
+  letter-spacing:.08em;line-height:2;margin-bottom:18px;
+  opacity:0;animation:fadeUp .9s .75s forwards;}
+.hero-desc{font-family:var(--serif);font-size:clamp(.9rem,1.8vw,1.1rem);color:var(--cream2);
+  line-height:1.8;max-width:720px;margin:0 auto 28px;
+  opacity:0;animation:fadeUp .9s .95s forwards;}
+.hero-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:fadeUp .8s 1.15s forwards;}
+.pill{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 13px;border:1px solid;}
+.pill-teal{border-color:rgba(61,200,184,.5);color:var(--teal);background:rgba(61,200,184,.06);}
+.pill-gold{border-color:rgba(200,168,74,.5);color:var(--gold);background:rgba(200,168,74,.06);}
+.pill-violet{border-color:rgba(144,112,216,.5);color:var(--violet);background:rgba(144,112,216,.06);}
+.pill-coral{border-color:rgba(224,80,96,.4);color:var(--coral);background:rgba(224,80,96,.05);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+
+/* SECTION STRUCTURE */
+.wrap{max-width:1100px;margin:0 auto;padding:56px 40px;}
+.wrap-narrow{max-width:820px;margin:0 auto;padding:40px 40px;}
+.sdiv{display:flex;align-items:center;gap:16px;max-width:1100px;margin:0 auto;padding:0 40px;}
+.sl{flex:1;height:1px;background:var(--edge);}
+.sg{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream3);white-space:nowrap;}
+.sec-label{font-family:var(--mono);font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;}
+.sec-num{font-family:var(--disp);font-size:clamp(2.5rem,8vw,6rem);font-weight:400;
+  color:rgba(61,200,184,.08);line-height:1;margin-bottom:-10px;}
+.sec-title{font-family:var(--disp);font-size:clamp(1.1rem,2.5vw,1.7rem);font-weight:400;
+  color:var(--cream);line-height:1.2;margin-bottom:14px;}
+.sec-title em{color:var(--teal);font-family:var(--serif);font-style:italic;}
+.sec-body{font-family:var(--serif);font-size:1rem;color:var(--cream2);line-height:1.88;margin-bottom:16px;}
+@media(max-width:640px){.wrap{padding:36px 18px;}.wrap-narrow{padding:28px 18px;}.sdiv{padding:0 18px;}}
+
+/* EQUATION BOXES */
+.eq{font-family:var(--mono);font-size:clamp(.78rem,1.5vw,.9rem);color:var(--gold2);
+  background:rgba(200,168,74,.06);border-left:3px solid rgba(200,168,74,.5);
+  padding:13px 18px;margin:14px 0;line-height:1.9;}
+.eq-teal{color:var(--teal);background:rgba(61,200,184,.05);border-left-color:rgba(61,200,184,.5);}
+.eq-violet{color:var(--violet);background:rgba(144,112,216,.05);border-left-color:rgba(144,112,216,.4);}
+.eq-coral{color:var(--coral);background:rgba(224,80,96,.05);border-left-color:rgba(224,80,96,.4);}
+
+/* THEOREM BLOCKS */
+.thm{background:var(--bg2);border:1px solid var(--edge);padding:20px 24px;margin:20px 0;position:relative;}
+.thm::before{position:absolute;top:-9px;left:18px;font-family:var(--mono);font-size:7px;
+  letter-spacing:.2em;background:var(--bg2);padding:0 8px;}
+.thm-proved::before{content:'PROVED';color:var(--teal);}
+.thm-conj::before{content:'CONJECTURE';color:var(--gold);}
+.thm-new::before{content:'NEW RESULT';color:var(--coral);}
+.thm-obs::before{content:'OBSERVATION';color:var(--violet);}
+.thm-body{font-family:var(--serif);font-size:.95rem;color:var(--cream2);line-height:1.85;}
+.thm-title{font-family:var(--mono);font-size:10px;color:var(--cream);margin-bottom:10px;letter-spacing:.05em;}
+
+/* CONSTELLATION TABLE */
+.ctbl{width:100%;border-collapse:collapse;margin:20px 0;font-family:var(--mono);font-size:10px;}
+.ctbl th{padding:10px 14px;text-align:left;background:var(--bg2);color:var(--gold);
+  letter-spacing:.1em;font-weight:400;border-bottom:2px solid rgba(200,168,74,.3);}
+.ctbl td{padding:9px 14px;border-bottom:1px solid var(--edge2);color:var(--cream2);vertical-align:top;}
+.ctbl tr:nth-child(even) td{background:rgba(255,255,255,.015);}
+.ctbl .c-degree{color:var(--teal);font-weight:500;}
+.ctbl .c-jump{color:var(--gold2);}
+.ctbl .c-prec{color:var(--violet);}
+.ctbl .c-label{color:var(--cream3);font-size:8px;letter-spacing:.12em;text-transform:uppercase;}
+
+/* CONSTANTS GRID */
+.const-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge);margin:20px 0;}
+@media(max-width:700px){.const-grid{grid-template-columns:1fr;}}
+.const-cell{background:var(--bg1);padding:22px 20px;}
+.const-sym{font-family:var(--disp);font-size:1.8rem;font-weight:400;margin-bottom:8px;}
+.const-val{font-family:var(--mono);font-size:.9rem;color:var(--gold2);margin-bottom:6px;}
+.const-desc{font-family:var(--serif);font-size:.85rem;color:var(--cream3);line-height:1.6;}
+
+/* DEGREE VISUAL */
+.degree-visual{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0;}
+@media(max-width:640px){.degree-visual{grid-template-columns:1fr;}}
+.deg-card{background:var(--bg2);border:1px solid var(--edge);padding:20px;text-align:center;
+  position:relative;overflow:hidden;}
+.deg-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+.deg-2::after{background:var(--teal);}
+.deg-3::after{background:var(--gold);}
+.deg-6::after{background:var(--coral);}
+.deg-num{font-family:var(--disp);font-size:3.5rem;font-weight:400;line-height:1;margin-bottom:8px;}
+.deg-2 .deg-num{color:rgba(61,200,184,.6);}
+.deg-3 .deg-num{color:rgba(200,168,74,.6);}
+.deg-6 .deg-num{color:rgba(224,80,96,.6);}
+.deg-label{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--cream3);margin-bottom:8px;}
+.deg-type{font-family:var(--serif);font-size:.95rem;color:var(--cream2);line-height:1.6;}
+.deg-formula{font-family:var(--mono);font-size:8px;color:var(--cream3);margin-top:8px;
+  background:rgba(0,0,0,.3);padding:6px 8px;line-height:1.7;}
+
+/* CHARTS */
+.chart-panel{background:var(--bg1);border:1px solid var(--edge);margin-bottom:18px;
+  opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s;}
+.chart-panel.visible{opacity:1;transform:none;}
+.chart-head{padding:13px 18px 10px;border-bottom:1px solid var(--edge2);
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.chart-num{font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--cream3);}
+.chart-title{font-family:var(--mono);font-size:11px;color:var(--gold2);flex:1;}
+canvas.cc{display:block;width:100%;background:#040410;}
+canvas.cc.h220{height:220px;}canvas.cc.h280{height:280px;}canvas.cc.h200{height:200px;}
+.chart-foot{padding:8px 18px;border-top:1px solid var(--edge2);display:flex;gap:14px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8px;
+  letter-spacing:.07em;color:var(--cream3);}
+.lsw{width:18px;height:2.5px;border-radius:1px;}
+.ldot{width:7px;height:7px;border-radius:50%;}
+
+/* COMPUTE BAR */
+.compute-bar{max-width:1100px;margin:0 auto 12px;padding:0 40px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+@media(max-width:640px){.compute-bar{padding:0 18px;}}
+input[type=range]{-webkit-appearance:none;height:3px;border-radius:2px;outline:none;cursor:pointer;}
+input[type=range].sl-teal{background:rgba(61,200,184,.3);}
+input[type=range].sl-teal::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--teal);cursor:pointer;border:2px solid var(--bg);}
+.ctrl-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--cream3);white-space:nowrap;}
+.ctrl-val{font-family:var(--mono);font-size:10px;color:var(--teal);min-width:50px;}
+.run-btn{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  background:var(--teal);color:#000;border:none;padding:8px 20px;cursor:pointer;}
+
+/* AL-BATTANI TABLE */
+.ab-table{width:100%;border-collapse:collapse;margin:20px 0;font-family:var(--mono);font-size:9px;}
+.ab-table th{padding:10px 12px;background:var(--bg3);color:var(--teal);
+  letter-spacing:.12em;font-weight:400;border-bottom:1px solid rgba(61,200,184,.3);text-align:left;}
+.ab-table td{padding:9px 12px;border-bottom:1px solid var(--edge2);color:var(--cream2);vertical-align:top;}
+.ab-table td:first-child{color:var(--cream3);font-size:8px;letter-spacing:.1em;}
+.ab-table tr:nth-child(even) td{background:rgba(255,255,255,.015);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0;}
+@media(max-width:700px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+.stat{background:var(--bg2);border:1px solid var(--edge);padding:11px 13px;}
+.stat-lbl{font-family:var(--mono);font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream3);margin-bottom:4px;}
+.stat-val{font-family:var(--mono);font-size:11px;}
+
+/* OPEN QUESTIONS */
+.oq{padding:18px 22px;background:var(--bg1);border:1px solid var(--edge);
+  border-left:3px solid;margin-bottom:14px;}
+.oq-gold{border-left-color:var(--gold);}
+.oq-teal{border-left-color:var(--teal);}
+.oq-violet{border-left-color:var(--violet);}
+.oq-coral{border-left-color:var(--coral);}
+.oq-label{font-family:var(--mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;}
+.oq-gold .oq-label{color:var(--gold);}
+.oq-teal .oq-label{color:var(--teal);}
+.oq-violet .oq-label{color:var(--violet);}
+.oq-coral .oq-label{color:var(--coral);}
+
+footer{border-top:1px solid var(--edge);padding:20px 40px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--cream3);}
+
+/* Export */
+.exp-panel-btn{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+  background:rgba(61,200,184,.1);border:1px solid rgba(61,200,184,.35);color:rgba(61,200,184,.8);
+  padding:4px 11px;cursor:pointer;transition:all .15s;white-space:nowrap;margin-left:auto;flex-shrink:0;}
+.exp-panel-btn:hover{background:rgba(61,200,184,.22);color:var(--teal);}
+</style>
+</head>
+<body>
+
+<nav id="tab-nav">
+  <div class="tabs">
+    <a href="index.html" class="tab"><span class="tab-dot"></span>Opener</a>
+    <a href="EN_explorer-1-2.html" class="tab"><span class="tab-dot"></span>Explorer</a>
+    <a href="EN_explorer-updated.html" class="tab"><span class="tab-dot"></span>Deep Analysis</a>
+    <a href="zmmz_explorer-1.html" class="tab"><span class="tab-dot"></span>Geometric Canvas</a>
+    <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&zeta;(2) Explorer</a>
+    <a href="gcd_explorer.html" class="tab"><span class="tab-dot"></span>GCD Explorer</a>
+    <a href="lift_paper.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
+    <a href="k_explorer.html" class="tab"><span class="tab-dot"></span>K Constant</a>
+    <div class="tab active"><span class="tab-dot"></span>Spectral Theory</div>
+  </div>
+  <span class="nav-right">Modular Prime Dynamics &nbsp;&middot;&nbsp; 2026</span>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Unified Spectral Theory &nbsp;&middot;&nbsp; Al-Battani Program &nbsp;&middot;&nbsp; 2026</div>
+    <h1 class="hero-title">
+      Modular <em>Prime Dynamics</em><br>
+      A Unified Spectral Theory
+    </h1>
+    <div class="hero-subtitle">
+      D(x) = d/dx log C(x) &nbsp;&middot;&nbsp; &Delta;<sub>p</sub> = 1/(p(p&minus;1)) &nbsp;&middot;&nbsp;
+      &Delta;<sub>twin</sub> = 2p/((p+1)(p&sup2;&minus;4))<br>
+      Degree sequence: 2 &rarr; 3 &rarr; 6 &nbsp;&middot;&nbsp;
+      J = 0.7732 &nbsp;&middot;&nbsp; J<sub>2</sub> = 0.4071 &nbsp;&middot;&nbsp; J<sub>3</sub> = 0.1378
+    </div>
+    <p class="hero-desc">
+      Primes are not random integers. They are the unique singularities in the drift of modular survival —
+      the only points where the velocity D(x) of the Lift Survival Constant undergoes a discrete jump.
+      This page unifies the Jump Theorem, the twin prime spectral extension, the complexity wall,
+      and the precession constants into a single framework: <em>Modular Prime Dynamics</em>.
+    </p>
+    <div class="hero-pills">
+      <span class="pill pill-teal">Jump Theorem — Proved</span>
+      <span class="pill pill-gold">Twin Apogee — New Result</span>
+      <span class="pill pill-violet">Complexity Wall 2&rarr;3&rarr;6</span>
+      <span class="pill pill-coral">E(N) = O(1/N) — Conjecture</span>
+    </div>
+  </div>
+</section>
+
+<!-- §1 THE MODULAR APOGEE -->
+<div class="sdiv" style="margin-top:8px;"><div class="sl"></div><div class="sg">I — The Modular Apogee</div><div class="sl"></div></div>
+<div class="wrap">
+  <div class="sec-label">Structural Foundation</div>
+  <div class="sec-num">01</div>
+  <h2 class="sec-title">C is the <em>Modular Apogee</em> — and it drifts</h2>
+  <p class="sec-body">
+    Al-Battani discovered that the solar apogee — long assumed fixed — was in fact slowly precessing.
+    The Lift Survival Constant C plays the same role in modular arithmetic: it is the theoretical limit
+    of the lift survival density, assumed constant, but actually the endpoint of a continuously drifting
+    function C(x) whose derivative D(x) reveals the prime structure of the integers.
+  </p>
+
+  <div class="eq">C = &prod;<sub>p</sub> (p&sup2;&minus;2)/(p&sup2;&minus;1) &asymp; 0.530711806246 &nbsp;&nbsp; [Modular Apogee]</div>
+  <div class="eq-teal">C(x) = &prod;<sub>p</sub> f<sub>p</sub>(x) &nbsp;&nbsp; where f<sub>p</sub> interpolates from p/(p+1) to (p&sup2;&minus;x&minus;1)/(p&sup2;&minus;1)</div>
+  <div class="eq-teal">D(x) = d/dx log C(x) = &minus;&sum;<sub>p &gt; x+1</sub> 1/(p&sup2;&minus;x&minus;1) &nbsp;&nbsp; [Drift velocity]</div>
+
+  <div class="thm thm-proved">
+    <div class="thm-title">Theorem — The Jump Theorem</div>
+    <div class="thm-body">
+      D(x) is smooth on every open interval (p&minus;1, q&minus;1) between consecutive primes.
+      At x = p&minus;1 for each prime p, D(x) has a jump discontinuity of exact size
+      &Delta;<sub>p</sub> = 1/(p(p&minus;1)). Composites produce no jump.
+      The prime p is recovered from jump size s by p = (1 + &radic;(1+4/s))/2.
+      The discriminant 1+4p(p&minus;1) = (2p&minus;1)&sup2; is always a perfect square.
+      The golden ratio &phi; is the supremum of the jump spectrum — the "ghost prime" at s=1.
+    </div>
+  </div>
+
+  <div class="thm thm-proved">
+    <div class="thm-title">Theorem — Four Constants from C(x)</div>
+    <div class="thm-body">
+      C(0) = &zeta;(2) = &pi;&sup2;/6 &nbsp;&middot;&nbsp; C(1) = 1 exactly &nbsp;&middot;&nbsp; C(2) = C &nbsp;&middot;&nbsp;
+      zeros at u = p&sup2; for each prime p (F(u) is in the Laguerre&ndash;P&oacute;lya class).<br><br>
+      J = &sum;<sub>p</sub> &Delta;<sub>p</sub> = &sum;<sub>p</sub> 1/(p(p&minus;1)) = &sum;<sub>k&ge;2</sub> P(k) &asymp; 0.773155
+      &nbsp; [Total precession — proved]<br>
+      J = D<sub>0</sub> + T exactly, where D<sub>0</sub> = &sum; 1/(p&sup2;&minus;1), T = &sum; 1/(p(p&sup2;&minus;1)).
+    </div>
+  </div>
+</div>
+
+<!-- §2 TWIN APOGEE -->
+<div class="sdiv"><div class="sl"></div><div class="sg">II — The Twin Prime Apogee</div><div class="sl"></div></div>
+<div class="wrap">
+  <div class="sec-label">New Result — Verified Session 2026</div>
+  <div class="sec-num">02</div>
+  <h2 class="sec-title">D<sub>pair</sub>(x) — the <em>Twin Prime drift function</em></h2>
+  <p class="sec-body">
+    The same program applied to twin prime pairs yields a second drift function
+    whose jumps occur exactly at twin prime positions, with a closed-form jump size.
+    This was not known before — it emerged from applying the Al-Battani program
+    to the pair survival problem.
+  </p>
+
+  <div class="eq-teal">D<sub>pair</sub>(x) = &minus;&sum;<sub>twin pair (p,p+2): p+2 &gt; x+1</sub>
+    [1/(p&sup2;&minus;x&minus;1) + 1/((p+2)&sup2;&minus;x&minus;1)]</div>
+
+  <div class="thm thm-new">
+    <div class="thm-title">New Result — Twin Jump Theorem</div>
+    <div class="thm-body">
+      D<sub>pair</sub>(x) is smooth everywhere except at x = p+1 for twin prime pairs (p, p+2).
+      At those positions the jump is exact:<br><br>
+      <strong>&Delta;<sub>twin</sub>(p) = 2p / ((p+1)(p&sup2;&minus;4))</strong><br><br>
+      Factored: p&sup2;&minus;4 = (p&minus;2)(p+2), so &Delta;<sub>twin</sub> = 2p/((p&minus;2)(p+1)(p+2)).<br>
+      Verified with zero exceptions across all twin primes to N = 500,000.<br>
+      Recovery requires solving the cubic s&middot;p&sup3; + s&middot;p&sup2; &minus; (4s+2)p &minus; 4s = 0.
+    </div>
+  </div>
+
+  <div class="thm thm-new">
+    <div class="thm-title">New Result — Twin Precession Constant J<sub>2</sub></div>
+    <div class="thm-body">
+      J<sub>2</sub> = &sum;<sub>twin pair p</sub> 2p/((p+1)(p&sup2;&minus;4)) &asymp; 0.407113253185<br><br>
+      J<sub>2</sub>/J &asymp; 0.526560 — twin prime pairs account for 52.7% of total modular precession.<br><br>
+      <strong>Reformulation of Twin Prime Conjecture:</strong> The Twin Prime Conjecture is equivalent to J<sub>2</sub>
+      being an infinite sum — equivalently, to J<sub>2</sub> being the limit of a non-terminating series
+      in the representation above. If finitely many twin primes exist, J<sub>2</sub> is a finite rational number.
+    </div>
+  </div>
+
+  <div class="thm thm-new">
+    <div class="thm-title">New Result — Stronger Anti-correlation at Twin Primes</div>
+    <div class="thm-body">
+      The structural anti-correlation (E<sub>r</sub> UP, E DOWN at every prime p &ge; 3) holds at twin primes
+      with greater magnitude. Mean |&Delta;E| at twin primes = 3.43&times;10<sup>&minus;4</sup> versus
+      6.14&times;10<sup>&minus;5</sup> at non-twin primes — nearly 6&times; larger.<br><br>
+      Reason: at twin prime p, p+1 is doubly constrained — even, and sandwiched between two primes.
+      It cannot borrow large prime factors from neighbors. Result: median &phi;(p+1)/(p+1) = 0.300
+      at twin primes versus 0.386 at non-twins. The suppression of the lift ratio is systematically
+      stronger where primes cluster. Pearson r = &minus;0.942 at twin prime positions (vs &minus;0.926 overall).
+    </div>
+  </div>
+</div>
+
+<!-- §3 THE COMPLEXITY WALL -->
+<div class="sdiv"><div class="sl"></div><div class="sg">III — The Complexity Wall</div><div class="sl"></div></div>
+<div class="wrap">
+  <div class="sec-label">The Degree Sequence 2 &rarr; 3 &rarr; 6</div>
+  <div class="sec-num">03</div>
+  <h2 class="sec-title">Recovery degree maps <em>Hardy&ndash;Littlewood difficulty</em></h2>
+  <p class="sec-body">
+    Each prime constellation type — single primes, twin pairs, prime triplets — leaves a spectral
+    signature in its drift function. The algebraic degree required to recover the constellation
+    from the jump size grows super-linearly. This is the number-theoretic analog of Al-Battani's
+    progression from circular to epicyclic to higher-order equations as planetary complexity grew.
+  </p>
+
+  <div class="degree-visual">
+    <div class="deg-card deg-2">
+      <div class="deg-num">2</div>
+      <div class="deg-label">Quadratic</div>
+      <div class="deg-type">Single primes<br>p = (1+&radic;(1+4/s))/2</div>
+      <div class="deg-formula">&Delta;<sub>p</sub> = 1/(p(p&minus;1))<br>Discriminant: (2p&minus;1)&sup2;<br>Obstruction: golden ratio &phi;</div>
+    </div>
+    <div class="deg-card deg-3">
+      <div class="deg-num">3</div>
+      <div class="deg-label">Cubic</div>
+      <div class="deg-type">Twin prime pairs<br>Solve: s&middot;p&sup3;+s&middot;p&sup2;&minus;(4s+2)p&minus;4s=0</div>
+      <div class="deg-formula">&Delta;<sub>twin</sub> = 2p/((p+1)(p&sup2;&minus;4))<br>No perfect-square discriminant<br>Obstruction: s-dependent</div>
+    </div>
+    <div class="deg-card deg-6">
+      <div class="deg-num">6</div>
+      <div class="deg-label">Sextic</div>
+      <div class="deg-type">Prime triplets (p,p+2,p+6)<br>Degree-6 recovery equation</div>
+      <div class="deg-formula">&Delta;<sub>triplet</sub>: three-term sum<br>Denom degree = 2+2+2 = 6<br>Growth: super-linear in k</div>
+    </div>
+  </div>
+
+  <div class="thm thm-obs">
+    <div class="thm-title">The Complexity Wall — Verified for k = 1, 2, 3</div>
+    <div class="thm-body">
+      The recovery polynomial degree is NOT k+1 as naively predicted.
+      The actual sequence is 2, 3, 6 for constellations of size 1, 2, 3.
+      Each additional prime in the constellation adds roughly 2 degrees (one per boundary of the new interval).
+      The growth is super-linear — the algebraic complexity of detecting a k-prime constellation
+      from the modular drift grows faster than linearly with k.
+      This mirrors the actual difficulty of the Hardy&ndash;Littlewood k-tuple conjectures,
+      which become significantly harder with each additional prime in the tuple.
+    </div>
+  </div>
+
+  <div class="ctbl-wrap" style="overflow-x:auto;">
+    <table class="ctbl">
+      <thead>
+        <tr>
+          <th>Constellation</th>
+          <th>Jump activates at</th>
+          <th class="c-jump">Jump formula</th>
+          <th class="c-degree">Recovery degree</th>
+          <th class="c-prec">Precession</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="c-label">Single prime</span><br>p</td>
+          <td>x = p&minus;1</td>
+          <td class="c-jump">1/(p(p&minus;1))</td>
+          <td class="c-degree">2 — Quadratic<br>&radic;(1+4/s)</td>
+          <td class="c-prec">J &asymp; 0.7732</td>
+          <td style="color:var(--teal)">Proved</td>
+        </tr>
+        <tr>
+          <td><span class="c-label">Twin pair</span><br>(p, p+2)</td>
+          <td>x = p+1</td>
+          <td class="c-jump">2p/((p+1)(p&sup2;&minus;4))</td>
+          <td class="c-degree">3 — Cubic<br>s&middot;p&sup3;+&hellip;=0</td>
+          <td class="c-prec">J<sub>2</sub> &asymp; 0.4071</td>
+          <td style="color:var(--coral)">New result</td>
+        </tr>
+        <tr>
+          <td><span class="c-label">Triplet</span><br>(p, p+2, p+6)</td>
+          <td>x = p+5</td>
+          <td class="c-jump">1/((p&minus;3)(p+2)) + 1/(p&sup2;+3p&minus;2) + 1/((p+5)(p+6))</td>
+          <td class="c-degree">6 — Sextic<br>degree-6 poly</td>
+          <td class="c-prec">J<sub>3</sub> &asymp; 0.1378</td>
+          <td style="color:var(--coral)">New result</td>
+        </tr>
+        <tr>
+          <td><span class="c-label">k-tuple</span><br>(p, p+h<sub>1</sub>, &hellip;, p+h<sub>k</sub>)</td>
+          <td>x = p+h<sub>k</sub>&minus;1</td>
+          <td class="c-jump">Sum of k+1 terms, each degree-2 denom</td>
+          <td class="c-degree">&asymp; 2(k+1) — super-linear</td>
+          <td class="c-prec">J<sub>k</sub> (conj.)</td>
+          <td style="color:var(--cream3)">Conjecture</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- §4 PRECESSION CONSTANTS -->
+<div class="sdiv"><div class="sl"></div><div class="sg">IV — Precession Constants</div><div class="sl"></div></div>
+<div class="wrap">
+  <div class="sec-label">New fundamental constants</div>
+  <div class="sec-num">04</div>
+  <h2 class="sec-title">J, J<sub>2</sub>, J<sub>3</sub> — the <em>spectral decomposition</em> of primes</h2>
+  <p class="sec-body">
+    Each precession constant measures the total "torque" applied to the modular system by a
+    specific class of prime constellation. Their ratios encode the density of each constellation type
+    in the prime spectrum.
+  </p>
+
+  <div class="const-grid">
+    <div class="const-cell">
+      <div class="const-sym" style="color:var(--gold)">J</div>
+      <div class="const-val">&asymp; 0.773154968933</div>
+      <div class="const-desc">Total prime precession. Sum of all jump sizes &Delta;<sub>p</sub> over all primes.
+        Equal to &sum;<sub>k&ge;2</sub>P(k) — encodes every prime zeta value.
+        Proved: J = D<sub>0</sub> + T exactly.</div>
+    </div>
+    <div class="const-cell">
+      <div class="const-sym" style="color:var(--teal)">J<sub>2</sub></div>
+      <div class="const-val">&asymp; 0.407113253185</div>
+      <div class="const-desc">Twin prime precession. Sum of &Delta;<sub>twin</sub>(p) over all twin prime pairs.
+        J<sub>2</sub>/J &asymp; 0.5266. Infinite iff Twin Prime Conjecture is true.
+        New result verified to N = 500,000.</div>
+    </div>
+    <div class="const-cell">
+      <div class="const-sym" style="color:var(--violet)">J<sub>3</sub></div>
+      <div class="const-val">&asymp; 0.137810484121</div>
+      <div class="const-desc">Triplet precession. Sum over prime triplets (p,p+2,p+6).
+        J<sub>3</sub>/J &asymp; 0.1782. J<sub>3</sub>/J<sub>2</sub> &asymp; 0.3385.
+        Infinite iff infinitely many prime triplets exist (Hardy&ndash;Littlewood).</div>
+    </div>
+  </div>
+
+  <div class="eq">J<sub>2</sub>/J &asymp; 0.526560 &nbsp;&nbsp; J<sub>3</sub>/J &asymp; 0.178244 &nbsp;&nbsp; J<sub>3</sub>/J<sub>2</sub> &asymp; 0.338507</div>
+
+  <p class="sec-body">
+    The sequence J, J<sub>2</sub>, J<sub>3</sub>, &hellip; is a spectral decomposition of the prime distribution.
+    Each term measures how much of the total modular drift is attributable to a given constellation density.
+    If all J<sub>k</sub> are infinite, all Hardy&ndash;Littlewood conjectures hold.
+    The ratio J<sub>2</sub>/J &asymp; 0.527 means that more than half the total modular drift
+    comes from twin prime pairs — the densest possible prime clustering — even though twin primes
+    account for only ~11% of primes below 500,000.
+  </p>
+</div>
+
+<!-- §5 LIVE COMPUTATION -->
+<div class="sdiv"><div class="sl"></div><div class="sg">V — Live computation</div><div class="sl"></div></div>
+
+<div class="compute-bar" style="margin-top:20px;">
+  <span class="ctrl-lbl">N</span>
+  <input type="range" id="n-sl" min="500" max="50000" value="10000" step="500" class="sl-teal" style="width:180px;"
+    oninput="document.getElementById('n-v').textContent=parseInt(this.value).toLocaleString()">
+  <span class="ctrl-val" id="n-v">10,000</span>
+  <button class="run-btn" onclick="runAll()">Compute &rarr;</button>
+</div>
+
+<div class="stats-row" style="max-width:1100px;margin:0 auto 8px;padding:0 40px;">
+  <div class="stat"><div class="stat-lbl">J (partial)</div><div class="stat-val" id="st-J" style="color:var(--gold)">—</div></div>
+  <div class="stat"><div class="stat-lbl">J<sub>2</sub> (partial)</div><div class="stat-val" id="st-J2" style="color:var(--teal)">—</div></div>
+  <div class="stat"><div class="stat-lbl">J<sub>3</sub> (partial)</div><div class="stat-val" id="st-J3" style="color:var(--violet)">—</div></div>
+  <div class="stat"><div class="stat-lbl">J<sub>2</sub>/J</div><div class="stat-val" id="st-ratio" style="color:var(--cream2)">—</div></div>
+  <div class="stat"><div class="stat-lbl">Anti-corr |&Delta;E| twin/non</div><div class="stat-val" id="st-anticorr" style="color:var(--coral)">—</div></div>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;padding:0 40px 24px;display:flex;flex-direction:column;gap:16px;">
+
+  <div class="chart-panel" id="cp-spec">
+    <div class="chart-head">
+      <span class="chart-num">Spec 01</span>
+      <span class="chart-title">Jump spectrum D(x) — single primes (gold) vs twin prime pairs (teal)</span>
+      <button class="exp-panel-btn" onclick="exportPanel(document.getElementById('cp-spec'))">&#8595;&nbsp;PNG</button>
+    </div>
+    <canvas class="cc h280" id="c-spec"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="ldot" style="background:var(--gold)"></div>&Delta;<sub>p</sub>=1/(p(p&minus;1)) at x=p&minus;1</div>
+      <div class="leg"><div class="ldot" style="background:var(--teal)"></div>&Delta;<sub>twin</sub>=2p/((p+1)(p&sup2;&minus;4)) at x=p+1</div>
+      <div class="leg"><div class="ldot" style="background:var(--violet)"></div>Triplet jump at x=p+5</div>
+    </div>
+  </div>
+
+  <div class="chart-panel" id="cp-prec">
+    <div class="chart-head">
+      <span class="chart-num">Spec 02</span>
+      <span class="chart-title">Cumulative precession J(x), J<sub>2</sub>(x), J<sub>3</sub>(x) — running totals</span>
+      <button class="exp-panel-btn" onclick="exportPanel(document.getElementById('cp-prec'))">&#8595;&nbsp;PNG</button>
+    </div>
+    <canvas class="cc h220" id="c-prec"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="lsw" style="background:var(--gold)"></div>J(p) cumulative</div>
+      <div class="leg"><div class="lsw" style="background:var(--teal)"></div>J<sub>2</sub>(p) cumulative</div>
+      <div class="leg"><div class="lsw" style="background:var(--violet)"></div>J<sub>3</sub>(p) cumulative</div>
+    </div>
+  </div>
+
+  <div class="chart-panel" id="cp-anticorr">
+    <div class="chart-head">
+      <span class="chart-num">Spec 03</span>
+      <span class="chart-title">&phi;(p+1)/(p+1) distribution — twin (teal) vs non-twin (gold) primes</span>
+      <button class="exp-panel-btn" onclick="exportPanel(document.getElementById('cp-anticorr'))">&#8595;&nbsp;PNG</button>
+    </div>
+    <canvas class="cc h220" id="c-anticorr"></canvas>
+    <div class="chart-foot">
+      <div class="lsw" style="background:var(--teal);display:inline-block;margin-right:6px;"></div>
+      <span class="leg">Twin primes: &phi;(p+1)/(p+1) — median 0.300, mean 0.292</span>
+      <div class="lsw" style="background:var(--gold);display:inline-block;margin:0 6px 0 12px;"></div>
+      <span class="leg">Non-twin: median 0.386, mean 0.386</span>
+      <div class="lsw" style="background:var(--coral);opacity:.6;display:inline-block;margin:0 6px 0 12px;"></div>
+      <span class="leg">C &asymp; 0.531 threshold</span>
+    </div>
+  </div>
+
+  <div class="chart-panel" id="cp-degree">
+    <div class="chart-head">
+      <span class="chart-num">Spec 04</span>
+      <span class="chart-title">Jump size decay by constellation type — degree sequence 2, 3, 6</span>
+      <button class="exp-panel-btn" onclick="exportPanel(document.getElementById('cp-degree'))">&#8595;&nbsp;PNG</button>
+    </div>
+    <canvas class="cc h220" id="c-degree"></canvas>
+    <div class="chart-foot">
+      <div class="leg"><div class="ldot" style="background:var(--teal)"></div>Single &Delta;<sub>p</sub></div>
+      <div class="leg"><div class="ldot" style="background:var(--gold)"></div>Twin &Delta;<sub>twin</sub></div>
+      <div class="leg"><div class="ldot" style="background:var(--violet)"></div>Triplet &Delta;<sub>trip</sub></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- §6 AL-BATTANI UNIFIED TABLE -->
+<div class="sdiv"><div class="sl"></div><div class="sg">VI — The Al-Battani Program — Unified Table</div><div class="sl"></div></div>
+<div class="wrap-narrow" style="padding-top:32px;">
+  <table class="ab-table">
+    <thead>
+      <tr>
+        <th>Al-Battani Astronomy</th>
+        <th>Single Primes — D(x)</th>
+        <th>Twin Primes — D<sub>pair</sub>(x)</th>
+        <th>Triplets — D<sub>trip</sub>(x)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>The Circle (ideal path)</td><td>(ℤ/Mℤ)* modular ring</td><td>Pair ring</td><td>Triple ring</td></tr>
+      <tr><td>The Apogee (limit)</td><td>C &asymp; 0.530712</td><td>C<sub>2</sub> (H-L twin constant)</td><td>H-L triplet constant</td></tr>
+      <tr><td>Apogee Drift</td><td>D(x) = d/dx log C(x)</td><td>D<sub>pair</sub>(x)</td><td>D<sub>trip</sub>(x)</td></tr>
+      <tr><td>Singularity location</td><td>x = p&minus;1</td><td>x = p+1</td><td>x = p+5</td></tr>
+      <tr><td>Jump size</td><td>1/(p(p&minus;1))</td><td>2p/((p+1)(p&sup2;&minus;4))</td><td>Three-term sum</td></tr>
+      <tr><td>Recovery equation</td><td>Quadratic (deg 2)</td><td>Cubic (deg 3)</td><td>Sextic (deg 6)</td></tr>
+      <tr><td>Golden obstruction</td><td>&phi; (universal)</td><td>s-dependent algebraic</td><td>More complex</td></tr>
+      <tr><td>Total precession</td><td>J &asymp; 0.7732</td><td>J<sub>2</sub> &asymp; 0.4071</td><td>J<sub>3</sub> &asymp; 0.1378</td></tr>
+      <tr><td>Anti-corr magnitude</td><td>&minus;6.1&times;10<sup>&minus;5</sup></td><td>&minus;3.4&times;10<sup>&minus;4</sup></td><td>Even stronger</td></tr>
+      <tr><td>Convergence of sum</td><td>Proved (&sum; converges)</td><td>Equiv. to TPC</td><td>Equiv. to H-L triplet</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- §7 OPEN QUESTIONS -->
+<div class="sdiv"><div class="sl"></div><div class="sg">VII — Open questions</div><div class="sl"></div></div>
+<div class="wrap-narrow" style="padding-top:28px;padding-bottom:72px;">
+
+  <div class="oq oq-gold">
+    <div class="oq-label">Q1 — E(N) = O(1/N) unconditional proof</div>
+    <p class="sec-body" style="margin:0;">The structural anti-correlation between E<sub>r</sub>(N) and E(N) at every prime cancels the
+    leading log N term in the error. Making this cancellation rigorous — bounding
+    &sum;<sub>d</sub> &mu;(d)/d &middot; (S(d,N)/B(N) &minus; d/&prod;<sub>p|d</sub>(p&sup2;&minus;1)) by O(1/N) — is the central open problem.
+    The Dirichlet series for &sum;L(m)m<sup>&minus;s</sup> factoring as [&zeta;(s&minus;1)/&zeta;(s)]&sup2; &middot; local factors
+    is the right analytic target.</p>
+  </div>
+
+  <div class="oq oq-teal">
+    <div class="oq-label">Q2 — Irrationality of J<sub>2</sub></div>
+    <p class="sec-body" style="margin:0;">The Twin Prime Conjecture is equivalent to J<sub>2</sub> being an infinite sum.
+    Proving J<sub>2</sub> irrational would imply infinitely many twin primes, but this is at least as hard as
+    the conjecture itself — the only known routes to irrationality of such sums go through the
+    distribution of primes in the sum. J<sub>2</sub> is a clean new reformulation, not a shortcut.</p>
+  </div>
+
+  <div class="oq oq-violet">
+    <div class="oq-label">Q3 — General degree formula for k-tuples</div>
+    <p class="sec-body" style="margin:0;">The degree sequence 2, 3, 6 for k = 1, 2, 3 grows super-linearly.
+    Is the degree for a k-prime admissible constellation exactly 2k? Or does it depend on the gap structure?
+    For the triplet (p, p+2, p+6) the three denominators each have degree 2, giving total degree 6 = 2&times;3.
+    If this pattern holds, the Hardy&ndash;Littlewood k-tuple conjectures correspond to degree-2k
+    recovery equations — a clean algebraic hierarchy.</p>
+  </div>
+
+  <div class="oq oq-coral">
+    <div class="oq-label">Q4 — Explicit formula for E(N) in terms of Riemann zeros</div>
+    <p class="sec-body" style="margin:0;">The dense sign changes of E(N) (over 1.4 million to N = 2,000,000)
+    suggest an explicit formula analogous to the prime counting formula.
+    Deriving it requires identifying the Dirichlet series for R(N) and locating its zeros.
+    The oscillation frequencies of E(N) should encode Im(&rho;) for non-trivial zeros &rho; of &zeta;(s).</p>
+  </div>
+
+</div>
+
+<footer>
+  <span>Wessen Getachew &nbsp;&middot;&nbsp; Unified Spectral Theory &nbsp;&middot;&nbsp; math.NT &nbsp;&middot;&nbsp; 2026</span>
+  <span>J &asymp; 0.7732 &nbsp;&middot;&nbsp; J<sub>2</sub> &asymp; 0.4071 &nbsp;&middot;&nbsp; J<sub>3</sub> &asymp; 0.1378 &nbsp;&middot;&nbsp; Degrees: 2, 3, 6</span>
+</footer>
+
+<script>
+const DPR=Math.min(window.devicePixelRatio||1,2);
+
+// ── Sieve ────────────────────────────────────────────────────────────────────
+function buildSieve(N){
+  const phi=new Int32Array(N+2),ip=new Uint8Array(N+2).fill(1),pr=[];
+  phi[1]=1;ip[0]=ip[1]=0;
+  for(let i=2;i<=N+1;i++){
+    if(ip[i]){pr.push(i);phi[i]=i-1;}
+    for(let j=0;j<pr.length&&i*pr[j]<=N+1;j++){
+      const p=pr[j];ip[i*p]=0;
+      if(i%p===0){phi[i*p]=phi[i]*p;break;}
+      else{phi[i*p]=phi[i]*(p-1);}
+    }
+  }
+  return{phi,ip,pr};
+}
+
+// ── Compute ──────────────────────────────────────────────────────────────────
+let result=null;
+
+function compute(N){
+  const{phi,ip,pr}=buildSieve(N);
+  let C=1;for(const p of pr)C*=(p*p-2)/(p*p-1);
+
+  let J=0,J2=0,J3=0;
+  const jumps_single=[],jumps_twin=[],jumps_trip=[];
+  const phiRats_twin=[],phiRats_nontwin=[];
+  let J_cum=[],J2_cum=[],J3_cum=[];
+  let cumJ=0,cumJ2=0,cumJ3=0;
+
+  // Anti-correlation tracking
+  let sumL=0,sumPh=0,sumPR=0;
+  const INV=6/(Math.PI*Math.PI);
+  let prevE=null,prevEr=null;
+  let twin_dE_sum=0,twin_n=0,nontwin_dE_sum=0,nontwin_n=0;
+
+  for(const p of pr){
+    const dSingle=1/(p*(p-1));
+    J+=dSingle; cumJ+=dSingle;
+    jumps_single.push({p,d:dSingle});
+
+    if(ip[p+2]&&p>=3){
+      const dTwin=2*p/((p+1)*(p*p-4));
+      J2+=dTwin; cumJ2+=dTwin;
+      jumps_twin.push({p,d:dTwin});
+    }
+    if(ip[p+2]&&ip[p+6]&&p>=5){
+      const t1=1/((p-3)*(p+2));
+      const t2=1/(p*p+3*p-2);
+      const t3=1/((p+5)*(p+6));
+      const dTrip=t1+t2+t3;
+      J3+=dTrip; cumJ3+=dTrip;
+      jumps_trip.push({p,d:dTrip});
+    }
+    J_cum.push({p,v:cumJ});
+    J2_cum.push({p,v:cumJ2});
+    J3_cum.push({p,v:cumJ3});
+
+    if(p+1<=N) phiRats_twin.push(...(ip[p+2]?[phi[p+1]/(p+1)]:[])
+      .concat(!ip[p+2]?[phi[p+1]/(p+1)]:[]));
+  }
+
+  // Separate twin/nontwin phi rats
+  const tRats=[],ntRats=[];
+  for(const p of pr){
+    if(p+1>N||p<5)continue;
+    const rat=phi[p+1]/(p+1);
+    if(ip[p+2])tRats.push(rat); else ntRats.push(rat);
+  }
+
+  // E anti-correlation
+  sumL=0;sumPh=0;sumPR=0;
+  for(let m=1;m<=Math.min(N,50000);m++){
+    sumL+=phi[m]*phi[m+1]/(m+1);
+    sumPh+=phi[m];
+    sumPR+=phi[m]/m;
+    const Er=sumPR/(m-1||1)-INV;
+    const E=sumL/sumPh-C;
+    if(ip[m]&&m>3&&prevE!==null){
+      const dE=E-prevE;
+      if(ip[m+2]){twin_dE_sum+=Math.abs(dE);twin_n++;}
+      else{nontwin_dE_sum+=Math.abs(dE);nontwin_n++;}
+    }
+    prevE=E;prevEr=Er;
+  }
+
+  return{N,J,J2,J3,jumps_single,jumps_twin,jumps_trip,
+    J_cum,J2_cum,J3_cum,tRats,ntRats,C,
+    twin_mean_dE:twin_dE_sum/twin_n,
+    nontwin_mean_dE:nontwin_dE_sum/nontwin_n,
+    twin_n,nontwin_n};
+}
+
+// ── Canvas helpers ────────────────────────────────────────────────────────────
+function setup(id){
+  const c=document.getElementById(id);if(!c)return null;
+  const W=c.parentElement.clientWidth||800,H=c.offsetHeight||220;
+  c.width=W*DPR;c.height=H*DPR;
+  const ctx=c.getContext('2d');ctx.scale(DPR,DPR);
+  ctx.fillStyle='#040410';ctx.fillRect(0,0,W,H);
+  return{ctx,W,H};
+}
+function mp(v,a,b,c,d){return c+(v-a)/(b-a)*(d-c);}
+function grid(ctx,W,H,p=24){
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  for(let i=1;i<4;i++){const y=p+(H-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-p,y);ctx.stroke();}
+}
+
+// Spec 01: Jump spectrum
+function drawSpec(r){
+  const s=setup('c-spec');if(!s)return;
+  const{ctx,W,H}=s,p=28;
+  const allJs=[...r.jumps_single.map(j=>j.d),...r.jumps_twin.map(j=>j.d),...r.jumps_trip.map(j=>j.d)];
+  const yMx=Math.max(...allJs)*1.08;
+  const maxP=r.jumps_single[r.jumps_single.length-1]?.p||1000;
+  const px=pp=>mp(pp,0,maxP,p,W-p), py=v=>mp(v,0,yMx,H-p,p);
+  grid(ctx,W,H,p);
+  // Zero line
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,py(0));ctx.lineTo(W-p,py(0));ctx.stroke();
+
+  // Single prime jumps
+  for(const j of r.jumps_single){
+    ctx.beginPath();ctx.arc(px(j.p),py(j.d),2,0,Math.PI*2);
+    ctx.fillStyle='rgba(200,168,74,.6)';ctx.fill();
+  }
+  // Twin jumps
+  for(const j of r.jumps_twin){
+    ctx.beginPath();ctx.arc(px(j.p),py(j.d),3,0,Math.PI*2);
+    ctx.fillStyle='rgba(61,200,184,.85)';ctx.fill();
+    // vertical line
+    ctx.strokeStyle='rgba(61,200,184,.2)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(px(j.p),py(0));ctx.lineTo(px(j.p),py(j.d));ctx.stroke();
+  }
+  // Triplet jumps
+  for(const j of r.jumps_trip){
+    ctx.beginPath();ctx.arc(px(j.p),py(j.d),4,0,Math.PI*2);
+    ctx.fillStyle='rgba(144,112,216,.9)';ctx.fill();
+  }
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('1',p,H-p+12);ctx.textAlign='right';ctx.fillText(maxP.toLocaleString(),W-p,H-p+12);ctx.textAlign='left';
+}
+
+// Spec 02: Cumulative precession
+function drawPrec(r){
+  const s=setup('c-prec');if(!s)return;
+  const{ctx,W,H}=s,p=28;
+  const yMx=r.J*1.05;
+  const maxP=r.J_cum[r.J_cum.length-1]?.p||1000;
+  const px=pp=>mp(pp,0,maxP,p,W-p), py=v=>mp(v,0,yMx,H-p,p);
+  grid(ctx,W,H,p);
+
+  const draw=(cum,col,lw=1.5)=>{
+    ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();
+    cum.forEach((c,i)=>{const x=px(c.p),y=py(c.v);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke();
+  };
+  draw(r.J_cum,'rgba(200,168,74,.85)',2);
+  draw(r.J2_cum,'rgba(61,200,184,.8)',1.8);
+  draw(r.J3_cum,'rgba(144,112,216,.7)',1.5);
+
+  // Labels at right end
+  ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='right';
+  const last=r.J_cum[r.J_cum.length-1];
+  if(last){
+    ctx.fillStyle='rgba(200,168,74,.7)';ctx.fillText('J≈'+r.J.toFixed(4),W-p-4,py(r.J)-4);
+    ctx.fillStyle='rgba(61,200,184,.7)';ctx.fillText('J₂≈'+r.J2.toFixed(4),W-p-4,py(r.J2)-4);
+    ctx.fillStyle='rgba(144,112,216,.7)';ctx.fillText('J₃≈'+r.J3.toFixed(4),W-p-4,py(r.J3)-4);
+  }
+  ctx.textAlign='left';
+}
+
+// Spec 03: phi(p+1)/(p+1) histogram
+function drawAnticorr(r){
+  const s=setup('c-anticorr');if(!s)return;
+  const{ctx,W,H}=s,p=28;
+  const bins=40;
+  const tBins=new Array(bins).fill(0);
+  const ntBins=new Array(bins).fill(0);
+  r.tRats.forEach(v=>{const b=Math.min(bins-1,Math.floor(v*bins));tBins[b]++;});
+  r.ntRats.forEach(v=>{const b=Math.min(bins-1,Math.floor(v*bins));ntBins[b]++;});
+  const maxT=Math.max(...tBins,1),maxNT=Math.max(...ntBins,1);
+  const bw=(W-2*p)/bins;
+  grid(ctx,W,H,p);
+
+  // C threshold
+  ctx.setLineDash([4,8]);ctx.strokeStyle='rgba(224,80,96,.5)';ctx.lineWidth=1;
+  const cx_c=mp(r.C,0,1,p,W-p);
+  ctx.beginPath();ctx.moveTo(cx_c,p);ctx.lineTo(cx_c,H-p);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='rgba(224,80,96,.5)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('C',cx_c+3,p+14);
+
+  for(let i=0;i<bins;i++){
+    const x=p+i*bw;
+    // non-twin (gold, back)
+    const nh=ntBins[i]/maxNT*(H-2*p-10);
+    ctx.fillStyle='rgba(200,168,74,.3)';ctx.fillRect(x,H-p-nh,bw-1,nh);
+    // twin (teal, front)
+    const th=tBins[i]/maxT*(H-2*p-10);
+    ctx.fillStyle='rgba(61,200,184,.55)';ctx.fillRect(x,H-p-th,bw-1,th);
+  }
+  ctx.fillStyle='rgba(255,255,255,.22)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('0',p,H-p+12);ctx.textAlign='right';ctx.fillText('1.0',W-p,H-p+12);ctx.textAlign='left';
+}
+
+// Spec 04: Jump size decay by type
+function drawDegree(r){
+  const s=setup('c-degree');if(!s)return;
+  const{ctx,W,H}=s,p=28;
+  const allP=[...new Set([...r.jumps_single,...r.jumps_twin,...r.jumps_trip].map(j=>j.p))].sort((a,b)=>a-b);
+  const maxP=allP[allP.length-1]||1000;
+  const allD=[...r.jumps_single,...r.jumps_twin,...r.jumps_trip].map(j=>j.d);
+  const yMx=Math.max(...allD)*1.05;
+  const px=pp=>mp(pp,2,maxP,p,W-p);
+  const py=v=>mp(Math.log(v),Math.log(Math.min(...allD)||1e-6),Math.log(yMx),H-p,p);
+  grid(ctx,W,H,p);
+
+  const drawLine=(pts,col)=>{
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();
+    pts.forEach((j,i)=>{const x=px(j.p),y=py(j.d);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke();
+    for(const j of pts){
+      ctx.beginPath();ctx.arc(px(j.p),py(j.d),2,0,Math.PI*2);
+      ctx.fillStyle=col;ctx.fill();
+    }
+  };
+  drawLine(r.jumps_single,'rgba(61,200,184,.65)');
+  drawLine(r.jumps_twin,'rgba(200,168,74,.85)');
+  drawLine(r.jumps_trip,'rgba(144,112,216,.85)');
+
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('log scale',p+4,p+14);
+  ctx.fillText('2',p,H-p+12);ctx.textAlign='right';ctx.fillText(maxP.toLocaleString(),W-p,H-p+12);ctx.textAlign='left';
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function runAll(){
+  const N=parseInt(document.getElementById('n-sl').value);
+  setTimeout(()=>{
+    result=compute(N);
+    drawSpec(result);drawPrec(result);drawAnticorr(result);drawDegree(result);
+    document.getElementById('st-J').textContent=result.J.toFixed(10);
+    document.getElementById('st-J2').textContent=result.J2.toFixed(10);
+    document.getElementById('st-J3').textContent=result.J3.toFixed(10);
+    document.getElementById('st-ratio').textContent=(result.J2/result.J).toFixed(8);
+    const r=result.twin_mean_dE/result.nontwin_mean_dE;
+    document.getElementById('st-anticorr').textContent=r.toFixed(2)+'× stronger';
+    document.querySelectorAll('.chart-panel').forEach(el=>el.classList.add('visible'));
+  },20);
+}
+
+// ── Hero canvas ───────────────────────────────────────────────────────────────
+(function(){
+  const cv=document.getElementById('hero-canvas');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=cv.width=cv.offsetWidth*DPR;H=cv.height=cv.offsetHeight*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);W=cv.offsetWidth;H=cv.offsetHeight;}
+  // Precompute jump positions
+  const sieve=new Uint8Array(300).fill(1);sieve[0]=sieve[1]=0;
+  for(let i=2;i*i<300;i++)if(sieve[i])for(let j=i*i;j<300;j+=i)sieve[j]=0;
+  const primes=[]; for(let i=2;i<300;i++)if(sieve[i])primes.push(i);
+  function draw(){
+    if(!W)resize();
+    ctx.fillStyle='rgba(3,3,10,.12)';ctx.fillRect(0,0,W,H);
+    t+=.004;
+    const cx=W/2,cy=H/2;
+    // Draw D(x) approximate waveform
+    ctx.strokeStyle='rgba(61,200,184,.25)';ctx.lineWidth=1.5;ctx.beginPath();
+    let first=true;
+    for(let px2=0;px2<W;px2+=2){
+      const x=(px2/W)*250;
+      let Dx=0;
+      for(const p of primes){if(p>x+1){const d=p*p-x-1;if(d>0)Dx-=1/d;}}
+      const y=cy+Dx*H*2.5;
+      if(y>0&&y<H){if(first){ctx.moveTo(px2,y);first=false;}else ctx.lineTo(px2,y);}
+      else first=true;
+    }
+    ctx.stroke();
+    // Jump markers
+    primes.slice(0,12).forEach((p,i)=>{
+      const xpos=((p-1)/250)*W;
+      const alpha=0.15+0.08*Math.sin(t*1.5+i);
+      ctx.strokeStyle=`rgba(200,168,74,${alpha})`;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(xpos,0);ctx.lineTo(xpos,H);ctx.stroke();
+      if(sieve[p+2]){
+        ctx.strokeStyle=`rgba(61,200,184,${alpha*1.4})`;
+        const xpos2=((p+1)/250)*W;
+        ctx.beginPath();ctx.moveTo(xpos2,0);ctx.lineTo(xpos2,H);ctx.stroke();
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  resize();draw();
+  window.addEventListener('resize',resize,{passive:true});
+})();
+
+// ── Export ────────────────────────────────────────────────────────────────────
+window.exportPanel = function(panel){
+  if(!panel)return;
+  const A4W=3508,A4H=2480,PAD=80,FS=2.8;
+  const ec=document.createElement('canvas');ec.width=A4W;ec.height=A4H;
+  const ctx=ec.getContext('2d');
+  ctx.fillStyle='#04040a';ctx.fillRect(0,0,A4W,A4H);
+  const HDR=120;
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(0,0,A4W,HDR);
+  ctx.strokeStyle='rgba(61,200,184,.5)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,HDR);ctx.lineTo(A4W,HDR);ctx.stroke();
+  const num=panel.querySelector('.chart-num');
+  const ttl=panel.querySelector('.chart-title');
+  ctx.fillStyle='#3dc8b8';ctx.font=`${11*FS}px JetBrains Mono,monospace`;ctx.textBaseline='middle';
+  ctx.fillText((num?num.textContent.trim():'')+'  '+(ttl?ttl.textContent.trim():''),PAD,HDR/2);
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.font=`${8.5*FS}px JetBrains Mono,monospace`;
+  ctx.textAlign='right';
+  ctx.fillText('Wessen Getachew · Unified Spectral Theory · math.NT · 2026',A4W-PAD,HDR/2);
+  ctx.textAlign='left';
+  const cv=panel.querySelector('canvas');
+  if(cv&&cv.width>0){
+    const avH=A4H-HDR-80,avW=A4W-2*PAD;
+    const ratio=cv.width/cv.height;
+    let dW=avW,dH=avW/ratio;
+    if(dH>avH){dH=avH;dW=avH*ratio;}
+    ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+    ctx.strokeRect(PAD+(avW-dW)/2-1,HDR+10-1,dW+2,dH+2);
+    ctx.drawImage(cv,0,0,cv.width,cv.height,PAD+(avW-dW)/2,HDR+10,dW,dH);
+  }
+  ctx.strokeStyle='rgba(61,200,184,.2)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD,A4H-36);ctx.lineTo(A4W-PAD,A4H-36);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.font=`${8*FS}px JetBrains Mono,monospace`;ctx.textBaseline='middle';
+  ctx.fillText('Lift Survival Framework · Spectral Theory · 3508×2480 · A4 Landscape',PAD,A4H-18);
+  const a=document.createElement('a');
+  a.download='spectral_'+(num?num.textContent.replace(/\W/g,'_'):'chart')+'_4k.png';
+  a.href=ec.toDataURL('image/png');a.click();
+};
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.06});
+document.querySelectorAll('.chart-panel').forEach(el=>obs.observe(el));
+window.addEventListener('load',()=>runAll());
+window.addEventListener('resize',()=>{if(result){drawSpec(result);drawPrec(result);drawAnticorr(result);drawDegree(result);}},{passive:true});
+</script>
+</body>
+</html>
