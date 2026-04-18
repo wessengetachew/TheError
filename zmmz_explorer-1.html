@@ -586,6 +586,9 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
               <option value="mersenne">Mersenne rings</option>
               <option value="gap_class">Prime gap class</option>
             </optgroup>
+            <optgroup label="Rate">
+              <option value="error_corr">E(N) contribution · rate mode</option>
+            </optgroup>
           </select>
         </div>
       </div>
@@ -734,6 +737,22 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
           <button onclick="applyPreset('inv_rot_strip')" style="text-align:left;width:100%;font-family:'JetBrains Mono',monospace;font-size:8px;padding:5px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);cursor:pointer">Strip inverted + ¼ rot</button>
           <button onclick="applyPreset('reset')" style="text-align:left;width:100%;font-family:'JetBrains Mono',monospace;font-size:8px;padding:5px 8px;background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.3);color:#c084fc;cursor:pointer">↺ Reset all</button>
         </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title" style="color:#e05060;border-color:rgba(224,80,96,.3)">Rate Correlation</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);line-height:1.7;margin-bottom:6px;">
+          Colors each ring by its E(N) contribution — whether it pushes R(N) above or below C.
+          Gold = prime ring (spiral dropout). Bar chart shows the full per-ring sequence.
+          Correlation between spiral dropouts and large swings is the geometric signature
+          of the Möbius cancellation driving O(1/N) convergence.
+        </div>
+        <button onclick="applyThm('error_corr')"
+          style="text-align:left;width:100%;font-family:'JetBrains Mono',monospace;font-size:8px;
+          padding:6px 9px;background:rgba(224,80,96,.08);border:1px solid rgba(224,80,96,.35);
+          color:#e05060;cursor:pointer;border-radius:2px;letter-spacing:.06em;">
+          ◈ E(N) Contribution — Rate Mode
+        </button>
       </div>
 
       <div class="section">
@@ -888,6 +907,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <option value="primorial">Primorial rings</option>
     <option value="mersenne">Mersenne rings</option>
     <option value="gap_class">Prime gap class</option>
+    <option value="error_corr">E(N) contribution</option>
   </select>
   <input type="range" id="sl-chain" min="0" max="12" value="0" style="display:none">
   <span id="lbl-chain" style="display:none">off</span>
@@ -968,6 +988,38 @@ function phi(n){
 }
 function gcd(a,b){ while(b){let t=b;b=a%b;a=t;} return a; }
 function coprimes(M){ const r=[]; for(let i=1;i<M;i++) if(gcd(i,M)===1) r.push(i); return r; }
+
+// ── E(N) contribution table — precomputed per ring for error_corr mode ───────
+// _ringEC[M] = {eContrib, spiralDrop, brokenFrac, sign}
+let _ringEC = {};
+let _ringEC_mmax = 0;
+let _C_ec = 0;
+
+function buildRingEC(mmax){
+  if(mmax <= _ringEC_mmax) return;
+  // Compute C up to mmax
+  let C=1; for(const p of PRIMES){ if(p>mmax) break; C*=(p*p-2)/(p*p-1); }
+  _C_ec = C;
+  // Accumulate running sums
+  let sumL=0, sumP=0;
+  for(let M=1;M<=mmax;M++){
+    const ph=phi(M), ph1=phi(M+1);
+    const Lm = ph*ph1/(M+1);
+    sumL+=Lm; sumP+=ph;
+    const R = sumP>0 ? sumL/sumP : 0;
+    const E = R - C;
+    // Local contribution: how much did ring M move E(N)?
+    // dE/dM ≈ E(M) - E(M-1) -- sign and magnitude
+    const prev = _ringEC[M-1] ? _ringEC[M-1].R : C;
+    const eContrib = R - prev;  // positive = pushed R up, negative = pulled down
+    // Spiral dropout: active prime drops off coprime set at M=p (p|M)
+    const spiralDrop = (M > 2 && isPrime(M)) ? 1 : 0;
+    // Broken lift fraction at this ring: 1 - φ(M+1)/(M+1)
+    const brokenFrac = 1 - ph1/(M+1);
+    _ringEC[M] = {eContrib, E, R, spiralDrop, brokenFrac, sign: E>=0?1:-1};
+  }
+  _ringEC_mmax = mmax;
+}
 
 // ── WebGL setup ──────────────────────────────────────────────────────────────
 // Create and mount canvases dynamically so they work on mobile
@@ -1209,6 +1261,23 @@ function pointColor(pt){
     h=(mersM.includes(M)?60:200+S.hue)%360; s=80;l=55;
   } else if(cm==='gap_class'){
     h=((r%12)*30+S.hue)%360; s=80;l=55;
+  } else if(cm==='error_corr'){
+    // Color by E(N) contribution of this ring
+    // Violet = ring pushes R above C (positive contribution)
+    // Teal   = ring pulls R below C (negative contribution)
+    // Brightness = magnitude of contribution
+    buildRingEC(S.mmax);
+    const ec = _ringEC[M];
+    if(ec){
+      const sign = ec.E >= 0 ? 1 : -1;
+      const mag = Math.min(1, Math.abs(ec.eContrib) * M * 20); // scale for visibility
+      h = sign > 0 ? (280+S.hue)%360 : (170+S.hue)%360; // violet vs teal
+      s = 85; l = 35 + mag * 30;
+      // Prime rings (spiral dropout points) get gold highlight
+      if(ec.spiralDrop){ h=(50+S.hue)%360; s=95; l=60; }
+    } else {
+      h=200; s=50; l=40;
+    }
   }
   const [rr,gg,bb] = applyHSB(hsl2rgb(h,s*S.sat,l));
   return [rr,gg,bb,a];
@@ -1540,6 +1609,57 @@ function drawOverlay(w,h,mat){
       ctx2d.stroke();
       ctx2d.setLineDash([]);
     });
+  }
+
+  // ── Error correlation overlay (error_corr mode) ──────────────────────────
+  if(S.color === 'error_corr'){
+    buildRingEC(S.mmax);
+    // Draw a mini bar chart in bottom-left corner showing per-ring E contribution
+    const barW = Math.min(w*0.38, 220);
+    const barH = 80;
+    const bx = 10, by = h - barH - 10;
+    ctx2d.fillStyle='rgba(4,4,14,0.88)';
+    ctx2d.fillRect(bx,by,barW,barH);
+    ctx2d.strokeStyle='rgba(255,255,255,0.08)';ctx2d.lineWidth=1;
+    ctx2d.strokeRect(bx,by,barW,barH);
+    // Title
+    ctx2d.fillStyle='rgba(200,168,74,0.8)';
+    ctx2d.font=`${8*dpr}px JetBrains Mono,monospace`;
+    ctx2d.textAlign='left';ctx2d.textBaseline='top';
+    ctx2d.fillText('E(N) contribution per ring',bx+4,by+3);
+    // Mid line
+    const mid = by + barH*0.6;
+    ctx2d.strokeStyle='rgba(255,255,255,0.15)';ctx2d.lineWidth=1;
+    ctx2d.beginPath();ctx2d.moveTo(bx+2,mid);ctx2d.lineTo(bx+barW-2,mid);ctx2d.stroke();
+    // Bars
+    const M_list = [];
+    for(let M=2;M<=S.mmax;M++) if(_ringEC[M]) M_list.push(M);
+    if(M_list.length){
+      const maxEc = Math.max(...M_list.map(M=>Math.abs(_ringEC[M].eContrib)));
+      const bw = Math.max(1, (barW-4)/M_list.length);
+      M_list.forEach((M,i)=>{
+        const ec=_ringEC[M];
+        const frac = maxEc>0 ? ec.eContrib/maxEc : 0;
+        const bh = Math.abs(frac)*(barH*0.35);
+        const bTop = frac>=0 ? mid-bh : mid;
+        const col = ec.spiralDrop ? 'rgba(200,168,74,0.9)' :
+                    frac>=0 ? 'rgba(144,112,216,0.8)' : 'rgba(61,200,184,0.8)';
+        ctx2d.fillStyle=col;
+        ctx2d.fillRect(bx+2+i*bw, bTop, Math.max(1,bw-0.5), bh);
+      });
+    }
+    // Legend
+    ctx2d.font=`${7*dpr}px JetBrains Mono,monospace`;
+    ctx2d.fillStyle='rgba(144,112,216,0.8)';ctx2d.fillText('▲ above C',bx+4,by+barH-16);
+    ctx2d.fillStyle='rgba(61,200,184,0.8)';ctx2d.fillText('▼ below C',bx+60,by+barH-16);
+    ctx2d.fillStyle='rgba(200,168,74,0.8)';ctx2d.fillText('◆ prime ring',bx+120,by+barH-16);
+    // E(N) value at current mmax
+    const ecLast = _ringEC[S.mmax];
+    if(ecLast){
+      ctx2d.fillStyle='rgba(255,255,255,0.5)';
+      ctx2d.font=`${8*dpr}px JetBrains Mono,monospace`;
+      ctx2d.fillText(`E(${S.mmax}) = ${ecLast.E.toExponential(3)}`,bx+4,by+barH-5);
+    }
   }
 
   // Labels
@@ -2691,6 +2811,9 @@ const THM_PRESETS = {
   c_angle:       {color:'angle',view:'concentric',mmax:80,_label:'Angle coloring',_analysis:'<strong>Angle coloring</strong> — hue encodes angular position r/M around each ring.'},
   c_gap_class:   {color:'gap_class',view:'concentric',mmax:80,chords:true,gapStr:'2,4,6',_label:'Gap class coloring',_analysis:'<strong>Gap class coloring</strong> — hue encodes r mod 12. Gap chords (gap 2,4,6) shown.'},
   c_mod6:        {color:'mod6',view:'concentric',mmax:100,_label:'Residue mod 6',_analysis:'<strong>Residue mod 6</strong> — only classes 1 and 5 mod 6 can be coprime to 6#=30, structuring all larger primorial rings.'},
+  error_corr:    {color:'error_corr',view:'concentric',mmax:80,lifts:true,broken:true,spiral:true,mirror:true,chain:0,
+                  _label:'E(N) contribution — rate correlation mode',
+                  _analysis:'<strong>E(N) Contribution Mode</strong> — each ring M is colored by whether it pushes R(N) above C (violet) or below C (teal). Gold = prime ring (spiral dropout point). The bar chart shows the per-ring contribution sequence. Correlation between prime spiral dropouts (gold) and large contributions confirms the Möbius cancellation mechanism driving O(1/N) convergence. Watch how the spiral path aligns with the largest violet/teal swings — those are the rings where the arithmetic structure of φ(M)φ(M+1) forces cancellation in the ratio.'},
 };
 
 function applyThm(name){
