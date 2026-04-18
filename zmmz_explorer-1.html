@@ -668,9 +668,9 @@ body.op-active{overflow:hidden;}
     <div class="tab active"><span class="tab-dot"></span>Geometric Canvas</div>
     <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&zeta;(2) Explorer</a>
     <a href="gcd_explorer.html" class="tab"><span class="tab-dot"></span>GCD Explorer</a>
-    <a href="lift_paper.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
+    <a href="lift_paper-48.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
     <a href="k_explorer.html" class="tab"><span class="tab-dot"></span>K Constant</a>
-    <a href="spectral_theory.html" class="tab"><span class="tab-dot"></span>Spectral Theory</a>
+    <a href="spectral_theory-1.html" class="tab"><span class="tab-dot"></span>Spectral Theory</a>
   </div>
   <span class="nav-right">(ℤ/Mℤ)* &nbsp;&middot;&nbsp; Lift Geometry</span>
 </nav>
@@ -3610,25 +3610,62 @@ document.querySelector('.nav-right').parentNode.insertBefore(_indexBadge, docume
 function applyIndexCmd(cmd) {
   if(!cmd || !cmd.M) return;
   _indexCmd = cmd;
-  const M = Math.max(2, Math.min(cmd.M, 512));
-  const newMmax = Math.min(Math.max(S.mmax, M + 15), 512);
-  setState({
-    mmax: newMmax,
-    color: cmd.color || 'prime_ring',
-    view: cmd.view || 'concentric',
-    lifts: cmd.lifts !== undefined ? cmd.lifts : true,
-    liftScanActive: false,
-  });
-  // Highlight the target ring as the prime ring
-  S.prime = M;
-  S.pidx = PRIMES.indexOf(M) + 1;
+  const M = Math.max(2, Math.min(cmd.M, 2000));
+
+  // Mode: rings array (context view p-2..p+2) or full view (p<=512)
+  if(cmd.rings && Array.isArray(cmd.rings) && cmd.rings.length > 1) {
+    // Context view: set specific rings as active modular rings in the opener canvas
+    const validRings = cmd.rings.filter(m => m >= 2 && m <= 2000);
+    if(validRings.length > 0 && window._opRings && window._opAnimLift) {
+      // Replace active rings with the specified set
+      const DIRS = [1,-1,1,-1,1,-1,1,-1,1,-1];
+      const bgScale = window._opBgScale || 1;
+      window._opRings.length = 0;
+      validRings.forEach((m, i) => {
+        const rf = 0.10 + (0.44 - 0.10) * (i / Math.max(validRings.length - 1, 1));
+        const liftFrom = (m / 130) * 0.46 * bgScale;
+        const ring = {
+          mod: m, rf, speed: 0,
+          dir: DIRS[i % 2],
+          pts: (window._opMakePts || function(n){const g=(a,b)=>{while(b){const x=b;b=a%b;a=x;}return a;};const p=[];for(let r=0;r<n;r++)p.push({r,cop:g(r||n,n)===1});return p;})(m),
+          liftProgress: 0, liftFrom, _anchor: 0
+        };
+        window._opRings.push(ring);
+        window._opAnimLift(ring);
+      });
+      if(typeof _autoSpaceRings === 'function') _autoSpaceRings();
+      if(typeof _rebuildRingButtons === 'function') _rebuildRingButtons();
+      if(typeof _updateCornerLabel === 'function') _updateCornerLabel();
+    }
+    // Also update bg max to show context
+    window._opBgMod = Math.min(M + 5, 512);
+    setState({
+      color: cmd.color || 'prime_ring',
+      view: cmd.view || 'concentric',
+      lifts: true, liftScanActive: false,
+    });
+  } else {
+    // Full view: p <= 512
+    const Mclamped = Math.min(M, 512);
+    const newMmax = Math.min(Math.max(S.mmax, Mclamped + 15), 512);
+    setState({
+      mmax: newMmax,
+      color: cmd.color || 'prime_ring',
+      view: cmd.view || 'concentric',
+      lifts: cmd.lifts !== undefined ? cmd.lifts : true,
+      liftScanActive: false,
+    });
+  }
+
+  S.prime = Math.min(M, 512);
+  S.pidx = PRIMES.indexOf(S.prime) + 1;
   S.npath = false;
   S.spiral = false;
   _copCache = {};
   rebuildPrimeSelect();
   autoFitZoom();
   _indexBadge.style.display = 'inline-block';
-  _indexBadge.textContent = '\u25c8 Prime p=' + M;
+  _indexBadge.textContent = (cmd.label ? cmd.label : '\u25c8 Prime p=' + M);
   dirty = true;
 }
 
@@ -4469,4 +4506,4 @@ function enterSite(){
 </body>
 </html>
 
-      </html>
+  </html>
