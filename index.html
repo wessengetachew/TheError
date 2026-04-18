@@ -741,9 +741,10 @@ footer {
     <a href="zmmz_explorer-1.html" class="tab"><span class="tab-dot"></span>Geometric Canvas</a>
     <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>&zeta;(2) Explorer</a>
     <a href="gcd_explorer.html" class="tab"><span class="tab-dot"></span>GCD Explorer</a>
-    <a href="lift_paper.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
+    <a href="lift_paper-48.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
     <a href="k_explorer.html" class="tab"><span class="tab-dot"></span>K Constant</a>
-    <a href="spectral_theory.html" class="tab"><span class="tab-dot"></span>Spectral Theory</a>
+    <a href="spectral_theory-1.html" class="tab"><span class="tab-dot"></span>Spectral Theory</a>
+    <a href="javascript:void(0)" class="tab" onclick="(function(){var s=document.getElementById('pk-section');s.style.display='block';var d=document.getElementById('pk-drawer');d.open=true;setTimeout(function(){s.scrollIntoView({behavior:'smooth'});},80);})()"><span class="tab-dot" style="background:#9070d8"></span>p^k Sublattice</a>
   </div>
   <span class="nav-right">C &asymp; 0.530711806246</span>
 </nav>
@@ -780,7 +781,7 @@ footer {
       <a href="#what" class="cta cta-ghost">Learn the Mathematics</a>
       <a href="zmmz_explorer-1.html" class="cta" id="cta-mobile-hide" style="border:1px solid rgba(224,80,96,.45);color:#e05060;background:rgba(224,80,96,.08);">Geometric Canvas ◈</a>
       <a href="#checker" class="cta" id="cta-mobile-hide2" style="border:1px solid rgba(200,168,74,.4);color:rgba(200,168,74,.85);background:rgba(200,168,74,.07);">Prime Checker ↓</a>
-      <button onclick="document.getElementById('prime-light-section').scrollIntoView({behavior:'smooth'})" class="cta" style="border:1px solid rgba(144,112,216,.45);color:rgba(144,112,216,.85);background:rgba(144,112,216,.08);">&#9672; Prime Light Wave</button>
+      <button onclick="(function(){var s=document.getElementById('prime-light-section');if(s.style.display==='none'||s.style.display==='')togglePrimeLight();setTimeout(function(){s.scrollIntoView({behavior:'smooth'});},150);})()" class="cta" style="border:1px solid rgba(144,112,216,.45);color:rgba(144,112,216,.85);background:rgba(144,112,216,.08);">&#9672; Prime Light Wave</button>
     </div>
   </div>
 
@@ -789,6 +790,63 @@ footer {
     <div class="scroll-line"></div>
   </div>
 </section>
+
+
+<!-- ═══════════ ALL PAGES NAV ═══════════ -->
+<div class="section-divider">
+  <div class="div-line"></div>
+  <div class="div-glyph">All Pages</div>
+  <div class="div-line"></div>
+</div>
+<div style="max-width:1100px;margin:0 auto;padding:16px 40px 32px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+    <a href="index.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(200,168,74,.25);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(200,168,74,.6)'" onmouseout="this.style.borderColor='rgba(200,168,74,.25)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);">01</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">Opener</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">Hero · Prime Light Wave · Jump Checker · Benchmark</span>
+    </a>
+    <a href="EN_explorer-1-2.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(61,200,184,.2);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(61,200,184,.5)'" onmouseout="this.style.borderColor='rgba(61,200,184,.2)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);">02</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">Explorer</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">9 charts · E(N) convergence · OLS slope · Animation</span>
+    </a>
+    <a href="EN_explorer-updated.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(61,200,184,.2);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(61,200,184,.5)'" onmouseout="this.style.borderColor='rgba(61,200,184,.2)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);">03</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">Deep Analysis</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">Friction · Ghost residues · Sign changes · Parity · Jump</span>
+    </a>
+    <a href="zmmz_explorer-1.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(224,80,96,.2);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(224,80,96,.5)'" onmouseout="this.style.borderColor='rgba(224,80,96,.2)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--coral);">04</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">Geometric Canvas</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">Modular ring animation · Lift lines · WebGL opener</span>
+    </a>
+    <a href="zeta_explorer.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(144,112,216,.2);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(144,112,216,.5)'" onmouseout="this.style.borderColor='rgba(144,112,216,.2)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--violet);">05</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">&zeta;(2) Explorer</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">Coprime density · 6/&pi;&sup2; convergence · 7 charts</span>
+    </a>
+    <a href="gcd_explorer.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(144,112,216,.2);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(144,112,216,.5)'" onmouseout="this.style.borderColor='rgba(144,112,216,.2)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--violet);">06</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">GCD Explorer</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">gcd(r,M) structure · Mertens · Anti-correlation · 8 charts</span>
+    </a>
+    <a href="lift_paper-48.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(200,168,74,.25);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(200,168,74,.6)'" onmouseout="this.style.borderColor='rgba(200,168,74,.25)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);">07</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">Lift Paper</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">F(u) · C(x) · Explorer · Projects gallery</span>
+    </a>
+    <a href="k_explorer.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(200,168,74,.25);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(200,168,74,.6)'" onmouseout="this.style.borderColor='rgba(200,168,74,.25)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);">08</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">K Constant</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">sup|E(N)&middot;N| &asymp; &zeta;(2)&middot;C · Safe prime structure · 5 charts</span>
+    </a>
+    <a href="spectral_theory-1.html" style="display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--bg1);border:1px solid rgba(61,200,184,.25);text-decoration:none;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(61,200,184,.6)'" onmouseout="this.style.borderColor='rgba(61,200,184,.25)'">
+      <span style="font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);">09</span>
+      <span style="font-family:var(--disp);font-size:.95rem;color:var(--cream);">Spectral Theory</span>
+      <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.6;">J, J&sub2;, J&sub3; · Twin apogee · Complexity wall 2&rarr;3&rarr;6</span>
+    </a>
+  </div>
+</div>
 
 <!-- ═══════════ WHAT THIS STUDIES ═══════════ -->
 <div class="section-divider" id="what">
@@ -1915,6 +1973,479 @@ function toggleDepth(btn) {
     </div>
   </div>
 </div>
+
+<!-- ═══════════ p^k SUBLATTICE ═══════════ -->
+<div class="section-divider" id="pk-section">
+  <div class="div-line"></div>
+  <div class="div-glyph">p^k sublattice verification</div>
+  <div class="div-line"></div>
+</div>
+
+<div class="section" style="padding:0;margin-bottom:0;">
+  <details id="pk-drawer" style="border:1px solid rgba(144,112,216,.2);border-radius:2px;background:rgba(144,112,216,.03);">
+    <summary style="cursor:pointer;padding:16px 22px;list-style:none;display:flex;align-items:flex-start;gap:16px;user-select:none;"
+      onmouseover="this.style.background='rgba(144,112,216,.06)'" onmouseout="this.style.background=''">
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:rgba(144,112,216,.6);">VERIFICATION · p^k</span>
+          <span id="pk-arrow" style="font-size:10px;color:rgba(144,112,216,.5);transition:transform .2s;">▶</span>
+        </div>
+        <div style="font-family:var(--disp);font-size:1.2rem;font-weight:400;color:var(--cream);margin-bottom:10px;">
+          Does O(1/N) Survive on Prime Power Sublattices?
+        </div>
+        <div style="font-family:var(--mono);font-size:8.5px;color:rgba(255,255,255,.38);line-height:1.75;max-width:680px;">
+          The full-lattice result E(N) = O(1/N) arises from global Möbius cancellation across all m.
+          This verifier tests whether that rate survives — or breaks — when R(N) = Σ L(m)/Σ φ(m)
+          is restricted to five sublattices: all m (baseline), prime powers p^k (k≥1),
+          primes only (k=1), prime squares (k=2), and higher prime powers (k≥2).
+          <br><br>
+          <strong style="color:rgba(255,255,255,.55);">What to look for:</strong>
+          Chart 2 flat → O(1/N) holds. Chart 4 OLS slope ≈ −1.0 → rate confirmed.
+          If the slope weakens toward −0.5, the sublattice geometry disrupts cancellation.
+          The SC/π(N) ratio tracks sign-change frequency; compare across modes to test
+          whether the spectral structure is universal or mode-dependent.
+          <br><br>
+          <strong style="color:rgba(255,255,255,.55);">Mathematical context:</strong>
+          For ℤ/p^kℤ the coprime density is φ(p^k)/p^k = (p−1)/p, independent of k.
+          This predicts the sublattice limiting constant C_sub shifts from C_full,
+          but the Möbius cancellation structure should be preserved — meaning O(1/N)
+          ought to hold. Failure would indicate that the O(1/N) result depends on
+          cross-primorial interference that prime-power-only rings cannot replicate.
+          <br><br>
+          <span style="color:rgba(144,112,216,.6);">Slider starts at N=1. Set max up to 50,000. Use Play to animate. Export PNG saves all four charts.</span>
+        </div>
+      </div>
+    </summary>
+
+    <div style="padding:0 22px 22px;">
+      <!-- Controls -->
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;padding-top:4px;">
+        <span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;">N</span>
+        <input type="range" id="pk-sl-N" min="1" max="5000" value="2000" step="1"
+          style="-webkit-appearance:none;width:200px;height:3px;background:rgba(144,112,216,.35);outline:none;border-radius:2px;cursor:pointer;"
+          oninput="document.getElementById('pk-val-N').textContent=Math.round(this.value);pkSchedule()">
+        <span id="pk-val-N" style="font-family:var(--mono);font-size:9px;color:#9070d8;min-width:36px;">2000</span>
+        <span style="width:1px;height:16px;background:rgba(255,255,255,.1);margin:0 4px;"></span>
+        <span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);">MAX</span>
+        <input type="number" id="pk-inp-max" value="5000" min="10" max="50000"
+          style="background:#0a0a18;border:1px solid rgba(255,255,255,.12);color:#e8e4d8;font-family:var(--mono);font-size:9px;padding:4px 8px;border-radius:2px;width:76px;"
+          onchange="pkUpdateMax()">
+        <span style="width:1px;height:16px;background:rgba(255,255,255,.1);margin:0 4px;"></span>
+        <span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);">MODE</span>
+        <select id="pk-sel-mode"
+          style="background:#0a0a18;border:1px solid rgba(255,255,255,.12);color:#e8e4d8;font-family:var(--mono);font-size:9px;padding:4px 8px;border-radius:2px;"
+          onchange="pkSchedule()">
+          <option value="all">All m (baseline)</option>
+          <option value="pk">Prime powers p^k (k≥1)</option>
+          <option value="p1">Primes only (k=1)</option>
+          <option value="pk2">Prime squares (k=2)</option>
+          <option value="pk3">Higher powers (k≥2)</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+        <button id="pk-btn-play" onclick="pkTogglePlay()"
+          style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:5px 12px;border-radius:2px;cursor:pointer;">
+          ▶ Play
+        </button>
+        <span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);">Speed</span>
+        <input type="range" id="pk-sl-speed" min="1" max="20" value="5"
+          style="-webkit-appearance:none;width:80px;height:3px;background:rgba(200,168,74,.3);outline:none;border-radius:2px;cursor:pointer;">
+        <span style="width:1px;height:16px;background:rgba(255,255,255,.1);margin:0 4px;"></span>
+        <button onclick="pkExport()"
+          style="background:rgba(200,168,74,.05);border:1px solid rgba(200,168,74,.3);color:rgba(200,168,74,.7);font-family:var(--mono);font-size:9px;padding:5px 12px;border-radius:2px;cursor:pointer;">
+          ↓ PNG
+        </button>
+        <button onclick="pkExportAll()"
+          style="background:rgba(200,168,74,.05);border:1px solid rgba(200,168,74,.3);color:rgba(200,168,74,.7);font-family:var(--mono);font-size:9px;padding:5px 12px;border-radius:2px;cursor:pointer;">
+          ↓ All Modes (4K)
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:flex;gap:20px;flex-wrap:wrap;padding:10px 14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:2px;margin-bottom:14px;">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.1em;">N</span>
+          <span id="pk-s-N" style="font-family:var(--mono);font-size:11px;color:#9070d8;">—</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.1em;">C sublattice</span>
+          <span id="pk-s-C" style="font-family:var(--mono);font-size:11px;color:#c8a84a;">—</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.1em;">|E(N)|</span>
+          <span id="pk-s-E" style="font-family:var(--mono);font-size:11px;color:#3dc8b8;">—</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.1em;">|E(N)|·N</span>
+          <span id="pk-s-EN" style="font-family:var(--mono);font-size:11px;color:#9070d8;">—</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.1em;">OLS slope</span>
+          <span id="pk-s-slope" style="font-family:var(--mono);font-size:11px;">—</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.1em;">Sign changes</span>
+          <span id="pk-s-SC" style="font-family:var(--mono);font-size:11px;">—</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <span style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.28);letter-spacing:.1em;">SC/π(N)</span>
+          <span id="pk-s-SCpi" style="font-family:var(--mono);font-size:11px;color:#c8a84a;">—</span>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div style="margin-bottom:14px;">
+        <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:6px;">CHART 1 — |E(N)| decay · gold = C/N · violet = C/log N</div>
+        <canvas id="pk-cv1" height="160" style="display:block;width:100%;border:1px solid rgba(255,255,255,.06);border-radius:2px;background:#050510;"></canvas>
+        <div style="display:flex;gap:14px;margin-top:5px;font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);">
+          <span>■ <span style="color:#3dc8b8">|E(N)|</span></span>
+          <span>■ <span style="color:#c8a84a">C/N</span></span>
+          <span>■ <span style="color:#9070d8">C/log N</span></span>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:6px;">CHART 2 — |E(N)|·N · flat = O(1/N) confirmed · drift = slower</div>
+        <canvas id="pk-cv2" height="160" style="display:block;width:100%;border:1px solid rgba(255,255,255,.06);border-radius:2px;background:#050510;"></canvas>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:6px;">CHART 3 — Signed E(N) · violet = positive · teal = negative · verticals = sign-change nodes</div>
+        <canvas id="pk-cv3" height="140" style="display:block;width:100%;border:1px solid rgba(255,255,255,.06);border-radius:2px;background:#050510;"></canvas>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:6px;">CHART 4 — log|E(N)| vs log N · OLS slope: −1.0 = O(1/N) · −0.5 = O(1/√N)</div>
+        <canvas id="pk-cv4" height="160" style="display:block;width:100%;border:1px solid rgba(255,255,255,.06);border-radius:2px;background:#050510;"></canvas>
+        <div style="display:flex;gap:14px;margin-top:5px;font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);">
+          <span>■ <span style="color:#3dc8b8">log|E|</span></span>
+          <span>■ <span style="color:#c8a84a">slope −1</span></span>
+          <span>■ <span style="color:#9070d8">slope −0.5</span></span>
+          <span>■ <span style="color:#e05060">OLS fit</span></span>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div id="pk-note" style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.06em;line-height:1.8;padding:12px 14px;border:1px solid rgba(255,255,255,.06);border-radius:2px;white-space:pre-wrap;margin-top:4px;">Loading…</div>
+    </div>
+  </details>
+</div>
+
+<script>
+(function(){
+// ── p^k sublattice engine (self-contained, no collision with main scripts) ──
+var _pkS=null,_pkPP=null,_pkCache={},_pkSlope=null;
+
+function pkSieve(N){
+  if(_pkS&&_pkS.phi.length>=N+2)return _pkS;
+  var phi=new Int32Array(N+2),ip=new Uint8Array(N+2).fill(1),pr=[];
+  phi[1]=1;
+  for(var i=2;i<=N+1;i++){
+    if(ip[i]){pr.push(i);phi[i]=i-1;}
+    for(var j=0;j<pr.length&&i*pr[j]<=N+1;j++){
+      var p=pr[j];ip[i*p]=0;
+      if(i%p===0){phi[i*p]=phi[i]*p;break;}
+      else{phi[i*p]=phi[i]*(p-1);}
+    }
+  }
+  _pkS={phi:phi,ip:ip,pr:pr};return _pkS;
+}
+
+function pkBuildPP(N,ip){
+  if(_pkPP&&_pkPP.N>=N)return;
+  var pp=new Uint8Array(N+2),k=new Uint8Array(N+2);
+  for(var m=2;m<=N+1;m++){
+    if(ip[m]){pp[m]=1;k[m]=1;continue;}
+    for(var p=2;p*p<=m;p++){
+      if(m%p===0&&ip[p]){var x=m,kk=0;while(x%p===0){x=Math.floor(x/p);kk++;}if(x===1){pp[m]=1;k[m]=kk;}break;}
+    }
+  }
+  _pkPP={N:N,pp:pp,k:k};
+}
+
+function pkFilter(mode){
+  var pp=_pkPP.pp,k=_pkPP.k;
+  if(mode==='all') return function(){return true;};
+  if(mode==='pk')  return function(m){return pp[m]===1;};
+  if(mode==='p1')  return function(m){return k[m]===1;};
+  if(mode==='pk2') return function(m){return k[m]===2;};
+  if(mode==='pk3') return function(m){return k[m]>=2;};
+  return function(){return true;};
+}
+
+function pkCompute(N,mode){
+  var key=N+'|'+mode;
+  if(_pkCache[key])return _pkCache[key];
+  var sv=pkSieve(N);
+  pkBuildPP(N,sv.ip);
+  var phi=sv.phi,ip=sv.ip,pr=sv.pr;
+  var accept=pkFilter(mode);
+  var Cfull=1;for(var i=0;i<pr.length;i++){var p=pr[i];Cfull*=(p*p-2)/(p*p-1);}
+  var sumL=0,sumPh=0,sumLf=0,sumPhf=0,raw=[];
+  for(var m=1;m<=N;m++){
+    var Lm=phi[m]*phi[m+1]/(m+1);
+    sumLf+=Lm;sumPhf+=phi[m];
+    if(accept(m)){sumL+=Lm;sumPh+=phi[m];}
+    if(m<5)continue;
+    raw.push({m:m,Rs:sumPh>0?sumL/sumPh:0,Rf:sumPhf>0?sumLf/sumPhf:0,ip:ip[m]===1});
+  }
+  var tail=raw.slice(Math.floor(raw.length*0.8));
+  var Csub=tail.reduce(function(a,d){return a+d.Rs;},0)/Math.max(tail.length,1);
+  var data=[],sc=0,ps=0,piN=0,lastSC=0;
+  raw.forEach(function(rv){
+    var m=rv.m,E=rv.Rs-Csub,Ef=rv.Rf-Cfull;
+    var absE=Math.abs(E),lm=Math.log(Math.max(m,2));
+    var sg=E>=0?1:-1,isc=false;
+    if(rv.ip)piN++;
+    if(ps!==0&&sg!==ps){sc++;isc=true;lastSC=m;}
+    ps=sg;
+    data.push({m:m,E:E,Ef:Ef,absE:absE,EN:absE*m,lm:lm,lgAbsE:absE>1e-15?Math.log(absE):NaN,ip:rv.ip,isc:isc,piC:piN,scC:sc});
+  });
+  var r={data:data,C:Csub,Cfull:Cfull,sc:sc,piN:piN,N:N,mode:mode};
+  _pkCache[key]=r;return r;
+}
+
+function pkMp(v,i0,i1,o0,o1){return i1===i0?o0:o0+(v-i0)/(i1-i0)*(o1-o0);}
+function pkGrid(ctx,W,H,p){
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  for(var i=1;i<4;i++){var y=p+(H-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(W-p,y);ctx.stroke();}
+}
+function pkIC(id,sc){
+  var c=document.getElementById(id);if(!c)return null;
+  var W=c.clientWidth||900,H=parseInt(c.getAttribute('height')),s=sc||1;
+  c.width=W*s;c.height=H*s;
+  var ctx=c.getContext('2d');ctx.scale(s,s);
+  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
+  return {ctx:ctx,W:W,H:H};
+}
+
+function pkOLS(pts){
+  var n=pts.length,sx=0,sy=0,sxy=0,sx2=0;
+  for(var i=0;i<n;i++){sx+=pts[i][0];sy+=pts[i][1];sxy+=pts[i][0]*pts[i][1];sx2+=pts[i][0]*pts[i][0];}
+  return (n*sxy-sx*sy)/(n*sx2-sx*sx);
+}
+
+function pkDraw(r,sc){
+  var data=r.data,p=14;if(!data.length)return null;
+  var slope=null;
+
+  // Chart 1
+  var cv=pkIC('pk-cv1',sc);if(cv){
+    var ctx=cv.ctx,W=cv.W,H=cv.H;
+    var d=data.filter(function(x){return x.absE>0;});
+    if(d.length){
+      var mn=d[0].m,mx=d[d.length-1].m;
+      var yMx=Math.max.apply(null,d.slice(0,Math.min(30,d.length)).map(function(x){return x.absE;}))*1.2||0.01;
+      var px=function(m){return pkMp(m,mn,mx,p,W-p);};
+      var py=function(v){return pkMp(Math.max(v,0),0,yMx,H-p,p);};
+      pkGrid(ctx,W,H,p);
+      ctx.setLineDash([3,7]);
+      ctx.strokeStyle='rgba(144,112,216,.45)';ctx.lineWidth=1.2;ctx.beginPath();var st=true;
+      d.forEach(function(x){if(x.lm>1){var y=py(r.C/x.lm);if(st){ctx.moveTo(px(x.m),y);st=false;}else ctx.lineTo(px(x.m),y);}});ctx.stroke();
+      ctx.strokeStyle='rgba(200,168,74,.55)';ctx.beginPath();st=true;
+      d.forEach(function(x){var y=py(r.C/x.m);if(st){ctx.moveTo(px(x.m),y);st=false;}else ctx.lineTo(px(x.m),y);});ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.strokeStyle='rgba(144,112,216,.9)';ctx.lineWidth=1.8;ctx.beginPath();st=true;
+      d.forEach(function(x){var y=py(x.absE);if(st){ctx.moveTo(px(x.m),y);st=false;}else ctx.lineTo(px(x.m),y);});ctx.stroke();
+    }
+  }
+
+  // Chart 2
+  cv=pkIC('pk-cv2',sc);if(cv){
+    var ctx=cv.ctx,W=cv.W,H=cv.H;
+    var d=data.filter(function(x){return x.absE>0;});
+    if(d.length){
+      var mn=d[0].m,mx=d[d.length-1].m;
+      var yMx=Math.max(Math.max.apply(null,d.map(function(x){return x.EN;})),Math.max.apply(null,d.map(function(x){return Math.abs(x.Ef)*x.m;})))*1.15||0.01;
+      var px=function(m){return pkMp(m,mn,mx,p,W-p);};
+      var py=function(v){return pkMp(Math.max(v,0),0,yMx,H-p,p);};
+      pkGrid(ctx,W,H,p);
+      if(r.mode!=='all'){
+        ctx.setLineDash([3,7]);ctx.strokeStyle='rgba(200,168,74,.4)';ctx.lineWidth=1.2;ctx.beginPath();var st=true;
+        d.forEach(function(x){var y=py(Math.abs(x.Ef)*x.m);if(st){ctx.moveTo(px(x.m),y);st=false;}else ctx.lineTo(px(x.m),y);});ctx.stroke();ctx.setLineDash([]);
+      }
+      ctx.strokeStyle='rgba(144,112,216,.9)';ctx.lineWidth=1.8;ctx.beginPath();var st=true;
+      d.forEach(function(x){var y=py(x.EN);if(st){ctx.moveTo(px(x.m),y);st=false;}else ctx.lineTo(px(x.m),y);});ctx.stroke();
+    }
+  }
+
+  // Chart 3
+  cv=pkIC('pk-cv3',sc);if(cv){
+    var ctx=cv.ctx,W=cv.W,H=cv.H;
+    var d=data;
+    if(d.length){
+      var mn=d[0].m,mx=d[d.length-1].m;
+      var eV=d.map(function(x){return x.E;});
+      var pad=Math.max(Math.abs(Math.min.apply(null,eV)),Math.abs(Math.max.apply(null,eV)))*1.15||0.01;
+      var px=function(m){return pkMp(m,mn,mx,p,W-p);};
+      var py=function(v){return pkMp(v,-pad,pad,H-p,p);};
+      var mid=py(0);
+      pkGrid(ctx,W,H,p);
+      ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p,mid);ctx.lineTo(W-p,mid);ctx.stroke();
+      d.forEach(function(x){if(x.isc){ctx.strokeStyle='rgba(144,112,216,.18)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px(x.m),p);ctx.lineTo(px(x.m),H-p);ctx.stroke();}});
+      ctx.lineWidth=1.4;var lsg=0,started=false;
+      d.forEach(function(x){
+        var sg=x.E>=0?1:-1;var col=sg>0?'rgba(144,112,216,.9)':'rgba(61,200,184,.9)';
+        if(!started){ctx.strokeStyle=col;ctx.beginPath();ctx.moveTo(px(x.m),py(x.E));started=true;lsg=sg;}
+        else if(sg!==lsg){ctx.stroke();ctx.strokeStyle=col;ctx.beginPath();ctx.moveTo(px(x.m),py(x.E));lsg=sg;}
+        else ctx.lineTo(px(x.m),py(x.E));
+      });ctx.stroke();
+    }
+  }
+
+  // Chart 4
+  cv=pkIC('pk-cv4',sc);if(cv){
+    var ctx=cv.ctx,W=cv.W,H=cv.H;
+    var d=data.filter(function(x){return isFinite(x.lgAbsE)&&x.absE>0&&x.lm>1;});
+    if(d.length>=10){
+      var mn=d[0].lm,mx=d[d.length-1].lm;
+      var yV=d.map(function(x){return x.lgAbsE;});
+      var yMin=Math.min.apply(null,yV),yMax=Math.max.apply(null,yV);
+      var mg=(yMax-yMin)*0.1;yMin-=mg;yMax+=mg;
+      var px=function(lm){return pkMp(lm,mn,mx,p,W-p);};
+      var py=function(v){return pkMp(v,yMin,yMax,H-p,p);};
+      pkGrid(ctx,W,H,p);
+      var pts=d.map(function(x){return[x.lm,x.lgAbsE];});
+      slope=pkOLS(pts);_pkSlope=slope;
+      var intc=(pts.reduce(function(a,x){return a+x[1];},0)-slope*pts.reduce(function(a,x){return a+x[0];},0))/pts.length;
+      var midLm=(mn+mx)/2,midY=intc+slope*midLm;
+      ctx.setLineDash([3,7]);
+      ctx.strokeStyle='rgba(200,168,74,.5)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(px(mn),py(midY+(mn-midLm)*(-1)));ctx.lineTo(px(mx),py(midY+(mx-midLm)*(-1)));ctx.stroke();
+      ctx.strokeStyle='rgba(144,112,216,.45)';ctx.beginPath();ctx.moveTo(px(mn),py(midY+(mn-midLm)*(-0.5)));ctx.lineTo(px(mx),py(midY+(mx-midLm)*(-0.5)));ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.strokeStyle='rgba(224,80,96,.7)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(px(mn),py(intc+slope*mn));ctx.lineTo(px(mx),py(intc+slope*mx));ctx.stroke();
+      ctx.strokeStyle='rgba(144,112,216,.85)';ctx.lineWidth=1.6;ctx.beginPath();var st=true;
+      d.forEach(function(x){var y=py(x.lgAbsE);if(st){ctx.moveTo(px(x.lm),y);st=false;}else ctx.lineTo(px(x.lm),y);});ctx.stroke();
+      ctx.fillStyle='rgba(224,80,96,.85)';ctx.font='9px JetBrains Mono,monospace';
+      ctx.fillText('OLS slope: '+slope.toFixed(4),p+4,p+12);
+    }
+  }
+  return slope;
+}
+
+var _pkTimer=null;
+function pkSchedule(){clearTimeout(_pkTimer);_pkTimer=setTimeout(pkRun,60);}
+
+function pkRun(sc){
+  var N=Math.round(+document.getElementById('pk-sl-N').value);
+  var mode=document.getElementById('pk-sel-mode').value;
+  var r=pkCompute(N,mode);
+  var data=r.data;
+  document.getElementById('pk-val-N').textContent=N;
+  document.getElementById('pk-s-N').textContent=N;
+  document.getElementById('pk-s-C').textContent=r.C.toFixed(9);
+  if(!data.length){document.getElementById('pk-note').textContent='Not enough data for N='+N+' in this mode.';return;}
+  var last=data[data.length-1];
+  document.getElementById('pk-s-E').textContent=last.absE.toExponential(4);
+  document.getElementById('pk-s-EN').textContent=(last.absE*N).toFixed(6);
+  document.getElementById('pk-s-SC').textContent=r.sc;
+  document.getElementById('pk-s-SCpi').textContent=r.piN>0?(r.sc/r.piN).toFixed(3):'—';
+  var slope=pkDraw(r,sc||1);
+  if(slope!==null){
+    var el=document.getElementById('pk-s-slope');
+    el.textContent=slope.toFixed(4);
+    el.style.color=slope<-0.9?'#3dc8b8':slope<-0.6?'#c8a84a':'#e05060';
+  }
+  var ml={'all':'All m (baseline)','pk':'Prime powers p^k (k≥1)','p1':'Primes only (k=1)','pk2':'Prime squares p^2','pk3':'Higher prime powers k≥2'};
+  var verdict=slope!==null?(slope<-0.9?'→ O(1/N) CONFIRMED':slope<-0.6?'→ Between O(1/√N) and O(1/N)':'→ Slower than O(1/N) — cancellation disrupted'):'';
+  document.getElementById('pk-note').textContent=
+    'Mode: '+ml[mode]+'\n'+
+    'N = '+N+' | C_sublattice ≈ '+r.C.toFixed(9)+' | C_full = '+r.Cfull.toFixed(9)+'\n'+
+    '|E(N)| = '+last.absE.toExponential(4)+'\n'+
+    '|E(N)|·N = '+(last.absE*N).toFixed(5)+'  (flat → O(1/N))\n'+
+    (slope!==null?'OLS log-log slope: '+slope.toFixed(4)+' '+verdict+'\n':'')+
+    'Sign changes: '+r.sc+' | π(N): '+r.piN+' | SC/π(N): '+(r.piN>0?(r.sc/r.piN).toFixed(3):'—')+'\n\n'+
+    'Charts: (1) |E(N)| vs references  (2) |E(N)|·N flatness test\n'+
+    '        (3) Signed E(N) oscillation  (4) log-log slope verification\n\n'+
+    'Theory: φ(p^k)/p^k = (p−1)/p is independent of k, so density is preserved\nacross prime powers. Möbius cancellation should hold → O(1/N) expected.\nFailure would indicate cross-primorial interference is required.';
+}
+
+function pkUpdateMax(){
+  var v=Math.max(10,Math.min(50000,+document.getElementById('pk-inp-max').value));
+  document.getElementById('pk-sl-N').max=v;
+  if(_pkS&&v>_pkS.phi.length-2){_pkS=null;_pkPP=null;_pkCache={};}
+  pkSchedule();
+}
+
+var _pkPlaying=false;
+function pkTogglePlay(){
+  _pkPlaying=!_pkPlaying;
+  var btn=document.getElementById('pk-btn-play');
+  btn.textContent=_pkPlaying?'⏹ Stop':'▶ Play';
+  btn.style.color=_pkPlaying?'#e05060':'rgba(255,255,255,.6)';
+  btn.style.borderColor=_pkPlaying?'rgba(224,80,96,.5)':'rgba(255,255,255,.12)';
+  if(_pkPlaying) pkAnim();
+}
+function pkAnim(){
+  if(!_pkPlaying)return;
+  var sl=document.getElementById('pk-sl-N');
+  var sp=+document.getElementById('pk-sl-speed').value;
+  var v=+sl.value+sp;if(v>+sl.max)v=1;
+  sl.value=v;pkRun();
+  setTimeout(pkAnim,30);
+}
+
+function pkExport(){
+  var ids=['pk-cv1','pk-cv2','pk-cv3','pk-cv4'];
+  var canvases=ids.map(function(id){return document.getElementById(id);});
+  var W=canvases[0].width,totalH=0;
+  canvases.forEach(function(c){totalH+=c.height+4;});
+  var out=document.createElement('canvas');out.width=W;out.height=totalH+56;
+  var ctx=out.getContext('2d');ctx.fillStyle='#050510';ctx.fillRect(0,0,W,totalH+56);
+  ctx.fillStyle='rgba(200,168,74,.8)';ctx.font='bold 12px JetBrains Mono,monospace';
+  var mode=document.getElementById('pk-sel-mode').options[document.getElementById('pk-sel-mode').selectedIndex].text;
+  ctx.fillText('p^k Sublattice O(1/N) Verification — '+mode+' — N='+document.getElementById('pk-sl-N').value,10,20);
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='9px JetBrains Mono,monospace';
+  ctx.fillText('wessengetachew.github.io | OLS slope: '+(_pkSlope?_pkSlope.toFixed(4):'—'),10,36);
+  var y=48;canvases.forEach(function(c){ctx.drawImage(c,0,y);y+=c.height+4;});
+  var a=document.createElement('a');
+  a.download='pk_N'+document.getElementById('pk-sl-N').value+'.png';
+  a.href=out.toDataURL('image/png');a.click();
+}
+
+function pkExportAll(){
+  var N=Math.round(+document.getElementById('pk-sl-N').value);
+  var modes=['all','pk','p1','pk2','pk3'];
+  var prevMode=document.getElementById('pk-sel-mode').value;
+  modes.forEach(function(mode,mi){
+    setTimeout(function(){
+      document.getElementById('pk-sel-mode').value=mode;
+      var r=pkCompute(N,mode);pkDraw(r,2);
+      setTimeout(function(){
+        var ids=['pk-cv1','pk-cv2','pk-cv3','pk-cv4'];
+        var canvases=ids.map(function(id){return document.getElementById(id);});
+        var W=canvases[0].width,totalH=0;canvases.forEach(function(c){totalH+=c.height+4;});
+        var out=document.createElement('canvas');out.width=W;out.height=totalH+70;
+        var ctx=out.getContext('2d');ctx.fillStyle='#050510';ctx.fillRect(0,0,W,totalH+70);
+        ctx.fillStyle='rgba(200,168,74,.8)';ctx.font='bold 18px JetBrains Mono,monospace';
+        ctx.fillText('p^k O(1/N) — '+mode+' — N='+N,14,26);
+        ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='12px JetBrains Mono,monospace';
+        ctx.fillText('wessengetachew.github.io',14,46);
+        var y=58;canvases.forEach(function(c){ctx.drawImage(c,0,y);y+=c.height+4;});
+        var a=document.createElement('a');a.download='pk_'+mode+'_N'+N+'.png';
+        a.href=out.toDataURL('image/png');a.click();
+        if(mi===modes.length-1){document.getElementById('pk-sel-mode').value=prevMode;pkRun();}
+      },250);
+    },mi*700);
+  });
+}
+
+// Arrow rotation on open/close
+var pkDrawer=document.getElementById('pk-drawer');
+if(pkDrawer){
+  pkDrawer.addEventListener('toggle',function(){
+    var arr=document.getElementById('pk-arrow');
+    if(arr) arr.style.transform=pkDrawer.open?'rotate(90deg)':'';
+    if(pkDrawer.open) setTimeout(pkRun,50);
+  });
+}
+
+window._pkRun=pkRun;
+window._pkExport=pkExport;
+window._pkExportAll=pkExportAll;
+window.pkTogglePlay=pkTogglePlay;
+window.pkSchedule=pkSchedule;
+window.pkUpdateMax=pkUpdateMax;
+})();
+</script>
 
 <!-- ═══════════ PROJECT LINKS ═══════════ -->
 <div class="section-divider">
