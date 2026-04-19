@@ -885,11 +885,11 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <select id="sel-label-fmt-bar" title="Label format"
       style="font-size:9px;padding:2px 4px;"
       onchange="document.getElementById('sel-label-fmt').value=this.value;S.labelFmt=this.value;dirty=true;">
+      <option value="r" selected>r</option>
       <option value="rM">r/M</option>
-      <option value="r">r</option>
+      <option value="Mr">M:r</option>
       <option value="dec">dec</option>
       <option value="deg">θ°</option>
-      <option value="Mr">M:r</option>
       <option value="gcd">gcd</option>
     </select>
   </div>
@@ -991,13 +991,13 @@ const S = {
   lifts: true, broken: false, noncop: false, area: false, spin: false,
   chain: 0,
   zoom: 0.85, panX: 0, panY: 0,
-  prime: 7, pidx: 3, allp: false, spiral: true, mirror: true,
+  prime: 2, pidx: 0, allp: false, spiral: true, mirror: true,
   channel: 0,
   customR: null, rpath: false,
   resPathM: 57, resPathActive: false, resPathFrame: 2,
   allpts: true, equator: false, sector: false, ringcirc: false,
   dim: true, dimAlpha: 0.08,
-  labels: false, labelSize: 9, labelFmt: 'rM', labelMaxM: 20,
+  labels: false, labelSize: 9, labelFmt: 'r', labelMaxM: 20,
   pathLabels: true,
   npath: true, lockp: false, noffset: 1, allnodd: false,
   liftThick: 0.8, liftAlpha: 0.35,
@@ -2278,7 +2278,7 @@ function exportViewPNG(viewName, filename, callback){
 
   if(viewName) S.view=viewName;
 
-  // Upscale to 3840×3840
+  // True 4K
   const EXP=3840;
   canvas.width=EXP; canvas.height=EXP;
   canvas.style.width=EXP+'px'; canvas.style.height=EXP+'px';
@@ -2286,22 +2286,40 @@ function exportViewPNG(viewName, filename, callback){
   overlay.style.width=EXP+'px'; overlay.style.height=EXP+'px';
   if(gl) gl.viewport(0,0,EXP,EXP);
 
-  // Fit zoom for this view at export resolution
   autoFitZoom();
 
-  // Scale up point sizes proportionally
   const origPtsize=S.ptsize;
-  S.ptsize = S.ptsize * (EXP / Math.min(origW, origH || origW));
+  const scale = EXP / Math.min(origW || EXP, origH || EXP);
+  S.ptsize = S.ptsize * scale;
 
   dirty=true;
 
-  // Two RAF cycles to ensure GL renders
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const url=canvas.toDataURL('image/png');
-    const a=document.createElement('a');
-    a.href=url; a.download=filename||'zmmz_export.png'; a.click();
+  // Three RAF cycles: GL render → overlay render → composite & save
+  requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    // Composite: GL canvas + overlay into one offscreen canvas
+    const out = document.createElement('canvas');
+    out.width = EXP; out.height = EXP;
+    const octx = out.getContext('2d');
 
-    // Restore everything
+    // Draw GL layer
+    octx.drawImage(canvas, 0, 0, EXP, EXP);
+
+    // Draw overlay (labels, lift lines, pinned points, error bar, etc.)
+    octx.drawImage(overlay, 0, 0, EXP, EXP);
+
+    // Watermark
+    octx.font = 'bold 28px JetBrains Mono, monospace';
+    octx.fillStyle = 'rgba(200,168,74,0.55)';
+    octx.textAlign = 'right';
+    octx.fillText('wessengetachew.github.io', EXP-24, EXP-24);
+
+    const url = out.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'zmmz_4k.png';
+    a.click();
+
+    // Restore
     S.view=origView; S.zoom=origZoom; S.panX=origPanX; S.panY=origPanY;
     S.ptsize=origPtsize;
     canvas.width=origW; canvas.height=origH;
@@ -2314,7 +2332,7 @@ function exportViewPNG(viewName, filename, callback){
     dirty=true;
 
     if(callback) setTimeout(callback, 300);
-  }));
+  })));
 }
 
 document.getElementById('btn-export-4k').onclick=()=>{
@@ -2448,7 +2466,7 @@ document.getElementById('btn-lift-stop2').onclick = ()=>{
 function setState(patch){Object.assign(S,patch);syncUI();dirty=true;}
 function applyPreset(name){
   const P={
-    reset:     {mmax:40,ptsize:2.5,view:'concentric',color:'angle',invert:false,delta:0,lifts:true,broken:false,chain:0,panX:0,panY:0,channel:0,prime:7,pidx:3,spiral:true,mirror:true,npath:true,noffset:1,dim:true,dimAlpha:0.08},
+    reset:     {mmax:40,ptsize:2.5,view:'concentric',color:'angle',invert:false,delta:0,lifts:true,broken:false,chain:0,panX:0,panY:0,channel:0,prime:2,pidx:0,spiral:true,mirror:true,npath:true,noffset:1,dim:true,dimAlpha:0.08},
     chain1:    {chain:1,color:'lift'},
     chain2:    {chain:2,color:'lift'},
     chain3:    {chain:3,color:'lift'},
