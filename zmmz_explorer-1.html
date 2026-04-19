@@ -866,7 +866,6 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <span id="lbl-n-strip" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3dc8b8;min-width:22px;text-align:center;font-weight:bold">1</span>
     <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="stepN(1)">▶</button>
     <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 6px">|</span>
-    <button class="thm-btn" onclick="applyThm('reset')" title="Reset all">↺</button>
     <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'" title="Stop animation">■</button>
   </div>
   </div>
@@ -876,6 +875,28 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <button id="btn-invert" title="Invert radius map">⇌ invert</button>
     <button id="btn-inspect" title="Inspect mode" style="border-color:var(--accent2);color:var(--accent2)">◉ Inspect</button>
     <button id="btn-inspect-clear" title="Clear pins">✕ Clear</button>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <button id="btn-path-label" title="Label spiral & ±n path points" onclick="togglePathLabel()"
+      style="border-color:rgba(200,168,74,.5);color:#c8a84a;background:rgba(200,168,74,.1);">
+      ◈ Label paths
+    </button>
+    <select id="sel-label-fmt-bar" title="Label format"
+      style="font-size:9px;padding:2px 4px;"
+      onchange="document.getElementById('sel-label-fmt').value=this.value;S.labelFmt=this.value;dirty=true;">
+      <option value="rM">r/M</option>
+      <option value="r">r</option>
+      <option value="dec">dec</option>
+      <option value="deg">θ°</option>
+      <option value="Mr">M:r</option>
+      <option value="gcd">gcd</option>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <button onclick="applyThm('reset')" title="Reset all settings"
+      style="border-color:rgba(192,132,252,.4);color:#c084fc;">↺ Reset</button>
   </div>
   <div class="ctrl-sep"></div>
   <div class="ctrl-group">
@@ -976,7 +997,8 @@ const S = {
   resPathM: 57, resPathActive: false, resPathFrame: 2,
   allpts: true, equator: false, sector: false, ringcirc: false,
   dim: true, dimAlpha: 0.08,
-  labels: false, labelSize: 9, labelFmt: 'r', labelMaxM: 20,
+  labels: false, labelSize: 9, labelFmt: 'rM', labelMaxM: 20,
+  pathLabels: true,
   npath: true, lockp: false, noffset: 1, allnodd: false,
   liftThick: 0.8, liftAlpha: 0.35,
   chords: false, gapStr: '2,4,6', chordAlpha: 0.25,
@@ -1677,7 +1699,7 @@ function drawOverlay(w,h,mat){
     }
   }
 
-  // Labels
+  // Labels — full (all points up to labelMaxM)
   if(S.labels){
     ctx2d.font=`${S.labelSize*dpr}px monospace`;
     ctx2d.fillStyle='rgba(220,220,255,0.85)';
@@ -1685,17 +1707,28 @@ function drawOverlay(w,h,mat){
     for(const pt of points){
       if(pt.M > S.labelMaxM) continue;
       const [sx,sy]=worldToScreen(pt.x,pt.y,w,h,mat,dpr);
-      let lbl='';
-      const f=S.labelFmt;
-      if(f==='r') lbl=String(pt.r);
-      else if(f==='rM') lbl=`${pt.r}/${pt.M}`;
-      else if(f==='dec') lbl=(pt.r/pt.M).toFixed(2);
-      else if(f==='deg') lbl=Math.round(360*pt.r/pt.M)+'°';
-      else if(f==='tpi') lbl=(pt.r/pt.M).toFixed(2)+'π';
-      else if(f==='rad') lbl=(2*Math.PI*pt.r/pt.M).toFixed(2);
-      else if(f==='Mr') lbl=`${pt.M}:${pt.r}`;
-      else if(f==='gcd') lbl=String(gcd(pt.r,pt.M+1));
+      const lbl=fmtLabel(pt,S.labelFmt);
       ctx2d.fillText(lbl,sx,sy-S.labelSize*dpr/2-2);
+    }
+  }
+
+  // Path labels — only spiral & ±n path points, always on when pathLabels=true
+  if(S.pathLabels){
+    ctx2d.textAlign='center'; ctx2d.textBaseline='middle';
+    const sz=(S.labelSize||9)*dpr;
+    ctx2d.font=`${sz}px monospace`;
+    for(const pt of points){
+      if(!pt.onPath||!pt.isCop) continue;
+      const [sx,sy]=worldToScreen(pt.x,pt.y,w,h,mat,dpr);
+      const lbl=fmtLabel(pt,S.labelFmt);
+      const tw=ctx2d.measureText(lbl).width;
+      // pill background
+      ctx2d.fillStyle='rgba(4,4,14,0.72)';
+      ctx2d.fillRect(sx-tw/2-2,sy-sz-4,tw+4,sz+4);
+      // gold=spiral/mirror, teal=npath
+      const isSpiral=(S.spiral&&pt.r===S.prime%pt.M)||(S.mirror&&pt.r===(pt.M-S.prime%pt.M)%pt.M);
+      ctx2d.fillStyle=isSpiral?'rgba(200,168,74,0.95)':'rgba(61,200,184,0.95)';
+      ctx2d.fillText(lbl,sx,sy-sz*0.5-2);
     }
   }
 
@@ -2472,6 +2505,18 @@ function syncUI(){
   document.getElementById('chk-area').checked=S.area;
   document.getElementById('chk-spin').checked=S.spin;
   document.getElementById('btn-invert').classList.toggle('active',S.invert);
+  // Sync path-label button state
+  const plBtn=document.getElementById('btn-path-label');
+  if(plBtn){
+    const labels = {r:'Label r', Mr:'Label M:r', rM:'Label r/M', deg:'Label θ°'};
+    plBtn.textContent = S.pathLabels ? '◈ '+(labels[S.labelFmt]||'Label') : '◈ Label off';
+    plBtn.style.background=S.pathLabels?'rgba(200,168,74,.15)':'rgba(255,255,255,.04)';
+    plBtn.style.borderColor=S.pathLabels?'rgba(200,168,74,.6)':'rgba(255,255,255,.12)';
+    plBtn.style.color=S.pathLabels?'#c8a84a':'rgba(255,255,255,.5)';
+  }
+  // Sync format bar select
+  const fmtBar=document.getElementById('sel-label-fmt-bar');
+  if(fmtBar) fmtBar.value=S.labelFmt;
   document.getElementById('arr-info').textContent={
     concentric:'Concentric: ρ = M',fermat:'Fermat Spiral: ρ = √M',
     farey:'Farey Half-Plane: x=r/M, y=1/M',strip:'Unfolded Strip'
@@ -2709,6 +2754,46 @@ function updateDeltaFrac(){
 }
 function setDelta(v){S.delta=v;document.getElementById('sl-delta').value=v*100;dirty=true;}
 function setChannel(n){S.channel=n;document.getElementById('num-channel').value=n;dirty=true;}
+function fmtLabel(pt,f){
+  if(f==='r') return String(pt.r);
+  if(f==='rM') return `${pt.r}/${pt.M}`;
+  if(f==='dec') return (pt.r/pt.M).toFixed(2);
+  if(f==='deg') return Math.round(360*pt.r/pt.M)+'°';
+  if(f==='tpi') return (pt.r/pt.M).toFixed(2)+'π';
+  if(f==='rad') return (2*Math.PI*pt.r/pt.M).toFixed(2);
+  if(f==='Mr') return `${pt.M}:${pt.r}`;
+  if(f==='gcd') return String(gcd(pt.r,pt.M+1));
+  return String(pt.r);
+}
+
+const PATH_LABEL_CYCLE = ['r', 'Mr', 'rM', 'deg', null]; // null = off
+
+function togglePathLabel(){
+  const cur = S.pathLabels ? (S.labelFmt || 'r') : null;
+  const idx = PATH_LABEL_CYCLE.indexOf(cur);
+  const next = PATH_LABEL_CYCLE[(idx + 1) % PATH_LABEL_CYCLE.length];
+  if(next === null){
+    S.pathLabels = false;
+  } else {
+    S.pathLabels = true;
+    S.labelFmt = next;
+    // sync drawer + bar selects
+    const df = document.getElementById('sel-label-fmt');
+    if(df) df.value = next;
+    const fb = document.getElementById('sel-label-fmt-bar');
+    if(fb) fb.value = next;
+  }
+  const btn = document.getElementById('btn-path-label');
+  if(btn){
+    const labels = {r:'Label r', Mr:'Label M:r', rM:'Label r/M', deg:'Label θ°'};
+    btn.textContent = next ? '◈ '+labels[next] : '◈ Label off';
+    btn.style.background = next ? 'rgba(200,168,74,.15)' : 'rgba(255,255,255,.04)';
+    btn.style.borderColor = next ? 'rgba(200,168,74,.6)' : 'rgba(255,255,255,.12)';
+    btn.style.color = next ? '#c8a84a' : 'rgba(255,255,255,.5)';
+  }
+  dirty = true;
+}
+
 function setN(n){S.noffset=n;document.getElementById('sl-noffset').value=n;document.getElementById('num-noffset').value=n;document.getElementById('npath-formula').textContent=`n=${n}: (M±${n})/2`;dirty=true;}
 
 // Prime select — rebuilt whenever mmax changes
@@ -3620,4 +3705,4 @@ try {
 </body>
 </html>
 
-</html>
+  </html>
