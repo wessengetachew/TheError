@@ -470,15 +470,21 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 
 <div id="drawer-backdrop" onclick="closeDrawer()"></div>
 <button id="drawer-toggle" onclick="toggleDrawer()">☰ Controls</button>
+<button id="adv-toggle" onclick="toggleAdvCanvas()" title="Switch between WebGL and Advanced Canvas2D"
+  style="position:fixed;top:calc(var(--nav-h)+8px);right:8px;z-index:150;
+  background:rgba(10,10,20,0.92);border:1px solid rgba(224,80,96,.4);color:#e05060;
+  font-family:'Courier New',monospace;font-size:10px;padding:4px 9px;cursor:pointer;
+  letter-spacing:.1em;border-radius:2px;backdrop-filter:blur(4px);white-space:nowrap;">
+  ◈ Advanced
+</button>
 
 <div id="page-body">
 
 <div id="drawer">
   <div id="drawer-tabs" style="position:relative">
     <button class="dtab active" onclick="showDTab('controls',this)">Controls</button>
-    <button class="dtab" onclick="showDTab('presets',this)">Presets</button>
-    <button class="dtab" onclick="showDTab('info',this)">Info</button>
-    <button class="dtab" onclick="showDTab('analysis',this)">Analysis</button>
+    <button class="dtab" onclick="showDTab('advanced',this)" style="color:#e05060;" id="dtab-btn-advanced">Advanced</button>
+    <button class="dtab" onclick="showDTab('library',this)">Library</button>
     <button onclick="toggleDrawer()" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);font-size:11px;padding:2px 7px;cursor:pointer;border-radius:2px;line-height:1.4">✕</button>
   </div>
   <div id="drawer-scroll">
@@ -706,6 +712,81 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       </div>
 
       <div class="section">
+        <div class="section-title" style="cursor:pointer;user-select:none;" onclick="this.parentElement.querySelector('.adv-body').style.display=this.parentElement.querySelector('.adv-body').style.display==='none'?'block':'none'">
+          ▶ Advanced
+        </div>
+        <div class="adv-body" style="display:none">
+
+          <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:4px;margin-top:6px;">RING SCALE</div>
+          <select id="sel-ring-scale" style="width:100%;font-size:9px;margin-bottom:6px;"
+            onchange="S.ringScale=this.value;_geomKey='';dirty=true;">
+            <option value="linear" selected>Linear</option>
+            <option value="sqrt">√m (Square root)</option>
+            <option value="log">Logarithmic</option>
+            <option value="quadratic">Quadratic m²</option>
+            <option value="unitcircle">Unit Circle</option>
+          </select>
+
+          <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:3px;">RING SPACING %</div>
+          <div class="row">
+            <input type="range" id="sl-ring-spacing" min="10" max="200" value="100" class="wide"
+              oninput="S.ringSpacing=+this.value/100;document.getElementById('num-ring-spacing').value=this.value;_geomKey='';dirty=true;">
+            <input type="number" id="num-ring-spacing" value="100" min="10" max="200" class="narrow"
+              oninput="S.ringSpacing=+this.value/100;document.getElementById('sl-ring-spacing').value=this.value;_geomKey='';dirty=true;">
+          </div>
+
+          <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:3px;margin-top:6px;">INNER RADIUS</div>
+          <div class="row">
+            <input type="range" id="sl-rinner" min="0" max="50" value="4" class="wide"
+              oninput="S.rinner=+this.value/100;document.getElementById('num-rinner').value=(+this.value/100).toFixed(2);_geomKey='';dirty=true;">
+            <input type="number" id="num-rinner" value="0.04" min="0" max="0.5" step="0.01" class="narrow"
+              oninput="S.rinner=parseFloat(this.value)||0;document.getElementById('sl-rinner').value=Math.round(S.rinner*100);_geomKey='';dirty=true;">
+          </div>
+
+          <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:3px;margin-top:6px;">DIRECTION</div>
+          <div class="row">
+            <select id="sel-dir" style="font-size:9px;" onchange="S.dir=+this.value;_geomKey='';dirty=true;">
+              <option value="1" selected>Clockwise +2πr/m</option>
+              <option value="-1">Counter-clockwise</option>
+            </select>
+          </div>
+
+          <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:3px;margin-top:6px;">RING POLYGON</div>
+          <div class="row">
+            <label><input type="checkbox" id="chk-ringpoly" onchange="S.ringPoly=this.checked;_geomKey='';dirty=true;"> Connect ring</label>
+          </div>
+          <div class="row">
+            <select id="sel-ringpoly-filter" style="font-size:9px;" onchange="S.ringPolyFilter=this.value;_geomKey='';dirty=true;">
+              <option value="all" selected>All points</option>
+              <option value="gcd1">gcd=1 only</option>
+              <option value="gcd2">gcd>1 only</option>
+            </select>
+          </div>
+
+          <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.1em;margin-bottom:3px;margin-top:6px;">PER-RING ROTATION δ·m</div>
+          <div class="row">
+            <span class="ctrl-label">a/b</span>
+            <input type="number" id="num-ringstep-a" value="0" min="0" max="360" class="narrow"
+              oninput="S.ringStepA=+this.value;_geomKey='';dirty=true;">
+            <span class="ctrl-label">/</span>
+            <input type="number" id="num-ringstep-b" value="2" min="1" max="360" class="narrow"
+              oninput="S.ringStepB=+this.value||1;_geomKey='';dirty=true;">
+          </div>
+          <div class="row">
+            <select id="sel-ringdyn" style="font-size:9px;" onchange="S.ringDyn=this.value;_geomKey='';dirty=true;">
+              <option value="linear" selected>Linear m/N</option>
+              <option value="quadratic">Quadratic m²/N²</option>
+              <option value="sqrt">√m/N</option>
+              <option value="log">Logarithmic</option>
+              <option value="sine">Sine wave</option>
+              <option value="step">Step a/b only</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section-title">Keys</div>
         <div class="info-box" style="font-size:9px;line-height:1.8">
           Scroll = zoom · Drag = pan · Dbl-click = reset<br>
@@ -715,8 +796,10 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       </div>
     </div><!-- dtab-controls -->
 
-    <!-- ── PRESETS TAB ── -->
-    <div id="dtab-presets" class="dtab-panel">
+    <!-- ── LIBRARY TAB (Presets + Info + Analysis merged) ── -->
+    <div id="dtab-library" class="dtab-panel">
+
+      <div class="section-title" style="font-size:9px;letter-spacing:.14em;color:var(--accent);padding:4px 0 6px;margin-bottom:6px;border-bottom:1px solid var(--border)">PRESETS</div>
 
       <div class="section">
         <div class="section-title">Theorems §8</div>
@@ -779,10 +862,8 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
         </div>
       </div>
 
-    </div><!-- dtab-presets -->
-
-    <!-- ── INFO TAB ── -->
-    <div id="dtab-info" class="dtab-panel">
+    
+      <div class="section-title" style="font-size:9px;letter-spacing:.14em;color:var(--accent);padding:4px 0 6px;margin:8px 0 6px;border-bottom:1px solid var(--border)">INFO</div>
       <div class="section">
         <div class="section-title">Legend</div>
         <div style="font-size:9px;line-height:1.9">
@@ -832,10 +913,8 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
         <div class="section-title">p Spiral Table</div>
         <div id="spiral-table" class="info-box" style="font-size:9px">—</div>
       </div>
-    </div><!-- dtab-info -->
-
-    <!-- ── ANALYSIS TAB ── -->
-    <div id="dtab-analysis" class="dtab-panel">
+    
+      <div class="section-title" style="font-size:9px;letter-spacing:.14em;color:var(--accent);padding:4px 0 6px;margin:8px 0 6px;border-bottom:1px solid var(--border)">ANALYSIS</div>
       <div style="padding:4px 0">
         <div id="analysis-text"><strong>Canvas Analysis</strong> — select a preset to see description.</div>
         <div id="stats-live">
@@ -846,45 +925,316 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
           M max: <span id="sl-mshow">—</span>
         </div>
       </div>
-    </div><!-- dtab-analysis -->
+    
+    </div><!-- dtab-library -->
+
+    <!-- ── ADVANCED TAB ── -->
+    <div id="dtab-advanced" class="dtab-panel">
+
+      <!-- Canvas2D Advanced Panel -->
+      <div class="section">
+        <div class="section-title" style="color:#e05060;border-color:rgba(224,80,96,.3)">Advanced Canvas</div>
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);line-height:1.7;margin-bottom:8px;">
+          Fixed-size Canvas2D renderer. Unfold, Dipole, Lifting Tower, Gap Overlay, Ring Polygon, Mirror — all stable regardless of M.
+        </div>
+
+        <!-- Send to main canvas -->
+        <div class="row" style="margin-bottom:6px">
+          <button onclick="advSendToMain()" style="width:100%;border-color:rgba(224,80,96,.5);color:#e05060;background:rgba(224,80,96,.08);font-size:9px;padding:6px;letter-spacing:.08em">
+            ◈ Send to Main Canvas
+          </button>
+        </div>
+
+        <!-- Mod N -->
+        <div class="row">
+          <span class="ctrl-label">Mod N</span>
+          <input type="range" id="adv-modn" min="2" max="300" value="30" class="wide"
+            oninput="document.getElementById('adv-modn-num').value=this.value;advDirty=true;advDraw()">
+          <input type="number" id="adv-modn-num" value="30" min="2" max="2000" class="narrow"
+            onchange="document.getElementById('adv-modn').value=Math.min(+this.value,300);advDirty=true;advDraw()">
+        </div>
+
+        <!-- Canvas size -->
+        <div class="row">
+          <span class="ctrl-label">Size</span>
+          <input type="number" id="adv-size" value="700" min="200" max="1200" class="narrow"
+            onchange="advResizeCanvas();advDraw()">
+          <button onclick="advResizeCanvas();advDraw()">Apply</button>
+          <span class="ctrl-label">Rotation</span>
+          <input type="range" id="adv-angle" min="0" max="360" value="90"
+            oninput="advDirty=true;advDraw()" style="width:60px">
+        </div>
+
+        <!-- View mode -->
+        <div class="row">
+          <span class="ctrl-label">View</span>
+          <select id="adv-view" onchange="advDirty=true;advDraw()" style="font-size:9px">
+            <option value="circle">Circle</option>
+            <option value="split" selected>Split (circle+unfold)</option>
+            <option value="rect">Unfold only</option>
+          </select>
+        </div>
+
+        <!-- Show mode -->
+        <div class="row">
+          <span class="ctrl-label">Show</span>
+          <select id="adv-show" onchange="advDirty=true;advDraw()" style="font-size:9px">
+            <option value="both">Both gcd=1 and gcd>1</option>
+            <option value="cop" selected>gcd=1 only</option>
+            <option value="ncp">gcd>1 only</option>
+          </select>
+        </div>
+
+        <!-- Color mode -->
+        <div class="row">
+          <span class="ctrl-label">Color</span>
+          <select id="adv-colmode" onchange="advDirty=true;advDraw()" style="font-size:9px;width:140px">
+            <option value="solid">Solid</option>
+            <option value="rainbow-angle" selected>Rainbow angle</option>
+            <option value="rainbow-residue">Rainbow residue</option>
+            <option value="rainbow-ring">Rainbow ring</option>
+            <option value="prime-composite">Prime/composite</option>
+            <option value="per-modulus">Per modulus</option>
+            <option value="per-residue">Per residue</option>
+            <option value="spectral">Spectral</option>
+            <option value="thermal">Thermal</option>
+            <option value="euler-phi">Euler φ density</option>
+            <option value="twin-prime">Twin prime</option>
+            <option value="quadratic-residue">Quadratic residue</option>
+            <option value="gcd-depth">GCD depth</option>
+            <option value="coprime-frac">Coprime fraction</option>
+            <option value="math-progression">Math progression</option>
+          </select>
+        </div>
+
+        <!-- Ring scale -->
+        <div class="row">
+          <span class="ctrl-label">Ring scale</span>
+          <select id="adv-rscale" onchange="advDirty=true;advDraw()" style="font-size:9px">
+            <option value="linear" selected>Linear</option>
+            <option value="sqrt">√ (Fermat)</option>
+            <option value="log">Log</option>
+            <option value="quadratic">Quadratic</option>
+          </select>
+          <label><input type="checkbox" id="adv-invert"> Invert</label>
+        </div>
+
+        <!-- Labels -->
+        <div class="row">
+          <span class="ctrl-label">Labels</span>
+          <select id="adv-labels" onchange="advDirty=true;advDraw()" style="font-size:9px">
+            <option value="none" selected>None</option>
+            <option value="fraction">r/m</option>
+            <option value="r">r</option>
+            <option value="angle">θ°</option>
+            <option value="decimal">decimal</option>
+            <option value="gcd">gcd</option>
+          </select>
+          <span class="ctrl-label">Size</span>
+          <input type="range" id="adv-lsize" min="5" max="18" value="8"
+            oninput="advDirty=true;advDraw()" style="width:50px">
+        </div>
+
+        <!-- Overlays -->
+        <div class="section-title" style="margin-top:8px">Overlays</div>
+        <div class="row" style="flex-wrap:wrap;gap:4px">
+          <label><input type="checkbox" id="adv-chords" onchange="advDirty=true;advDraw()"> Chords</label>
+          <label><input type="checkbox" id="adv-spokes" onchange="advDirty=true;advDraw()"> Spokes</label>
+          <label><input type="checkbox" id="adv-polygon" onchange="advDirty=true;advDraw()"> Polygon</label>
+          <label><input type="checkbox" id="adv-crossmod" onchange="advDirty=true;advDraw()"> Cross-mod</label>
+          <label><input type="checkbox" id="adv-mirror" onchange="advDirty=true;advDraw()"> Mirror σ(r)</label>
+          <label><input type="checkbox" id="adv-dipole" onchange="advDirty=true;advDraw()"> Dipole</label>
+        </div>
+
+        <!-- Prime Spiral -->
+        <div class="section-title" style="margin-top:8px">Prime Spiral</div>
+        <div class="row">
+          <label><input type="checkbox" id="adv-spiral" checked onchange="advDirty=true;advDraw()"> Spiral r≡p mod M</label>
+          <label><input type="checkbox" id="adv-spiral-mirror" checked onchange="advDirty=true;advDraw()"> Mirror</label>
+        </div>
+        <div class="row">
+          <span class="ctrl-label">p</span>
+          <select id="adv-prime-sel" onchange="advDirty=true;advDraw()" style="font-size:9px;width:70px">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="7">7</option>
+            <option value="11">11</option>
+            <option value="13">13</option>
+            <option value="17">17</option>
+            <option value="19">19</option>
+            <option value="23">23</option>
+            <option value="29">29</option>
+            <option value="31">31</option>
+            <option value="37">37</option>
+          </select>
+          <button onclick="advStepPrime(-1)">◀</button>
+          <button onclick="advStepPrime(1)">▶</button>
+        </div>
+
+        <!-- ±n Paths -->
+        <div class="section-title" style="margin-top:8px">±n Lift Paths (M±n)/2</div>
+        <div class="row">
+          <label><input type="checkbox" id="adv-npath" checked onchange="advDirty=true;advDraw()"> Show paths</label>
+        </div>
+        <div class="row">
+          <span class="ctrl-label">n</span>
+          <input type="range" id="adv-noffset" min="1" max="99" value="1" style="width:80px"
+            oninput="document.getElementById('adv-noffset-num').value=this.value;advDirty=true;advDraw()">
+          <input type="number" id="adv-noffset-num" value="1" min="1" max="999" class="narrow"
+            onchange="document.getElementById('adv-noffset').value=Math.min(+this.value,99);advDirty=true;advDraw()">
+          <button onclick="advStepN(-1)">◀</button>
+          <button onclick="advStepN(1)">▶</button>
+        </div>
+        <div class="row" style="flex-wrap:wrap;gap:3px">
+          <button onclick="advSetN(1)" style="font-size:8px;padding:2px 5px">1</button>
+          <button onclick="advSetN(2)" style="font-size:8px;padding:2px 5px">2</button>
+          <button onclick="advSetN(3)" style="font-size:8px;padding:2px 5px">3</button>
+          <button onclick="advSetN(5)" style="font-size:8px;padding:2px 5px">5</button>
+          <button onclick="advSetN(7)" style="font-size:8px;padding:2px 5px">7</button>
+          <button onclick="advSetN(11)" style="font-size:8px;padding:2px 5px">11</button>
+        </div>
+
+        <!-- Gap overlay -->
+        <div class="section-title" style="margin-top:8px;color:#4a90d9;border-color:rgba(74,144,217,.3)">Gap Overlay</div>
+        <div class="row">
+          <input type="text" id="adv-gap-input" placeholder="e.g. 2 or 2,4,6" value=""
+            style="flex:1;font-family:var(--mono);font-size:9px;padding:3px 6px;background:rgba(0,0,0,.4);
+            border:1px solid rgba(74,144,217,.4);color:#e8e0c8;border-radius:2px"
+            onkeydown="if(event.key==='Enter')advGapInputApply()">
+          <button onclick="advGapInputApply()" style="border-color:rgba(74,144,217,.5);color:#4a90d9;font-size:9px">Show</button>
+          <button onclick="advClearGap()" style="font-size:9px">Clear</button>
+        </div>
+        <div class="row" style="flex-wrap:wrap;gap:3px;margin-top:3px">
+          <button onclick="advShowGap(2)" style="font-size:8px;padding:2px 5px;border-color:rgba(78,205,196,.4);color:#4ecdc4">Twin</button>
+          <button onclick="advShowGap(4)" style="font-size:8px;padding:2px 5px;border-color:rgba(69,183,209,.4);color:#45b7d1">Cousin</button>
+          <button onclick="advShowGap(6)" style="font-size:8px;padding:2px 5px;border-color:rgba(150,206,180,.4);color:#96ceb4">Sexy</button>
+          <button onclick="advShowGap(8)" style="font-size:8px;padding:2px 5px">8</button>
+          <button onclick="advShowGap(12)" style="font-size:8px;padding:2px 5px">12</button>
+          <button onclick="advShowGap(14)" style="font-size:8px;padding:2px 5px">14</button>
+          <button onclick="advShowGap(18)" style="font-size:8px;padding:2px 5px">18</button>
+          <button onclick="advShowGap(30)" style="font-size:8px;padding:2px 5px">30</button>
+        </div>
+        <!-- Gap options -->
+        <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:4px">
+          <label style="font-size:8px"><input type="checkbox" id="adv-inspect-mode"
+            onchange="_advInspectMode=this.checked;window.advDraw&&window.advDraw()"> Inspect colours</label>
+          <label style="font-size:8px"><input type="checkbox" id="adv-stop-boundary"
+            onchange="_advStopBoundary=this.checked;window.advDraw&&window.advDraw()"> Stop at r/r</label>
+          <label style="font-size:8px">
+            <button onclick="_advRMode=_advRMode==='actual'?'addressable':'actual';this.textContent=_advRMode==='actual'?'Actual':'Addressable';window.advDraw&&window.advDraw();"
+              style="font-size:8px;padding:1px 5px">Addressable</button>
+          </label>
+        </div>
+        <div class="row">
+          <span class="ctrl-label" style="font-size:8px">α</span>
+          <input type="range" id="adv-overlay-alpha" min="10" max="100" value="80" style="width:60px;accent-color:#4a90d9"
+            oninput="_advOverlayAlpha=this.value/100;window.advDraw&&window.advDraw()">
+          <span class="ctrl-label" style="font-size:8px">thick</span>
+          <input type="range" id="adv-overlay-thick" min="1" max="40" value="10" style="width:60px;accent-color:#4a90d9"
+            oninput="_advOverlayThick=this.value/10;window.advDraw&&window.advDraw()">
+        </div>
+        <!-- Gap stats -->
+        <div id="adv-gap-stats" style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.5);
+          line-height:1.8;padding:4px 6px;background:rgba(74,144,217,.06);border-radius:2px;
+          border:1px solid rgba(74,144,217,.2);margin-top:4px;display:none"></div>
+        <!-- Per-r path table -->
+        <div id="adv-r-table" style="margin-top:6px;max-height:240px;overflow-y:auto;
+          font-family:var(--mono);font-size:8px"></div>
+
+        <!-- Unfold controls -->
+        <div class="section-title" style="margin-top:8px">Unfold</div>
+        <div class="row">
+          <span class="ctrl-label">Cut</span>
+          <input type="range" id="adv-cut" min="0" max="360" value="180"
+            oninput="document.getElementById('adv-cut-val').textContent=this.value+'°';advDirty=true;advDraw()"
+            style="width:80px">
+          <span id="adv-cut-val" style="color:#f97316;font-size:9px;min-width:32px">180°</span>
+        </div>
+        <div class="row">
+          <button id="adv-unfold-play" onclick="advToggleUnfoldPlay()" style="font-size:9px;border-color:rgba(249,115,22,.4);color:#f97316">▶ Animate</button>
+          <span class="ctrl-label">Speed</span>
+          <input type="range" id="adv-unfold-speed" min="1" max="20" value="6" style="width:50px">
+        </div>
+
+        <!-- Dipole controls -->
+        <div class="section-title" style="margin-top:8px">Dipole Settings</div>
+        <div class="row">
+          <span class="ctrl-label">Base</span>
+          <input type="number" id="adv-dipole-base" value="30" min="2" max="500" class="narrow"
+            onchange="advDirty=true;advDraw()">
+          <span class="ctrl-label">Levels</span>
+          <input type="number" id="adv-dipole-nmax" value="3" min="1" max="8" class="narrow"
+            onchange="advDirty=true;advDraw()">
+        </div>
+
+        <!-- Export -->
+        <div class="section-title" style="margin-top:8px">Export</div>
+        <div class="row">
+          <button onclick="advExport()" style="border-color:rgba(200,168,74,.4);color:#c8a84a;font-size:9px">↓ PNG</button>
+          <button onclick="advExportCSV()" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;font-size:9px">↓ CSV</button>
+        </div>
+
+        <!-- The canvas lives in the main area — click ◈ Advanced to show it -->
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(200,168,74,.5);
+          padding:8px;border:1px solid rgba(200,168,74,.2);border-radius:2px;text-align:center;">
+          Click <strong style="color:#e05060">◈ Advanced</strong> button (top-left) to swap<br>
+          the main canvas for the Advanced Canvas2D view.
+        </div>
+      </div>
+
+    </div><!-- dtab-advanced -->
 
   </div><!-- drawer-scroll -->
 </div><!-- drawer -->
 
   <div id="main-col">
+  <!-- Advanced Canvas panel — swaps with WebGL canvas when toggled -->
+  <div id="adv-main-panel" style="display:none;flex:1;min-height:0;background:#050510;position:relative;overflow:hidden;align-items:center;justify-content:center;">
+    <canvas id="adv-canvas" width="700" height="700"
+      style="display:block;max-width:100%;max-height:100%;width:auto;height:auto;cursor:crosshair;touch-action:none"
+      title="Click a point to inspect it"></canvas>
+    <div id="adv-info" style="position:absolute;bottom:8px;left:8px;right:8px;font-family:var(--mono);font-size:8px;
+      color:rgba(255,255,255,.4);line-height:1.7;padding:4px 8px;background:rgba(0,0,0,.5);
+      border-radius:2px;pointer-events:none">Click a point for details.</div>
+  </div>
   <div id="canvas-area">
     <div id="canvas-wrap"></div>
     <div id="thm-strip">
-  <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:center">
+  <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:center;flex-wrap:wrap">
     <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#c8a84a;letter-spacing:.1em">p</span>
     <button class="thm-btn" style="border-color:rgba(200,168,74,.4);color:#c8a84a;padding:3px 10px;font-size:11px" onclick="stepPrime(-1)">◀</button>
     <span id="lbl-prime-strip" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c8a84a;min-width:22px;text-align:center;font-weight:bold">2</span>
     <button class="thm-btn" style="border-color:rgba(200,168,74,.4);color:#c8a84a;padding:3px 10px;font-size:11px" onclick="stepPrime(1)">▶</button>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 6px">|</span>
+    <button id="btn-strip-spiral" class="thm-btn" style="border-color:rgba(200,168,74,.3);color:#c8a84a;padding:3px 7px;font-size:9px" onclick="_stripToggleSpiral()" title="Toggle prime spiral">⟳p</button>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
     <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#3dc8b8;letter-spacing:.1em">n</span>
     <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="stepN(-1)">◀</button>
     <span id="lbl-n-strip" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3dc8b8;min-width:22px;text-align:center;font-weight:bold">1</span>
     <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="stepN(1)">▶</button>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 6px">|</span>
+    <button id="btn-strip-npath" class="thm-btn" style="border-color:rgba(61,200,184,.3);color:#3dc8b8;padding:3px 7px;font-size:9px" onclick="_stripToggleNpath()" title="Toggle ±n paths">±n</button>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
     <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'" title="Stop animation">■</button>
   </div>
   </div>
 </div>
   <div id="ctrl">
+  <!-- Shared: invert + inspect + clear -->
   <div class="ctrl-group">
-    <button id="btn-invert" title="Invert radius map">⇌ invert</button>
+    <button id="btn-invert" title="Invert radius map" onclick="_ctrlInvert()">⇌ invert</button>
     <button id="btn-inspect" title="Inspect mode" style="border-color:var(--accent2);color:var(--accent2)">◉ Inspect</button>
     <button id="btn-inspect-clear" title="Clear pins">✕ Clear</button>
   </div>
   <div class="ctrl-sep"></div>
+
+  <!-- Shared: label paths -->
   <div class="ctrl-group">
     <button id="btn-path-label" title="Label spiral & ±n path points" onclick="togglePathLabel()"
       style="border-color:rgba(200,168,74,.5);color:#c8a84a;background:rgba(200,168,74,.1);">
-      ◈ Label paths
+      ◈ Label r
     </button>
-    <select id="sel-label-fmt-bar" title="Label format"
-      style="font-size:9px;padding:2px 4px;"
-      onchange="document.getElementById('sel-label-fmt').value=this.value;S.labelFmt=this.value;dirty=true;">
+    <select id="sel-label-fmt-bar" title="Label format" style="font-size:9px;padding:2px 4px;"
+      onchange="_ctrlLabelFmt(this.value)">
       <option value="r" selected>r</option>
       <option value="rM">r/M</option>
       <option value="Mr">M:r</option>
@@ -894,38 +1244,65 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     </select>
   </div>
   <div class="ctrl-sep"></div>
+
+  <!-- Reset -->
   <div class="ctrl-group">
-    <button onclick="applyThm('reset')" title="Reset all settings"
-      style="border-color:rgba(192,132,252,.4);color:#c084fc;">↺ Reset</button>
+    <button onclick="_ctrlReset()" title="Reset" style="border-color:rgba(192,132,252,.4);color:#c084fc;">↺ Reset</button>
   </div>
   <div class="ctrl-sep"></div>
-  <div class="ctrl-group">
+
+  <!-- View — switches between WebGL views and adv views -->
+  <div class="ctrl-group" id="ctrl-view-group">
     <span class="ctrl-label">View</span>
-    <select id="sel-view">
+    <!-- WebGL views -->
+    <select id="sel-view" style="display:block">
       <option value="concentric">Concentric</option>
       <option value="fermat">Fermat Spiral</option>
       <option value="farey">Farey Half-Plane</option>
       <option value="strip">Unfolded Strip</option>
     </select>
+    <!-- Adv views -->
+    <select id="ctrl-adv-view" style="display:none;font-size:10px;padding:2px 4px;"
+      onchange="document.getElementById('adv-view').value=this.value;window.advDraw&&window.advDraw()">
+      <option value="circle">Circle</option>
+      <option value="split" selected>Circle + Unfold</option>
+      <option value="rect">Unfold only</option>
+    </select>
   </div>
   <div class="ctrl-sep"></div>
+
+  <!-- M — drives both canvases -->
   <div class="ctrl-group">
-    <span class="ctrl-label">M</span>
+    <span class="ctrl-label" id="ctrl-m-label">M</span>
     <input type="range" id="sl-mmax" min="4" max="512" value="60" class="wide">
     <input type="number" id="num-mmax" min="4" max="2000" value="60" class="narrow">
   </div>
   <div class="ctrl-sep"></div>
-  <div class="ctrl-group">
+
+  <!-- Zoom (WebGL only) / Rotation (Adv only) -->
+  <div class="ctrl-group" id="ctrl-zoom-group">
     <span class="ctrl-label">Zoom</span>
     <input type="range" id="sl-zoom" min="5" max="500" value="85">
     <button id="btn-zoom-reset">⌂</button>
   </div>
+  <div class="ctrl-group" id="ctrl-rot-group" style="display:none">
+    <span class="ctrl-label">a/b</span>
+    <input type="number" id="ctrl-rot-a" value="1" min="0" max="999" class="narrow" title="Numerator a">
+    <span style="color:var(--muted);font-size:10px">/</span>
+    <input type="number" id="ctrl-rot-b" value="4" min="1" max="999" class="narrow" title="Denominator b">
+    <button onclick="_advSetRot()" title="Set angle to (a/b)×360°" style="font-size:9px;padding:2px 6px">Set</button>
+    <button onclick="_advAddRot()" title="Add (a/b)×360° to current angle" style="font-size:9px;padding:2px 6px;border-color:rgba(61,200,184,.4);color:#3dc8b8">+Step</button>
+    <button id="ctrl-rot-play" onclick="_advRotPlay()" title="Animate cumulative rotation" style="font-size:9px;padding:2px 6px;border-color:rgba(200,168,74,.4);color:#c8a84a">▶</button>
+  </div>
   <div class="ctrl-sep"></div>
+
+  <!-- Export -->
   <div class="ctrl-group">
     <button id="btn-export-4k">↓ 4K</button>
-    <button id="btn-export-all4">↓ All 4</button>
+    <button id="btn-export-all4" id="ctrl-export-all">↓ All 4</button>
     <button id="btn-export-csv">↓ CSV</button>
   </div>
+
   <!-- hidden inputs kept for JS wiring compatibility -->
   <input type="number" id="num-delta-r" value="0" style="display:none">
   <input type="number" id="num-delta-m" value="1" style="display:none">
@@ -1003,6 +1380,10 @@ const S = {
   liftThick: 0.8, liftAlpha: 0.35,
   chords: false, gapStr: '2,4,6', chordAlpha: 0.25,
   frInspA: 1, frInspB: 7, frInspActive: false,
+  // Advanced
+  ringScale: 'linear', ringSpacing: 1.0, rinner: 0.04,
+  dir: 1, ringPoly: false, ringPolyFilter: 'all',
+  ringStepA: 0, ringStepB: 2, ringDyn: 'linear',
   showStats: false,
   playActive: false, playM: 2, playSpeed: 4,
   liftScanM: 2, liftScanActive: false, liftScanSpeed: 4,
@@ -1144,37 +1525,66 @@ function buildPoints(){
   points = [];
   const mmax = S.mmax;
 
-  for(let M=2; M<=mmax; M++){
-    const cop = coprimes(M);
-    const nonc = S.noncop ? [...Array(M-1).keys()].map(i=>i+1).filter(r=>gcd(r,M)>1) : [];
-    const all = S.noncop ? [...cop,...nonc] : cop;
+  // Fast coprime generator using precomputed phi sieve up to mmax+1
+  // Avoids O(M²) gcd loop — uses factor sieve instead
+  const _sieveN = mmax + 2;
+  const _isCopr = new Uint8Array(_sieveN); // reused per M via marking
+  // We'll build coprimes per M on demand but cache them
+  // For performance at high M, skip non-coprime enumeration above M=300
 
-    // Next ring coprime set for lift check
-    const cop2 = new Set(coprimes(M+1));
+  for(let M=2; M<=mmax; M++){
+    const cop = _copCache[M] || (_copCache[M] = coprimes(M));
+    const cop2Set = _copCache[M+1] ? new Set(_copCache[M+1]) : (_copCache[M+1]=coprimes(M+1), new Set(_copCache[M+1]));
+    const nonc = (S.noncop && M <= 200) ? [...Array(M-1).keys()].map(i=>i+1).filter(r=>gcd(r,M)>1) : [];
+    const all = S.noncop ? [...cop,...nonc] : cop;
 
     for(const r of all){
       const isCop = gcd(r,M)===1;
-      const lifted = isCop && cop2.has(r % (M+1));
+      const lifted = isCop && cop2Set.has(r % (M+1));
 
-      // Angle
-      let theta = (2*Math.PI*r/M) + S.delta * M * 2*Math.PI;
+      // Angle — apply direction and per-ring rotation step
+      const _dir = S.dir || 1;
+      const _stepRot = S.ringStepA && S.ringStepB ? (S.ringStepA/S.ringStepB) * 2*Math.PI : 0;
+      let _ringFrac = 0;
+      if(_stepRot && S.ringDyn){
+        const t = (S.mmax>1) ? (M-1)/(S.mmax-1) : 0;
+        if(S.ringDyn==='linear')      _ringFrac = t;
+        else if(S.ringDyn==='quadratic') _ringFrac = t*t;
+        else if(S.ringDyn==='sqrt')   _ringFrac = Math.sqrt(t);
+        else if(S.ringDyn==='log')    _ringFrac = t>0?Math.log(1+t*9)/Math.log(10):0;
+        else if(S.ringDyn==='sine')   _ringFrac = Math.sin(t*Math.PI/2);
+        else if(S.ringDyn==='step')   _ringFrac = 1; // apply a/b uniformly
+      }
+      let theta = _dir*(2*Math.PI*r/M) + S.delta * M * 2*Math.PI + _stepRot * _ringFrac;
+
+      // Radius with ring scale and spacing
+      const _baseRho = S.invert ? (S.mmax - M + 2) : M;
+      let _scaledRho;
+      if(S.ringScale==='sqrt')       _scaledRho = Math.sqrt(M/S.mmax)*S.mmax;
+      else if(S.ringScale==='log')   _scaledRho = Math.log(Math.max(M,1))/Math.log(Math.max(S.mmax,2))*S.mmax;
+      else if(S.ringScale==='quadratic') _scaledRho = (M*M)/(S.mmax*S.mmax)*S.mmax;
+      else if(S.ringScale==='unitcircle') _scaledRho = S.mmax;
+      else _scaledRho = _baseRho; // linear
+      // Apply spacing
+      const _sp = S.ringSpacing||1;
+      const _rinner = S.rinner||0;
+      const rho = _rinner*S.mmax + (_scaledRho - _rinner*S.mmax) * _sp;
 
       // Position by view
       let x,y;
-      const rho = S.invert ? (S.mmax - M + 2) : M;
       if(S.view==='concentric'){
         x = rho * Math.cos(theta);
         y = rho * Math.sin(theta);
       } else if(S.view==='fermat'){
-        const rr = Math.sqrt(M);
+        const rr = Math.sqrt(M) * _sp;
         x = rr * Math.cos(theta);
         y = rr * Math.sin(theta);
       } else if(S.view==='farey'){
         x = r/M; y = 1/M; // [0,1] x [0,1]
         x = x*2-1; y = y*2;
-      } else { // strip
+      } else { // strip — fixed Y step per ring, independent of mmax
         x = (r/M)*2-1;
-        y = (M/mmax)*2-1;
+        y = (M - 1) * 0.12 - 1;  // fixed 0.12 world units per ring, starts at y=−1
       }
 
       // PlayM filter — when active, dim/hide rings except current
@@ -1429,14 +1839,19 @@ function buildBuffers(){
 // NDC x = (worldX * sx) + panNdcX
 // NDC y = (worldY * sy) + panNdcY  (WebGL Y is up, world Y is up for concentric)
 function buildTransform(w,h){
-  const aspect = w / h; // should be ~1 since canvas is square
-  const scale = S.zoom * 2 / S.mmax;
-  const sx = scale / aspect; // account for any residual non-square
+  const aspect = w / h;
+  let scale;
+  if(S.view === 'farey' || S.view === 'strip'){
+    // Fixed scale independent of mmax — adding rings doesn't shrink the view
+    // User controls zoom entirely via the zoom slider
+    scale = S.zoom * 2 / 50; // fixed reference size = 50
+  } else {
+    scale = S.zoom * 2 / S.mmax;
+  }
+  const sx = scale / aspect;
   const sy = scale;
-  // Pan in NDC: panX/panY are in world units
   const tx = S.panX * sx;
   const ty = S.panY * sy;
-  // column-major 3x3 for WebGL
   return new Float32Array([
     sx, 0, 0,
      0,sy, 0,
@@ -1446,6 +1861,14 @@ function buildTransform(w,h){
 
 // ── Render ──────────────────────────────────────────────────────────────────
 let dirty = true;
+let _geomKey = '';  // cache key — skip buildBuffers if only pan/zoom changed
+
+function geomStateKey(){
+  return [S.mmax,S.view,S.color,S.chain,S.lifts,S.broken,S.noncop,S.invert,
+          S.spiral,S.mirror,S.prime,S.npath,S.noffset,S.allnodd,S.allp,S.allpts,
+          S.channel,S.rpath,S.customR,S.hue,S.sat,S.bri,S.liftThick,S.liftAlpha,
+          S.dim,S.dimAlpha,S.chords,S.gapStr,S.delta].join('|');
+}
 let spinAngle = 0;
 let lastTime = 0;
 let animFrame = null;
@@ -1492,6 +1915,15 @@ function draw(ts=0){
   if(S.playActive){ /* handled by playTimer */ }
 
   if(!dirty) return;
+
+  // Throttle at high M to keep UI responsive — skip frames proportionally
+  const _throttleEvery = S.mmax > 400 ? 3 : S.mmax > 200 ? 2 : 1;
+  if(_throttleEvery > 1){
+    if(!draw._skipCount) draw._skipCount = 0;
+    draw._skipCount++;
+    if(draw._skipCount % _throttleEvery !== 0 && !S.spin) return;
+  }
+
   dirty = false;
 
   const w = canvas.width, h = canvas.height;
@@ -1500,7 +1932,9 @@ function draw(ts=0){
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-  buildBuffers();
+  // Only rebuild geometry when relevant state changes, not on pan/zoom
+  const gk = geomStateKey();
+  if(gk !== _geomKey){ buildBuffers(); _geomKey = gk; }
   // Canvas is square; use CSS size for transform so world units are consistent
   const cssSize = canvas.clientWidth || Math.round(w/Math.min(devicePixelRatio,2));
   const mat = buildTransform(cssSize, cssSize);
@@ -2224,7 +2658,7 @@ function updateInspectPanel(){
   // On desktop (drawer always visible) switch to info tab silently.
   // On mobile: never force-open — canvas must stay tappable.
   if(window.innerWidth >= 900){
-    showDTab('info', document.querySelectorAll('.dtab')[1]);
+    showDTab('library', document.querySelectorAll('.dtab')[1]);
   }
 }
 
@@ -2683,9 +3117,6 @@ document.getElementById('chk-stats').addEventListener('change',e=>{
 //   scale * 1 = zoom*2/mmax → want = 0.88 → zoom = 0.88*mmax/2
 // For strip: world x,y ∈ (-1,1) same as concentric edge → zoom = 0.88
 function autoFitZoom(resetPan){
-  // buildTransform: NDC = worldCoord * (zoom * 2 / mmax)
-  // To fill canvas: zoom * 2 / mmax * worldRadius = 0.88
-  // => zoom = 0.88 * mmax / (2 * worldRadius)
   if(resetPan !== false){
     S.panX = 0;
     S.panY = 0;
@@ -2693,30 +3124,17 @@ function autoFitZoom(resetPan){
   const m = S.mmax;
   let zoom;
   if(S.view === 'concentric'){
-    // world radius = mmax  →  zoom = 0.88 * mmax / (2 * mmax) = 0.44... wait
-    // Actually: scale = zoom*2/mmax, point at rho=mmax → NDC = mmax * zoom*2/mmax = zoom*2
-    // To get NDC=0.88: zoom*2 = 0.88 → zoom = 0.44
-    // But we want it to fill ~88% of ±1 NDC space, so max NDC should be 0.88
-    // max rho = mmax, NDC = mmax * zoom*2/mmax = zoom*2
-    // zoom*2 = 0.88 → zoom = 0.44
     zoom = 0.44;
   } else if(S.view === 'fermat'){
-    // world radius = sqrt(mmax)
-    // NDC = sqrt(mmax) * zoom*2/mmax = zoom*2/sqrt(mmax)
-    // zoom*2/sqrt(mmax) = 0.88 → zoom = 0.44 * sqrt(mmax)
     zoom = 0.44 * Math.sqrt(m);
   } else if(S.view === 'farey'){
-    // world x ∈ [-1,1], y ∈ [0, 2] (y = 1/M*2, max at M=2 → y=1, min at M=mmax → y=2/mmax≈0)
-    // Center y at ~0.5 (pan), world half-width = 1
-    // NDC = 1 * zoom*2/mmax → zoom*2/mmax = 0.88 → zoom = 0.44 * mmax
-    zoom = 0.44 * m;
-    S.panY = -0.5; // shift up slightly to center the data vertically
+    // With fixed scale (ref=50): zoom=22 gives comfortable initial view
+    zoom = 22;
+    if(resetPan !== false) S.panY = -0.3;
   } else { // strip
-    // strip: world x = r/M*2-1, y = M/mmax*2-1, both in (-1,1)
-    // NDC = world * zoom*2/mmax, to fill: zoom*2/mmax = 0.88 → zoom = 0.44*mmax
-    zoom = 0.44 * m;
+    zoom = 18;
   }
-  S.zoom = Math.max(0.05, Math.min(50, zoom));
+  S.zoom = Math.max(0.05, Math.min(500, zoom));
   const sl = document.getElementById('sl-zoom');
   if(sl) sl.value = Math.min(500, Math.round(S.zoom * 100));
   dirty = true;
@@ -2728,37 +3146,181 @@ document.getElementById('sel-view').addEventListener('change',e=>{
   syncUI();
 });
 document.getElementById('sel-color').addEventListener('change',e=>{S.color=e.target.value;dirty=true;});
-document.getElementById('btn-invert').addEventListener('click',()=>{S.invert=!S.invert;dirty=true;syncUI();});
+// btn-invert handled by _ctrlInvert below
 
 document.getElementById('btn-inspect').addEventListener('click',()=>{
-  inspectMode = !inspectMode;
-  const btn = document.getElementById('btn-inspect');
-  btn.classList.toggle('active', inspectMode);
-  btn.textContent = inspectMode ? '◉ Inspecting' : '◉ Inspect';
-  btn.style.borderColor = inspectMode ? '#c084fc' : '';
-  btn.style.color = inspectMode ? '#c084fc' : '';
-  btn.style.background = inspectMode ? 'rgba(192,132,252,0.15)' : '';
-  if(inspectMode && pinnedPoints.length===0){
-    document.getElementById('click-info').innerHTML =
-      '<span style="color:var(--accent2);font-size:9px">◉ Inspect ON — tap a point to pin it</span>';
-    // Desktop only: switch drawer tab silently (drawer already visible)
-    if(window.innerWidth >= 900){
-      showDTab('info', document.querySelectorAll('.dtab')[1]);
+  if(_advCanvasActive){
+    // Toggle adv inspect mode
+    _advInspectMode = !_advInspectMode;
+    const btn = document.getElementById('btn-inspect');
+    btn.classList.toggle('active', _advInspectMode);
+    btn.textContent = _advInspectMode ? '◉ Inspecting' : '◉ Inspect';
+    btn.style.borderColor = _advInspectMode ? '#c084fc' : '';
+    btn.style.color = _advInspectMode ? '#c084fc' : '';
+    btn.style.background = _advInspectMode ? 'rgba(192,132,252,0.15)' : '';
+    var info=document.getElementById('adv-info');
+    if(info&&_advInspectMode) info.textContent='◉ Inspect ON — tap a point to pin it';
+    if(window.advDraw) window.advDraw();
+  } else {
+    inspectMode = !inspectMode;
+    const btn = document.getElementById('btn-inspect');
+    btn.classList.toggle('active', inspectMode);
+    btn.textContent = inspectMode ? '◉ Inspecting' : '◉ Inspect';
+    btn.style.borderColor = inspectMode ? '#c084fc' : '';
+    btn.style.color = inspectMode ? '#c084fc' : '';
+    btn.style.background = inspectMode ? 'rgba(192,132,252,0.15)' : '';
+    if(inspectMode && pinnedPoints.length===0){
+      document.getElementById('click-info').innerHTML =
+        '<span style="color:var(--accent2);font-size:9px">◉ Inspect ON — tap a point to pin it</span>';
+      if(window.innerWidth >= 900){
+        showDTab('library', document.querySelectorAll('.dtab')[1]);
+      }
     }
+    dirty = true;
   }
-  dirty = true;
 });
 
 document.getElementById('btn-inspect-clear').addEventListener('click',()=>{
-  pinnedPoints = [];
-  document.getElementById('click-info').innerHTML = 'Click a point';
-  dirty = true;
+  if(_advCanvasActive){
+    if(typeof advClearPins==='function') advClearPins();
+  } else {
+    pinnedPoints = [];
+    document.getElementById('click-info').innerHTML = 'Click a point';
+    dirty = true;
+  }
 });
 document.getElementById('btn-zoom-reset').addEventListener('click',()=>{ autoFitZoom(); dirty=true; });
 
 // Sync mmax slider/num bidirectionally
-document.getElementById('sl-mmax').addEventListener('input',e=>{document.getElementById('num-mmax').value=e.target.value;S.mmax=Number(e.target.value);_copCache={};rebuildPrimeSelect();autoFitZoom(false);dirty=true;});
-document.getElementById('num-mmax').addEventListener('input',e=>{const v=Math.max(4,Math.min(2000,Number(e.target.value)));document.getElementById('sl-mmax').value=Math.min(v,512);S.mmax=v;_copCache={};rebuildPrimeSelect();autoFitZoom(false);dirty=true;});
+document.getElementById('sl-mmax').addEventListener('input',e=>{
+  document.getElementById('num-mmax').value=e.target.value;
+  S.mmax=Number(e.target.value);
+  _copCache={};rebuildPrimeSelect();
+  if(S.view==='concentric'||S.view==='fermat') autoFitZoom(false);
+  dirty=true;
+  // Also sync adv canvas M display and redraw if active
+  if(_advCanvasActive){
+    var am=document.getElementById('adv-modn-num');
+    var as=document.getElementById('adv-modn');
+    if(am) am.value=S.mmax;
+    if(as) as.value=Math.min(S.mmax,300);
+    if(window.advDraw) window.advDraw();
+  }
+});
+document.getElementById('num-mmax').addEventListener('input',e=>{
+  const v=Math.max(4,Math.min(2000,Number(e.target.value)));
+  document.getElementById('sl-mmax').value=Math.min(v,512);
+  S.mmax=v;_copCache={};rebuildPrimeSelect();
+  if(S.view==='concentric'||S.view==='fermat') autoFitZoom(false);
+  dirty=true;
+  if(_advCanvasActive){
+    var am=document.getElementById('adv-modn-num');
+    var as=document.getElementById('adv-modn');
+    if(am) am.value=v;
+    if(as) as.value=Math.min(v,300);
+    if(window.advDraw) window.advDraw();
+  }
+});
+
+// ── Advanced canvas rotation controls ────────────────────────────────────
+var _advRotTimer = null;
+var _advCurrentAngle = 90; // tracks cumulative angle
+
+function _advGetAB(){
+  var a = Math.max(0, +document.getElementById('ctrl-rot-a').value || 1);
+  var b = Math.max(1, +document.getElementById('ctrl-rot-b').value || 4);
+  return {a:a, b:b, deg:(a/b)*360};
+}
+function _advSetAngle(deg){
+  _advCurrentAngle = ((deg % 360) + 360) % 360;
+  var el = document.getElementById('adv-angle');
+  if(el) el.value = _advCurrentAngle;
+  if(window.advDraw) window.advDraw();
+}
+function _advSetRot(){
+  // Absolute: set angle to (a/b)×360
+  _advSetAngle(_advGetAB().deg);
+}
+function _advAddRot(){
+  // Cumulative: add (a/b)×360 to current
+  _advSetAngle(_advCurrentAngle + _advGetAB().deg);
+}
+function _advRotPlay(){
+  var btn = document.getElementById('ctrl-rot-play');
+  if(_advRotTimer){
+    cancelAnimationFrame(_advRotTimer); _advRotTimer=null;
+    if(btn){btn.textContent='▶';btn.style.background='';}
+    return;
+  }
+  if(btn){btn.textContent='⏹';btn.style.background='rgba(200,168,74,.15)';}
+  function step(){
+    _advSetAngle(_advCurrentAngle + _advGetAB().deg * 0.5); // half-step per frame for smooth anim
+    _advRotTimer = requestAnimationFrame(step);
+  }
+  _advRotTimer = requestAnimationFrame(step);
+}
+
+// ── Ctrl bar dual-mode functions ──────────────────────────────────────────
+function _ctrlInvert(){
+  if(_advCanvasActive){
+    var cb=document.getElementById('adv-invert');
+    if(cb){ cb.checked=!cb.checked; if(window.advDraw) window.advDraw(); }
+  } else {
+    S.invert=!S.invert; dirty=true; syncUI();
+  }
+}
+function _ctrlReset(){
+  if(_advCanvasActive){
+    // Reset adv-specific controls
+    var els={
+      'adv-view':'split','adv-show':'cop','adv-colmode':'rainbow-angle',
+      'adv-rscale':'linear','adv-labels':'none','adv-angle':'90',
+      'adv-modn-num':'30','adv-modn':'30'
+    };
+    Object.keys(els).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.value=els[id];
+    });
+    var inv=document.getElementById('adv-invert');
+    if(inv) inv.checked=false;
+    ['adv-chords','adv-spokes','adv-polygon','adv-crossmod','adv-mirror','adv-dipole']
+      .forEach(function(id){ var el=document.getElementById(id); if(el) el.checked=false; });
+    var cv=document.getElementById('ctrl-adv-view');
+    if(cv) cv.value='split';
+    if(window.advDraw) window.advDraw();
+  } else {
+    applyThm('reset');
+  }
+}
+function _ctrlLabelFmt(v){
+  if(_advCanvasActive){
+    _advLabelFmt=v;
+    if(window.advDraw) window.advDraw();
+  } else {
+    document.getElementById('sel-label-fmt').value=v;
+    S.labelFmt=v; dirty=true;
+  }
+}
+
+// ── Switch ctrl bar mode when toggling canvas ─────────────────────────────
+function _ctrlBarMode(isAdv){
+  document.getElementById('sel-view').style.display=isAdv?'none':'block';
+  document.getElementById('ctrl-adv-view').style.display=isAdv?'block':'none';
+  document.getElementById('ctrl-zoom-group').style.display=isAdv?'none':'flex';
+  document.getElementById('ctrl-rot-group').style.display=isAdv?'flex':'none';
+  // Export: adv uses advExport, WebGL uses exportViewPNG
+  var e4k=document.getElementById('btn-export-4k');
+  var eall=document.getElementById('btn-export-all4');
+  if(isAdv){
+    if(e4k) e4k.onclick=function(){ if(window.advExport) window.advExport(); };
+    if(eall) eall.style.display='none';
+  } else {
+    if(e4k) e4k.onclick=function(){ exportViewPNG(null,'zmmz_4k.png'); };
+    if(eall) eall.style.display='';
+  }
+}
+// Also wire invert button
+document.getElementById('btn-invert').addEventListener('click', _ctrlInvert);
 document.getElementById('sl-chain').addEventListener('input',e=>{S.chain=Number(e.target.value);document.getElementById('lbl-chain').textContent=S.chain||'off';dirty=true;});
 document.getElementById('sl-ptsize').addEventListener('input',e=>{S.ptsize=e.target.value/10;document.getElementById('lbl-ptsize').textContent=S.ptsize.toFixed(1);dirty=true;});
 
@@ -2787,31 +3349,84 @@ function fmtLabel(pt,f){
 const PATH_LABEL_CYCLE = ['r', 'Mr', 'rM', 'deg', null]; // null = off
 
 function togglePathLabel(){
-  const cur = S.pathLabels ? (S.labelFmt || 'r') : null;
-  const idx = PATH_LABEL_CYCLE.indexOf(cur);
-  const next = PATH_LABEL_CYCLE[(idx + 1) % PATH_LABEL_CYCLE.length];
-  if(next === null){
+  if(_advCanvasActive){
+    // Cycle adv path labels
+    var cur = _advPathLabels ? (_advLabelFmt || 'r') : null;
+    var idx = PATH_LABEL_CYCLE.indexOf(cur);
+    var next = PATH_LABEL_CYCLE[(idx + 1) % PATH_LABEL_CYCLE.length];
+    if(next === null){
+      _advPathLabels = false;
+    } else {
+      _advPathLabels = true;
+      _advLabelFmt = next;
+      var fb = document.getElementById('sel-label-fmt-bar');
+      if(fb) fb.value = next;
+    }
+    var btn = document.getElementById('btn-path-label');
+    if(btn){
+      var labels = {r:'Label r', Mr:'Label M:r', rM:'Label r/M', deg:'Label θ°'};
+      btn.textContent = next ? '◈ '+labels[next] : '◈ Label off';
+      btn.style.background = next ? 'rgba(200,168,74,.15)' : 'rgba(255,255,255,.04)';
+      btn.style.borderColor = next ? 'rgba(200,168,74,.6)' : 'rgba(255,255,255,.12)';
+      btn.style.color = next ? '#c8a84a' : 'rgba(255,255,255,.5)';
+    }
+    if(window.advDraw) window.advDraw();
+    return;
+  }
+  var cur2 = S.pathLabels ? (S.labelFmt || 'r') : null;
+  var idx2 = PATH_LABEL_CYCLE.indexOf(cur2);
+  var next2 = PATH_LABEL_CYCLE[(idx2 + 1) % PATH_LABEL_CYCLE.length];
+  if(next2 === null){
     S.pathLabels = false;
   } else {
     S.pathLabels = true;
-    S.labelFmt = next;
-    // sync drawer + bar selects
-    const df = document.getElementById('sel-label-fmt');
-    if(df) df.value = next;
-    const fb = document.getElementById('sel-label-fmt-bar');
-    if(fb) fb.value = next;
+    S.labelFmt = next2;
+    var df2 = document.getElementById('sel-label-fmt');
+    if(df2) df2.value = next2;
+    var fb2 = document.getElementById('sel-label-fmt-bar');
+    if(fb2) fb2.value = next2;
   }
-  const btn = document.getElementById('btn-path-label');
-  if(btn){
-    const labels = {r:'Label r', Mr:'Label M:r', rM:'Label r/M', deg:'Label θ°'};
-    btn.textContent = next ? '◈ '+labels[next] : '◈ Label off';
-    btn.style.background = next ? 'rgba(200,168,74,.15)' : 'rgba(255,255,255,.04)';
-    btn.style.borderColor = next ? 'rgba(200,168,74,.6)' : 'rgba(255,255,255,.12)';
-    btn.style.color = next ? '#c8a84a' : 'rgba(255,255,255,.5)';
+  var btn2 = document.getElementById('btn-path-label');
+  if(btn2){
+    var labels2 = {r:'Label r', Mr:'Label M:r', rM:'Label r/M', deg:'Label θ°'};
+    btn2.textContent = next2 ? '◈ '+labels2[next2] : '◈ Label off';
+    btn2.style.background = next2 ? 'rgba(200,168,74,.15)' : 'rgba(255,255,255,.04)';
+    btn2.style.borderColor = next2 ? 'rgba(200,168,74,.6)' : 'rgba(255,255,255,.12)';
+    btn2.style.color = next2 ? '#c8a84a' : 'rgba(255,255,255,.5)';
   }
   dirty = true;
 }
 
+function _stripToggleSpiral(){
+  var btn=document.getElementById('btn-strip-spiral');
+  if(_advCanvasActive){
+    var cb=document.getElementById('adv-spiral');
+    if(cb){ cb.checked=!cb.checked; }
+    var on=cb&&cb.checked;
+    if(btn){ btn.style.background=on?'rgba(200,168,74,.2)':''; btn.style.borderColor=on?'rgba(200,168,74,.7)':'rgba(200,168,74,.3)'; }
+    if(window.advDraw) window.advDraw();
+  } else {
+    S.spiral=!S.spiral;
+    var chk=document.getElementById('chk-spiral');if(chk) chk.checked=S.spiral;
+    if(btn){ btn.style.background=S.spiral?'rgba(200,168,74,.2)':''; btn.style.borderColor=S.spiral?'rgba(200,168,74,.7)':'rgba(200,168,74,.3)'; }
+    dirty=true;
+  }
+}
+function _stripToggleNpath(){
+  var btn=document.getElementById('btn-strip-npath');
+  if(_advCanvasActive){
+    var cb=document.getElementById('adv-npath');
+    if(cb){ cb.checked=!cb.checked; }
+    var on=cb&&cb.checked;
+    if(btn){ btn.style.background=on?'rgba(61,200,184,.2)':''; btn.style.borderColor=on?'rgba(61,200,184,.7)':'rgba(61,200,184,.3)'; }
+    if(window.advDraw) window.advDraw();
+  } else {
+    S.npath=!S.npath;
+    var chk=document.getElementById('chk-npath');if(chk) chk.checked=S.npath;
+    if(btn){ btn.style.background=S.npath?'rgba(61,200,184,.2)':''; btn.style.borderColor=S.npath?'rgba(61,200,184,.7)':'rgba(61,200,184,.3)'; }
+    dirty=true;
+  }
+}
 function setN(n){S.noffset=n;document.getElementById('sl-noffset').value=n;document.getElementById('num-noffset').value=n;document.getElementById('npath-formula').textContent=`n=${n}: (M±${n})/2`;dirty=true;}
 
 // Prime select — rebuilt whenever mmax changes
@@ -2842,17 +3457,40 @@ document.getElementById('sel-prime').addEventListener('change',e=>{
 });
 rebuildPrimeSelect();
 function stepPrime(dir){
-  const eligible = PRIMES.filter(p => p <= S.mmax);
+  if(_advCanvasActive){
+    // Step the adv prime selector
+    var sel=document.getElementById('adv-prime-sel');
+    if(!sel) return;
+    var opts=Array.from(sel.options).map(function(o){return +o.value;}).sort(function(a,b){return a-b;});
+    var cur=+sel.value;
+    var idx=opts.indexOf(cur);
+    var next=opts[Math.max(0,Math.min(opts.length-1,idx+dir))];
+    sel.value=next;
+    // update strip label
+    ['lbl-prime-bar','lbl-prime-strip'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=next;});
+    if(window.advDraw) window.advDraw();
+    return;
+  }
+  var eligible = PRIMES.filter(p => p <= S.mmax);
   S.pidx = Math.max(0, Math.min(eligible.length-1, S.pidx + dir));
   S.prime = eligible[S.pidx];
-  const sel = document.getElementById('sel-prime');
-  if(sel) sel.value = S.pidx + 1;
-  ['lbl-prime-bar','lbl-prime-strip'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=S.prime;});
+  var selP = document.getElementById('sel-prime');
+  if(selP) selP.value = S.pidx + 1;
+  ['lbl-prime-bar','lbl-prime-strip'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=S.prime;});
   dirty = true;
 }
 function stepN(dir){
+  if(_advCanvasActive){
+    var el=document.getElementById('adv-noffset-num');
+    var sl=document.getElementById('adv-noffset');
+    if(!el) return;
+    var n=Math.max(1,Math.min(999,+el.value+dir));
+    el.value=n; if(sl) sl.value=Math.min(n,99);
+    ['lbl-n-bar','lbl-n-strip'].forEach(function(id){var e2=document.getElementById(id);if(e2)e2.textContent=n;});
+    if(window.advDraw) window.advDraw();
+    return;
+  }
   S.noffset = Math.max(1, Math.min(999, S.noffset + dir));
-  // n and M must share parity for integer paths — skip even n if odd preferred
   const nSlider = document.getElementById('sl-noffset');
   const nNum    = document.getElementById('num-noffset');
   if(nSlider) nSlider.value = S.noffset;
@@ -3190,6 +3828,53 @@ function toggleDrawer(){
     t.textContent = open ? '✕ Close' : '☰ Controls';
     _setCanvasDrawerMode(open);
   }
+}
+
+// ── Advanced canvas swap ─────────────────────────────────────────────────
+var _advCanvasActive = false;
+window._advCanvasActive = false;
+
+function toggleAdvCanvas(){
+  _advCanvasActive = !_advCanvasActive;
+  window._advCanvasActive = _advCanvasActive;
+  var mainPanel = document.getElementById('adv-main-panel');
+  var canvasArea = document.getElementById('canvas-area');
+  var btn = document.getElementById('adv-toggle');
+  if(_advCanvasActive){
+    canvasArea.style.display='none';
+    mainPanel.style.display='flex';
+    btn.textContent='◈ WebGL';
+    btn.style.background='rgba(224,80,96,.25)';
+    _ctrlBarMode(true);
+    requestAnimationFrame(function(){
+      _resizeAdvMain();
+      requestAnimationFrame(function(){
+        if(typeof window.advDraw==='function') window.advDraw();
+      });
+    });
+  } else {
+    mainPanel.style.display='none';
+    canvasArea.style.display='';
+    btn.textContent='◈ Advanced';
+    btn.style.background='rgba(10,10,20,0.92)';
+    _ctrlBarMode(false);
+    fitCanvas();
+    dirty=true;
+  }
+}
+
+function _resizeAdvMain(){
+  var c=document.getElementById('adv-canvas');
+  if(!c) return;
+  var panel=document.getElementById('adv-main-panel');
+  var w=panel.clientWidth||window.innerWidth-270;
+  var h=panel.clientHeight||window.innerHeight-94;
+  var sz=Math.max(200,Math.min(w,h)-8);
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  c.width=Math.round(sz*dpr);
+  c.height=Math.round(sz*dpr);
+  c.style.width=sz+'px';
+  c.style.height=sz+'px';
 }
 function closeDrawer(){
   if(isDesktop()) return;
@@ -3720,7 +4405,1099 @@ try {
 </script>
 
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ADVANCED CANVAS2D ENGINE — ported from Farey Explorer
+     Self-contained: no collision with WebGL zmmz engine
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+// ── State ─────────────────────────────────────────────────────────────────
+var advDirty = true;
+var _advAngle = 90;        // canvas rotation degrees
+var _advGap = null;        // active gap overlay value
+var _advGapPairs = [];     // [{r1,r2}]
+var _advGapColor = '#4ecdc4';
+var _advUnfoldTimer = null;
+var _advCutAngle = 180;    // unfold cut angle
+var _advFracCache = null;
+window.advDirty = true;
+
+// ── GCD ────────────────────────────────────────────────────────────────────
+function _gcd(a,b){ while(b){var t=b;b=a%b;a=t;} return a; }
+
+// ── Build fractions ────────────────────────────────────────────────────────
+function _buildFractions(modN){
+  if(_advFracCache && _advFracCache.N===modN) return _advFracCache;
+  var cop=[],ncp=[];
+  for(var m=1;m<=modN;m++){
+    for(var r=0;r<m;r++){
+      var g=_gcd(r||m,m); // gcd(0,m)=m
+      if(r===0){ (m===1?cop:ncp).push({r:r,m:m}); }
+      else if(g===1){ cop.push({r:r,m:m}); }
+      else{ ncp.push({r:r,m:m}); }
+    }
+  }
+  _advFracCache={N:modN,cop:cop,ncp:ncp};
+  return _advFracCache;
+}
+
+// ── Point color ─────────────────────────────────────────────────────────────
+function _ptColor(p, modN, fallback){
+  var mode = document.getElementById('adv-colmode').value;
+  var r=p.r, m=p.m;
+  switch(mode){
+    case 'solid': return fallback;
+    case 'rainbow-angle': return 'hsl('+Math.round((r/(m||1))*360)+',80%,55%)';
+    case 'rainbow-residue': return 'hsl('+Math.round(360*r/(modN||1))+',75%,55%)';
+    case 'rainbow-ring': return 'hsl('+Math.round(300*(m-1)/(modN-1||1))+',70%,55%)';
+    case 'prime-composite': {
+      if(r<2) return '#888';
+      var ip=true; for(var d=2;d*d<=r;d++){if(r%d===0){ip=false;break;}} return ip?'#40c88a':'#e87040';
+    }
+    case 'per-modulus': return 'hsl('+Math.round(360*((m*137)%modN)/(modN||1))+',68%,55%)';
+    case 'per-residue': return 'hsl('+Math.round((r*137.508)%360)+',70%,55%)';
+    case 'spectral': return 'hsl('+Math.round(270-(r/(m||1))*270)+',85%,55%)';
+    case 'thermal': {
+      var t=(m-1)/(modN-1||1);
+      if(t<0.25) return 'hsl(240,80%,'+Math.round(30+t*80)+'%)';
+      if(t<0.5)  return 'hsl(180,80%,'+Math.round(40+t*60)+'%)';
+      if(t<0.75) return 'hsl(60,90%,'+Math.round(45+t*40)+'%)';
+      return 'hsl(0,90%,'+Math.round(55+t*30)+'%)';
+    }
+    case 'euler-phi': {
+      function _phi(n){var rv=n,mn=n;for(var i=2;i*i<=mn;i++){if(mn%i===0){while(mn%i===0)mn=Math.floor(mn/i);rv-=Math.floor(rv/i);}}if(mn>1)rv-=Math.floor(rv/mn);return rv;}
+      return 'hsl('+Math.round(_phi(m)/m*270)+',75%,55%)';
+    }
+    case 'twin-prime': {
+      function _isTwin(n){if(n<2)return false;function _ip(x){if(x<2)return false;for(var i=2;i*i<=x;i++)if(x%i===0)return false;return true;}return _ip(n)&&(_ip(n-2)||_ip(n+2));}
+      return _isTwin(r)?'#ffd700':(fallback==='cop'?'#2a4a6a':'#4a1a1a');
+    }
+    case 'quadratic-residue': {
+      var isQR=false; for(var xq=0;xq<m&&!isQR;xq++){if((xq*xq-r)%m===0)isQR=true;}
+      return isQR?'#4ecdc4':'#e879f9';
+    }
+    case 'gcd-depth': {
+      var dc=0; for(var d2=1;d2<=r;d2++){if(r%d2===0)dc++;} 
+      return 'hsl('+Math.round(240-Math.min(dc,12)/12*240)+',80%,55%)';
+    }
+    case 'coprime-frac': {
+      function _phi2(n){var rv=n,mn=n;for(var i=2;i*i<=mn;i++){if(mn%i===0){while(mn%i===0)mn=Math.floor(mn/i);rv-=Math.floor(rv/i);}}if(mn>1)rv-=Math.floor(rv/mn);return rv;}
+      return 'hsl('+Math.round(((r/Math.max(_phi2(m),1))%1)*360)+',78%,55%)';
+    }
+    case 'math-progression': {
+      var tt=(m-1)/(modN-1||1);
+      return 'hsl('+(fallback==='cop'?200:10)+',72%,'+Math.round(35+45*tt)+'%)';
+    }
+    default: return fallback;
+  }
+}
+
+// ── Canvas helpers ──────────────────────────────────────────────────────────
+function _advCanvas(){ return document.getElementById('adv-canvas'); }
+function _advCtx(){ return _advCanvas().getContext('2d'); }
+
+function advResizeCanvas(){
+  var c=_advCanvas();
+  var sz=Math.max(200,Math.min(1200,+document.getElementById('adv-size').value||700));
+  c.width=sz; c.height=sz;
+}
+
+// ── Main draw ───────────────────────────────────────────────────────────────
+function advDraw(){
+  var c=_advCanvas(); if(!c) return;
+  var ctx=c.getContext('2d');
+  var W=c.width, H=c.height;
+  if(!W||!H) return;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#050510'; ctx.fillRect(0,0,W,H);
+
+  // adv canvas uses its OWN mod N (independent from WebGL)
+  var modN=Math.max(2,+document.getElementById('adv-modn-num').value||30);
+  var invert=(document.getElementById('adv-invert')||{}).checked;
+  var view=document.getElementById('adv-view').value;
+  var show=document.getElementById('adv-show').value;
+  var ang=+document.getElementById('adv-angle').value;
+  var lscale=document.getElementById('adv-rscale').value;
+  var labelMode=document.getElementById('adv-labels').value;
+  var lsize=+document.getElementById('adv-lsize').value||8;
+  var showChords=(document.getElementById('adv-chords')||{}).checked;
+  var showSpokes=(document.getElementById('adv-spokes')||{}).checked;
+  var showPoly=(document.getElementById('adv-polygon')||{}).checked;
+  var showCross=(document.getElementById('adv-crossmod')||{}).checked;
+  var showMirror=(document.getElementById('adv-mirror')||{}).checked;
+  var showDipole=(document.getElementById('adv-dipole')||{}).checked;
+  var cutDeg=_advCutAngle;
+
+  var fracs=_buildFractions(modN);
+  var allPts=(show==='cop')?fracs.cop:(show==='ncp')?fracs.ncp:fracs.cop.concat(fracs.ncp);
+  var copSet=new Set(fracs.cop.map(function(p){return p.r+','+p.m;}));
+
+  // Layout
+  var _unfold=(view!=='circle');
+  var _circW=(view==='split')?W*0.47:(view==='circle'?W:0);
+  var _rectX=(view==='split')?W*0.51:(view==='rect'?W*0.02:W);
+  var _rectW=(view==='split')?W*0.47:(view==='rect'?W*0.96:0);
+  var _rectPAD=H*0.05, _rectH=H-_rectPAD*2, _rectCy=H/2;
+
+  var cx=(view==='split')?_circW/2:(view==='rect'?-9999:W/2);
+  var cy=H/2;
+  var spacing=1, rinner=0.04, zoom=1;
+  var cpW=(view==='rect')?0:((view==='split')?_circW:W);
+  var rBase=cpW*0.42*spacing; if(rBase>cpW*0.49) rBase=cpW*0.49;
+  var rMin=cpW*rinner*zoom, rMax=rBase*zoom;
+  if(rMin>=rMax) rMin=rMax*0.05;
+
+  function radius(m){
+    var _m=invert?(modN-m+1):m; var t;
+    if(lscale==='log') t=Math.log(Math.max(_m,1))/Math.log(Math.max(modN,2));
+    else if(lscale==='sqrt') t=Math.sqrt(_m)/Math.sqrt(modN);
+    else if(lscale==='quadratic') t=(_m*_m)/(modN*modN);
+    else t=(_m-1)/Math.max(modN-1,1);
+    return rMin+(rMax-rMin)*t;
+  }
+  var angRad=(ang+90)*Math.PI/180; // +90 so 0° = top
+  var cutRad=(cutDeg+ang)*Math.PI/180;
+
+  function ptXY(r,m){
+    var theta=2*Math.PI*r/(m||1)+angRad;
+    var rad=radius(m);
+    if(_unfold && view!=='circle'){
+      var cpx=cx+rad*Math.sin(theta);
+      var cpy=cy-rad*Math.cos(theta);
+      var th2=((theta%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+      var _mCol=invert?(modN-m):(m-1);
+      var rx2=_rectX+_mCol/Math.max(modN-1,1)*_rectW;
+      var ry2=_rectCy+((th2/Math.PI)-1)*(_rectH/2);
+      return {x:view==='rect'?rx2:cpx,y:view==='rect'?ry2:cpy,rx:rx2,ry:ry2,cx:cpx,cy:cpy};
+    }
+    return {x:cx+rad*Math.sin(theta),y:cy-rad*Math.cos(theta)};
+  }
+
+  // Rings
+  if(view!=='rect'){
+    for(var m=1;m<=modN;m++){
+      var rr=radius(m);
+      ctx.beginPath(); ctx.arc(cx,cy,rr,0,2*Math.PI);
+      ctx.strokeStyle='#2a4a6a'; ctx.lineWidth=m===modN?1.2:0.4;
+      ctx.globalAlpha=m===modN?0.7:0.12; ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // Unfold rect background
+  if(_unfold && _rectW>0){
+    ctx.strokeStyle='rgba(249,115,22,0.3)'; ctx.lineWidth=1;
+    ctx.strokeRect(_rectX,_rectCy-_rectH/2,_rectW,_rectH);
+    var _cutTh2=((cutRad%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+    var _cutY=_rectCy+((_cutTh2/Math.PI)-1)*(_rectH/2);
+    ctx.beginPath(); ctx.moveTo(_rectX,_cutY); ctx.lineTo(_rectX+_rectW,_cutY);
+    ctx.strokeStyle='#f97316'; ctx.lineWidth=1.5; ctx.setLineDash([6,3]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(249,115,22,0.6)'; ctx.font='7px JetBrains Mono,monospace';
+    ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillText('cut '+cutDeg.toFixed(0)+'°',_rectX+3,_cutY-1);
+    ctx.globalAlpha=1;
+    [0.25,0.5,0.75].forEach(function(f){
+      var gy=_rectCy-_rectH/2+f*_rectH;
+      ctx.beginPath(); ctx.moveTo(_rectX,gy); ctx.lineTo(_rectX+_rectW,gy);
+      ctx.strokeStyle='rgba(249,115,22,0.1)'; ctx.lineWidth=0.5; ctx.stroke();
+    });
+    if(view==='split'){
+      ctx.beginPath(); ctx.moveTo(W*0.49,H*0.05); ctx.lineTo(W*0.49,H*0.95);
+      ctx.strokeStyle='rgba(249,115,22,0.15)'; ctx.lineWidth=1; ctx.setLineDash([5,6]); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+
+  // ── Draw points per view pass ─────────────────────────────────────────────
+  function drawPass(passView){
+    var col1='#4a90d9', col2='#c94040';
+    var sets=[];
+    if(show==='both'||show==='cop') sets.push({pts:fracs.cop,color:col1,which:'cop'});
+    if(show==='both'||show==='ncp') sets.push({pts:fracs.ncp,color:col2,which:'ncp'});
+
+    sets.forEach(function(s){
+      var pts=s.pts, color=s.color, which=s.which;
+      var ptMap={};
+      pts.forEach(function(p){ptMap[p.r+'/'+p.m]=p;});
+
+      // Chords: r/m ↔ (m-r)/m
+      if(showChords){
+        var done={};
+        pts.forEach(function(p){
+          var pr=p.m-p.r;
+          var k1=p.r+'/'+p.m, k2=pr+'/'+p.m;
+          if(done[k1]||done[k2]) return;
+          if(ptMap[k2]&&p.r!==pr){
+            done[k1]=done[k2]=1;
+            var xy1=ptXY(p.r,p.m), xy2=ptXY(pr,p.m);
+            if(!xy1||!xy2) return;
+            var x1=passView==='rect'?(xy1.rx||xy1.x):xy1.x;
+            var y1=passView==='rect'?(xy1.ry||xy1.y):xy1.y;
+            var x2=passView==='rect'?(xy2.rx||xy2.x):xy2.x;
+            var y2=passView==='rect'?(xy2.ry||xy2.y):xy2.y;
+            ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+            ctx.strokeStyle=color; ctx.lineWidth=Math.max(0.05,1-modN/400);
+            ctx.globalAlpha=0.04+0.14*p.m/modN; ctx.stroke();
+          }
+        });
+        ctx.globalAlpha=1;
+      }
+
+      // Cross-mod: r/m → r/(m+1)
+      if(showCross){
+        var ptByRM={};
+        pts.forEach(function(p){ptByRM[p.r+','+p.m]=true;});
+        var drawnC={};
+        pts.forEach(function(p){
+          if(p.m>=modN) return;
+          if(!ptByRM[p.r+','+(p.m+1)]) return;
+          var ek=p.r+':'+p.m+'-'+(p.m+1);
+          if(drawnC[ek]) return; drawnC[ek]=1;
+          var h=Math.round(360*(p.r%modN)/modN);
+          var xy1=ptXY(p.r,p.m), xy2=ptXY(p.r,p.m+1);
+          if(!xy1||!xy2) return;
+          ctx.beginPath(); ctx.moveTo(xy1.x,xy1.y); ctx.lineTo(xy2.x,xy2.y);
+          ctx.strokeStyle='hsl('+h+',65%,55%)'; ctx.lineWidth=0.4;
+          ctx.globalAlpha=0.15+0.35*(p.m/modN); ctx.stroke();
+        });
+        ctx.globalAlpha=1;
+      }
+
+      // Ring polygon
+      if(showPoly){
+        var byM={};
+        pts.forEach(function(p){if(!byM[p.m])byM[p.m]=[];byM[p.m].push(p);});
+        var mList=Object.keys(byM).map(Number).sort(function(a,b){return a-b;});
+        mList.forEach(function(m){
+          var ring=(byM[m]||[]).slice().sort(function(a,b){return a.r/a.m-b.r/b.m;});
+          if(ring.length<2) return;
+          var mi=mList.indexOf(m);
+          var h=Math.round(360*mi/Math.max(mList.length-1,1));
+          ctx.strokeStyle='hsl('+h+',65%,55%)';
+          ctx.lineWidth=Math.max(0.2,1-modN/300);
+          ctx.globalAlpha=0.25+0.75*(m/modN);
+          var rpts=ring.map(function(rp){return ptXY(rp.r,rp.m);}).filter(Boolean);
+          if(rpts.length<2) return;
+          ctx.beginPath(); ctx.moveTo(rpts[0].x,rpts[0].y);
+          for(var i=1;i<rpts.length;i++) ctx.lineTo(rpts[i].x,rpts[i].y);
+          ctx.lineTo(rpts[0].x,rpts[0].y); ctx.stroke();
+        });
+        ctx.globalAlpha=1;
+      }
+
+      // Dots
+      var dotBase=W/300;
+      pts.forEach(function(p){
+        var xy=ptXY(p.r,p.m); if(!xy) return;
+        var x=passView==='rect'?(xy.rx!==undefined?xy.rx:xy.x):xy.x;
+        var y=passView==='rect'?(xy.ry!==undefined?xy.ry:xy.y):xy.y;
+        var hasGap=(_advGap!==null&&_advGapPairs.length>0);
+        var dotR=Math.max(1,(1-p.m/modN*0.15)*dotBase*(p.m===modN?1.4:1));
+        var dotColor=_ptColor(p,modN,color);
+        ctx.globalAlpha=hasGap?0.1:0.9; // gap overlay draws its own highlighted dots
+        ctx.beginPath(); ctx.arc(x,y,dotR,0,2*Math.PI);
+        ctx.fillStyle=dotColor; ctx.fill();
+        // Label
+        if(labelMode!=='none'&&p.m===modN){
+          var lbl='';
+          if(labelMode==='fraction') lbl=p.r+'/'+p.m;
+          else if(labelMode==='r') lbl=''+p.r;
+          else if(labelMode==='angle') lbl=Math.round(360*p.r/p.m)+'°';
+          else if(labelMode==='decimal') lbl=(p.r/p.m).toFixed(2);
+          else if(labelMode==='gcd') lbl=''+_gcd(p.r,p.m);
+          if(lbl){
+            ctx.globalAlpha=1; ctx.font=lsize+'px JetBrains Mono,monospace';
+            ctx.fillStyle=dotColor; ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(lbl,x,y-dotR-lsize*0.7);
+          }
+        }
+      });
+      ctx.globalAlpha=1;
+    }); // end sets.forEach
+  }
+
+  // Execute draw passes
+  if(view==='split'){
+    ctx.save(); ctx.beginPath(); ctx.rect(0,0,_circW,H); ctx.clip();
+    drawPass('circ');
+    ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(_rectX,0,_rectW,H); ctx.clip();
+    drawPass('rect');
+    ctx.restore();
+  } else {
+    drawPass(view);
+  }
+
+  // ── Full gap overlay (inward paths + chords) ─────────────────────────────
+  _advDrawGapOverlay(ctx,W,H,modN,ptXY,view,_rectX,_rectW,_rectH,_rectCy,_circW);
+
+  // ── Mirror σ(r) = M-r ──────────────────────────────────────────────────
+  if(showMirror && view!=='rect'){
+    var copOuter={};
+    fracs.cop.forEach(function(p){if(p.m===modN) copOuter[p.r]=true;});
+    var drawn={};
+    Object.keys(copOuter).forEach(function(rStr){
+      var r=parseInt(rStr);
+      var mir=(modN-r)%modN;
+      var key=Math.min(r,mir)+':'+Math.max(r,mir);
+      if(drawn[key]) return; drawn[key]=1;
+      var isFixed=(r===mir);
+      var xy1=ptXY(r,modN);
+      if(!xy1) return;
+      if(isFixed){
+        ctx.beginPath(); ctx.arc(xy1.x,xy1.y,Math.max(4,W*0.009),0,2*Math.PI);
+        ctx.strokeStyle='#ffd700'; ctx.lineWidth=2; ctx.globalAlpha=0.9; ctx.stroke();
+      } else if(copOuter[mir]){
+        var xy2=ptXY(mir,modN);
+        if(!xy2) return;
+        ctx.beginPath(); ctx.moveTo(xy1.x,xy1.y); ctx.lineTo(xy2.x,xy2.y);
+        ctx.strokeStyle='#e879f9'; ctx.lineWidth=1; ctx.globalAlpha=0.5; ctx.stroke();
+        [xy1,xy2].forEach(function(xy){
+          ctx.beginPath(); ctx.arc(xy.x,xy.y,Math.max(2,W*0.004),0,2*Math.PI);
+          ctx.fillStyle='#e879f9'; ctx.globalAlpha=0.8; ctx.fill();
+        });
+      }
+    });
+    ctx.globalAlpha=1;
+  }
+
+  // ── Dipole field ────────────────────────────────────────────────────────
+  if(showDipole && view!=='rect'){
+    var dBase=Math.max(2,+document.getElementById('adv-dipole-base').value||30);
+    var dNmax=Math.max(1,+document.getElementById('adv-dipole-nmax').value||3);
+    var dRings=[];
+    for(var dn=0;dn<=dNmax;dn++){
+      var dm=dBase*Math.pow(2,dn);
+      if(dm>modN) break;
+      dRings.push(Math.round(dm));
+    }
+    dRings.forEach(function(dm,li){
+      var lAlpha=0.3+0.55*li/Math.max(dRings.length-1,1);
+      var rad=radius(dm);
+      ctx.beginPath(); ctx.arc(cx,cy,rad,0,2*Math.PI);
+      ctx.strokeStyle='#e879f9'; ctx.lineWidth=0.8; ctx.globalAlpha=lAlpha*0.4;
+      ctx.setLineDash([3,5]); ctx.stroke(); ctx.setLineDash([]);
+      var copR=[];
+      for(var r=1;r<dm;r++) if(_gcd(r,dm)===1) copR.push(r);
+      var drawnD={};
+      copR.forEach(function(r){
+        var mirror=dm-r;
+        if(mirror<=0||mirror>=dm||_gcd(mirror,dm)!==1) return;
+        var pk=Math.min(r,mirror)+':'+Math.max(r,mirror);
+        if(drawnD[pk]) return; drawnD[pk]=1;
+        if(r===mirror) return;
+        var pt1=ptXY(r,dm), pt2=ptXY(mirror,dm);
+        if(!pt1||!pt2) return;
+        try{
+          var grad=ctx.createLinearGradient(pt1.x,pt1.y,pt2.x,pt2.y);
+          grad.addColorStop(0,'#4ecdc4'); grad.addColorStop(1,'#e879f9');
+          ctx.strokeStyle=grad;
+        } catch(e){ ctx.strokeStyle='#e879f9'; }
+        ctx.lineWidth=1.2; ctx.globalAlpha=lAlpha*0.65;
+        ctx.beginPath(); ctx.moveTo(pt1.x,pt1.y); ctx.lineTo(pt2.x,pt2.y); ctx.stroke();
+        // Arc outside
+        var mx=(pt1.x+pt2.x)/2, my=(pt1.y+pt2.y)/2;
+        var os=1.6+0.8*(li/Math.max(dRings.length-1,1));
+        var cvx=cx+(mx-cx)*os, cvy=cy+(my-cy)*os;
+        ctx.beginPath(); ctx.moveTo(pt1.x,pt1.y); ctx.quadraticCurveTo(cvx,cvy,pt2.x,pt2.y);
+        ctx.lineWidth=0.6; ctx.globalAlpha=lAlpha*0.35; ctx.stroke();
+        // Dots
+        [[pt1,'#4ecdc4'],[pt2,'#e879f9']].forEach(function(pd){
+          ctx.beginPath(); ctx.arc(pd[0].x,pd[0].y,Math.max(2,W*0.005),0,2*Math.PI);
+          ctx.fillStyle=pd[1]; ctx.globalAlpha=lAlpha+0.1; ctx.fill();
+        });
+      });
+    });
+    ctx.globalAlpha=1;
+  }
+
+  // Center dot
+  if(view!=='rect'){
+    ctx.beginPath(); ctx.arc(cx,cy,3,0,2*Math.PI);
+    ctx.fillStyle='#8a8a6a'; ctx.globalAlpha=0.6; ctx.fill(); ctx.globalAlpha=1;
+  }
+
+  // ── Prime spiral + ±n paths ─────────────────────────────────────────────
+  var _advPtXYFn = function(r,m){
+    var theta=2*Math.PI*r/(m||1)+angRad;
+    var rad=radius(m);
+    if(_unfold&&view!=='circle'){
+      var th2=((theta%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+      var _mCol=invert?(modN-m):(m-1);
+      var rx2=_rectX+_mCol/Math.max(modN-1,1)*_rectW;
+      var ry2=_rectCy+((th2/Math.PI)-1)*(_rectH/2);
+      return {x:view==='rect'?rx2:(cx+rad*Math.sin(theta)),
+              y:view==='rect'?ry2:(cy-rad*Math.cos(theta))};
+    }
+    return {x:cx+rad*Math.sin(theta),y:cy-rad*Math.cos(theta)};
+  };
+  advDrawPaths(ctx, W, H, modN, _advPtXYFn, radius, angRad, _gcd);
+
+  // ── Path labels (spiral + ±n points) ─────────────────────────────────────
+  _advDrawPathLabels(ctx, W, H, modN, _advPtXYFn);
+
+  // ── Inspect overlay (hover + pinned points) ───────────────────────────────
+  _advDrawInspect(ctx, W, H, modN, _advPtXYFn);
+
+  // Attribution
+  ctx.fillStyle='rgba(200,168,74,0.3)'; ctx.font='7px JetBrains Mono,monospace';
+  ctx.textAlign='right'; ctx.textBaseline='bottom';
+  ctx.fillText('wessengetachew.github.io',W-4,H-3);
+  ctx.restore();
+}
+
+// ── Gap overlay — full system ported from Farey Explorer ─────────────────
+var GAP_COLORS={
+  1:'#ff6b6b', 2:'#4ecdc4', 4:'#45b7d1', 6:'#96ceb4',
+  8:'#ffeaa7', 10:'#dfe6e9', 12:'#fd79a8', 14:'#a29bfe',
+  16:'#6c5ce7', 18:'#00b894', 20:'#fdcb6e', 22:'#e17055',
+  24:'#74b9ff', 26:'#55efc4', 28:'#fab1a0', 30:'#81ecec'
+};
+var _advSelectedR = new Set();  // multi-select residues
+var _advInspectMode = false;    // both gap colour mode AND click-to-pin
+var _advRMode = 'addressable';  // 'addressable' or 'actual'
+var _advOverlayAlpha = 0.8;
+// Inspect / pinned points
+var _advPinned = [];            // [{r,m,x,y,color,key}]
+var _advHoverPt = null;
+var _advPathLabels = false;     // show path labels (spiral + npath points)
+var _advLabelFmt = 'r';        // label format: r, rM, Mr, dec, deg, gcd
+var ADV_PIN_COLORS = ['#ff6b6b','#ffd700','#4ecdc4','#c084fc','#f97316','#34d399','#60a5fa','#f472b6'];
+var _advOverlayThick = 1.0;
+var _advStopBoundary = false;
+var MAX_DISPLAY = 300;
+
+function _isValidGap(g){ return g===1||(g>0&&g%2===0); }
+
+function _sievePairsForGap(gap, modN, limit){
+  limit = limit||Math.max(modN*20, 5000);
+  var top = limit+gap;
+  var sieve = new Uint8Array(top+1);
+  sieve[0]=sieve[1]=1;
+  for(var i=2;i*i<=top;i++) if(!sieve[i]) for(var j=i*i;j<=top;j+=i) sieve[j]=1;
+  var pairs=[], seen={};
+  for(var p=2;p<=limit;p++){
+    if(sieve[p]||sieve[p+gap]) continue;
+    // Verify exact gap
+    var exact=true;
+    for(var q=p+1;q<p+gap;q++){if(!sieve[q]){exact=false;break;}}
+    if(!exact) continue;
+    var r1=((p%modN)+modN)%modN;
+    var r2=(((p+gap)%modN)+modN)%modN;
+    if(!r1||!r2) continue;
+    if(_gcd(r1,modN)!==1||_gcd(r2,modN)!==1) continue;
+    var key=r1+','+r2;
+    if(seen[key]) continue; seen[key]=true;
+    pairs.push({r1:r1,r2:r2,m:modN,p:p,gap:gap});
+  }
+  return pairs;
+}
+
+function advApplyGap(gap){
+  gap=parseInt(gap);
+  if(!_isValidGap(gap)){ _advInfo('Gap '+gap+' is not a valid prime gap'); return; }
+  var modN=+document.getElementById('adv-modn-num').value||30;
+  if(gap===1){
+    // Residue r=1 on every ring
+    var pairs=[];
+    for(var m=2;m<=modN;m++) pairs.push({r1:1,r2:1,m:m,p:null,gap:1});
+    _advGap=1; _advGapPairs=pairs; _advGapColor='#ffd700';
+  } else {
+    var pairs=_sievePairsForGap(gap,modN);
+    if(!pairs.length){ _advInfo('No prime pairs for gap '+gap+' (sieve to '+Math.max(modN*20,5000)+')'); return; }
+    _advGap=gap; _advGapPairs=pairs; _advGapColor=GAP_COLORS[gap]||'#4a90d9';
+  }
+  _advSelectedR=new Set();
+  _advUpdateGapInfo();
+  _advUpdateRTable();
+  if(window.advDraw) window.advDraw();
+}
+
+function advApplyMultiGap(raw){
+  var gaps=raw.split(/[,\s]+/).map(function(s){return parseInt(s);}).filter(function(n){return !isNaN(n)&&n>0;});
+  if(!gaps.length) return;
+  var invalid=gaps.filter(function(g){return !_isValidGap(g);});
+  if(invalid.length){ _advInfo('Invalid gaps: '+invalid.join(',')); return; }
+  var modN=+document.getElementById('adv-modn-num').value||30;
+  var allPairs=[];
+  gaps.forEach(function(gap){
+    var p=_sievePairsForGap(gap,modN);
+    p.forEach(function(pair){allPairs.push(pair);});
+  });
+  if(!allPairs.length){ _advInfo('No pairs found for gap(s): '+gaps.join(',')); return; }
+  _advGap=gaps[0]; _advGapPairs=allPairs; _advGapColor=GAP_COLORS[gaps[0]]||'#4a90d9';
+  _advSelectedR=new Set();
+  _advUpdateGapInfo();
+  _advUpdateRTable();
+  if(window.advDraw) window.advDraw();
+}
+
+function advClearGap(){
+  _advGap=null; _advGapPairs=[]; _advSelectedR=new Set();
+  var info=document.getElementById('adv-info');
+  if(info) info.textContent='Click a point for details.';
+  var rt=document.getElementById('adv-r-table');
+  if(rt) rt.innerHTML='';
+  if(window.advDraw) window.advDraw();
+}
+window.advClearGap=advClearGap;
+
+function advShowGap(gap){ advApplyGap(gap); }
+window.advShowGap=advShowGap;
+
+function advGapInputApply(){
+  var el=document.getElementById('adv-gap-input');
+  if(!el||!el.value.trim()){ advClearGap(); return; }
+  var raw=el.value.trim();
+  var gaps=raw.split(/[,\s]+/).filter(function(s){return s.length;});
+  if(gaps.length===1) advApplyGap(+gaps[0]);
+  else advApplyMultiGap(raw);
+}
+window.advGapInputApply=advGapInputApply;
+
+function advSelectR(r){
+  if(_advSelectedR.has(r)) _advSelectedR.delete(r); else _advSelectedR.add(r);
+  _advUpdateRTable();
+  if(window.advDraw) window.advDraw();
+}
+window.advSelectR=advSelectR;
+
+function _advInfo(msg){
+  var el=document.getElementById('adv-info');
+  if(el) el.textContent=msg;
+}
+
+function _advUpdateGapInfo(){
+  var modN=+document.getElementById('adv-modn-num').value||30;
+  var gapNames={1:'Gap 1',2:'Twin primes',4:'Cousin primes',6:'Sexy primes'};
+  var name=gapNames[_advGap]||'Gap '+_advGap;
+  var msg=name+' · '+_advGapPairs.length+' unique (r₁,r₂) pairs mod '+modN;
+  _advInfo(msg);
+  // update stats panel
+  var sp=document.getElementById('adv-gap-stats');
+  if(!sp) return;
+  sp.style.display='block';
+  var r1set={},r2set={};
+  _advGapPairs.forEach(function(p){r1set[p.r1]=true;r2set[p.r2]=true;});
+  var allR=Object.keys(Object.assign({},r1set,r2set)).map(Number).sort(function(a,b){return a-b;});
+  sp.innerHTML='<strong style="color:'+_advGapColor+'">'+name+'</strong>'
+    +' &nbsp;·&nbsp; <span style="color:#e879f9">'+_advGapPairs.length+'</span> pairs'
+    +' &nbsp;·&nbsp; residues: <span style="color:#4ecdc4">'+allR.join(', ')+'</span>';
+}
+
+function _advUpdateRTable(){
+  var el=document.getElementById('adv-r-table');
+  if(!el||!_advGapPairs.length){if(el)el.innerHTML='';return;}
+  var modN=+document.getElementById('adv-modn-num').value||30;
+  // Collect unique r values
+  var rList=[],rSeen={};
+  _advGapPairs.forEach(function(pair){
+    if(!rSeen[pair.r1]){rSeen[pair.r1]=true;rList.push(pair.r1);}
+    if(!rSeen[pair.r2]){rSeen[pair.r2]=true;rList.push(pair.r2);}
+  });
+  var r1Pairs={},r2Pairs={};
+  _advGapPairs.forEach(function(pair){
+    if(!r1Pairs[pair.r1])r1Pairs[pair.r1]=[];
+    r1Pairs[pair.r1].push(pair);
+    if(!r2Pairs[pair.r2])r2Pairs[pair.r2]=[];
+    r2Pairs[pair.r2].push(pair);
+  });
+  function rCol(idx){
+    if(!_advInspectMode) return _advGapColor;
+    return 'hsl('+Math.round((idx*137.508)%360)+',82%,58%)';
+  }
+  var html='';
+  rList.forEach(function(r,idx){
+    var col=rCol(idx);
+    var isSel=_advSelectedR.has(r);
+    var bg=isSel?'rgba(255,215,0,0.10)':'rgba(255,255,255,0.03)';
+    var bc=isSel?'#ffd700':col;
+    // Path: r mod m for m=modN down to 1
+    var pathStr='';
+    var shown=0;
+    for(var m=modN;m>=1&&shown<10;m--){
+      if(_advStopBoundary&&m<r) break;
+      var rem=((r%m)+m)%m;
+      var isCop=_gcd(rem||m,m)===1;
+      var bullet=isCop?'<span style="color:#4ecdc4">●</span>':'<span style="color:#c94040">○</span>';
+      pathStr+=bullet+'<span style="color:#666">m='+m+'</span>:'+rem+'/'+m+' ';
+      shown++;
+    }
+    if(modN>10) pathStr+='<span style="color:#666">…</span>';
+    var primes=(r1Pairs[r]||[]).slice(0,5).map(function(p){return p.p;}).join(', ');
+    if((r1Pairs[r]||[]).length>5) primes+='…';
+    html+='<div onclick="advSelectR('+r+')" style="cursor:pointer;margin-bottom:8px;padding:6px 8px;'
+      +'border-left:3px solid '+bc+';background:'+bg+';border-radius:0 3px 3px 0;font-size:8px;line-height:1.8">'
+      +'<div style="display:flex;justify-content:space-between"><strong style="color:'+col+'">r = '+r+'</strong>'
+      +'<span style="color:#666">θ='+(360*r/modN).toFixed(1)+'°</span></div>'
+      +(primes?'<div style="color:#9a8060">primes: <span style="color:#ffd700">'+primes+'</span></div>':'')
+      +'<div style="word-break:break-all">'+pathStr+'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+// ── Adv gap drawing — called inside advDraw after main points ─────────────
+function _advDrawGapOverlay(ctx, W, H, modN, ptXYFn, view, _rectX, _rectW, _rectH, _rectCy, _circW){
+  if(_advGap===null||!_advGapPairs.length) return;
+  var pairs=_advGapPairs.slice(0,MAX_DISPLAY);
+  var n=pairs.length;
+  var overlayAlpha=_advOverlayAlpha;
+  var thickScale=_advOverlayThick;
+
+  // Collect unique highlighted residues
+  function _isPrime(n){if(n<2)return false;if(n===2)return true;if(n%2===0)return false;for(var d=3;d*d<=n;d+=2){if(n%d===0)return false;}return true;}
+  var isActual=(_advRMode==='actual');
+  var hlList=[],hlSeen={};
+  pairs.forEach(function(pair){
+    if(!hlSeen[pair.r1]&&(!isActual||_isPrime(pair.r1))){hlSeen[pair.r1]=true;hlList.push(pair.r1);}
+    if(!hlSeen[pair.r2]&&(!isActual||_isPrime(pair.r2))){hlSeen[pair.r2]=true;hlList.push(pair.r2);}
+  });
+
+  var palette=[];
+  if(_advInspectMode) hlList.forEach(function(_,i){palette.push('hsl('+Math.round((i*137.508)%360)+',82%,58%)');});
+
+  var hasSel=(_advSelectedR.size>0);
+  function rCol(r){
+    if(_advSelectedR.has(r)) return '#ffe033';
+    if(!_advInspectMode) return _advGapColor;
+    var idx=hlList.indexOf(r);
+    return idx>=0?palette[idx]:_advGapColor;
+  }
+  function rAlpha(r){
+    if(isActual&&!_isPrime(r)) return 0;
+    if(!hasSel) return 1;
+    return _advSelectedR.has(r)?1:0.15;
+  }
+
+  // Draw order: non-selected first
+  var drawOrder=hlList.slice().sort(function(a,b){
+    return (_advSelectedR.has(a)?1:0)-(_advSelectedR.has(b)?1:0);
+  });
+
+  drawOrder.forEach(function(r){
+    var col=rCol(r); var aScale=rAlpha(r); var isSel=_advSelectedR.has(r);
+    if(aScale===0) return;
+    var lineW=(isSel?3.5:1.0)*thickScale;
+    // Inward cross-mod path from outer ring down
+    for(var mk=modN-1;mk>=1;mk--){
+      if(_advStopBoundary&&mk<r) break;
+      var xyA=ptXYFn(r,mk), xyB=ptXYFn(r,mk+1);
+      if(!xyA||!xyB) continue;
+      var t=mk/modN;
+      ctx.beginPath(); ctx.moveTo(xyA.x,xyA.y); ctx.lineTo(xyB.x,xyB.y);
+      ctx.strokeStyle=col;
+      ctx.lineWidth=Math.max(0.6,W*0.002*t)*lineW;
+      ctx.globalAlpha=(isSel?(0.6+0.4*t):(0.2+0.55*t))*overlayAlpha*aScale;
+      ctx.stroke();
+    }
+    // Outer ring dot
+    var xyOuter=ptXYFn(r,modN); if(!xyOuter) return;
+    var dotR=Math.max(3,W*0.006);
+    if(isSel){
+      ctx.beginPath(); ctx.arc(xyOuter.x,xyOuter.y,dotR*2.6,0,2*Math.PI);
+      ctx.strokeStyle='#ffd700'; ctx.lineWidth=1.5; ctx.globalAlpha=0.5; ctx.stroke();
+      dotR*=1.7;
+    }
+    ctx.beginPath(); ctx.arc(xyOuter.x,xyOuter.y,dotR,0,2*Math.PI);
+    ctx.fillStyle=col; ctx.globalAlpha=isSel?1.0:0.95*aScale; ctx.fill();
+  });
+
+  // Chords between r1 and r2 at outer ring
+  pairs.forEach(function(pair,i){
+    var xy1=ptXYFn(pair.r1,pair.m||modN);
+    var xy2=ptXYFn(pair.r2,pair.m||modN);
+    if(!xy1||!xy2) return;
+    var chordCol=_advInspectMode?rCol(pair.r1):_advGapColor;
+    ctx.globalAlpha=(0.5+0.35*(i/Math.max(n-1,1)))*overlayAlpha;
+    if(pair.r1===pair.r2){
+      ctx.beginPath(); ctx.arc(xy1.x,xy1.y,Math.max(3,W*0.006),0,2*Math.PI);
+      ctx.fillStyle=chordCol; ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.moveTo(xy1.x,xy1.y); ctx.lineTo(xy2.x,xy2.y);
+      ctx.strokeStyle=chordCol; ctx.lineWidth=Math.max(1,W*0.0025); ctx.stroke();
+    }
+  });
+  ctx.globalAlpha=1;
+}
+
+// ── Unfold animation ────────────────────────────────────────────────────────
+function advToggleUnfoldPlay(){
+  var btn=document.getElementById('adv-unfold-play');
+  if(_advUnfoldTimer){
+    cancelAnimationFrame(_advUnfoldTimer); _advUnfoldTimer=null;
+    if(btn){btn.textContent='▶ Animate';btn.style.background='';}
+    return;
+  }
+  if(btn){btn.textContent='⏹ Stop';btn.style.background='rgba(249,115,22,.2)';}
+  function step(){
+    var speed=+document.getElementById('adv-unfold-speed').value||6;
+    _advCutAngle=(_advCutAngle+speed)%360;
+    document.getElementById('adv-cut').value=Math.round(_advCutAngle);
+    document.getElementById('adv-cut-val').textContent=Math.round(_advCutAngle)+'°';
+    advDraw();
+    _advUnfoldTimer=requestAnimationFrame(step);
+  }
+  _advUnfoldTimer=requestAnimationFrame(step);
+}
+
+// Wire cut slider
+document.getElementById('adv-cut').addEventListener('input',function(){
+  _advCutAngle=+this.value;
+  advDraw();
+});
+
+// ── Export ────────────────────────────────────────────────────────────────
+function advExport(){
+  var c=_advCanvas();
+  var a=document.createElement('a');
+  a.download='zmmz_advanced_mod'+document.getElementById('adv-modn-num').value+'.png';
+  a.href=c.toDataURL('image/png'); a.click();
+}
+function advExportCSV(){
+  var modN=+document.getElementById('adv-modn-num').value||30;
+  var fracs=_buildFractions(modN);
+  var rows=['r,m,gcd,coprime,theta_deg'];
+  fracs.cop.concat(fracs.ncp).forEach(function(p){
+    rows.push([p.r,p.m,_gcd(p.r||p.m,p.m),(copSet?copSet.has(p.r+','+p.m):true)?1:0,
+      (360*p.r/p.m).toFixed(4)].join(','));
+  });
+  var a=document.createElement('a');
+  a.download='adv_mod'+modN+'.csv';
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.join('\n'));
+  a.click();
+}
+
+// ── Adv inspect & label helpers ───────────────────────────────────────────
+function _advFindNearest(mx,my){
+  var c=_advCanvas(); if(!c) return null;
+  var W=c.width,H=c.height;
+  var modN=+document.getElementById('adv-modn-num').value||30;
+  var ang=+document.getElementById('adv-angle').value;
+  var lscale=document.getElementById('adv-rscale').value;
+  var invert=(document.getElementById('adv-invert')||{}).checked;
+  var view=document.getElementById('adv-view').value;
+  var _circW=(view==='split')?W*0.47:(view==='circle'?W:0);
+  var cx=(view==='split')?_circW/2:(view==='rect'?-9999:W/2), cy=H/2;
+  var cpW=(view==='rect')?0:((view==='split')?_circW:W);
+  var rBase=cpW*0.42; if(rBase>cpW*0.49) rBase=cpW*0.49;
+  var rMin=cpW*0.04, rMax=rBase; if(rMin>=rMax) rMin=rMax*0.05;
+  function radius(m){
+    var _m=invert?(modN-m+1):m,t;
+    if(lscale==='log') t=Math.log(Math.max(_m,1))/Math.log(Math.max(modN,2));
+    else if(lscale==='sqrt') t=Math.sqrt(_m)/Math.sqrt(modN);
+    else if(lscale==='quadratic') t=(_m*_m)/(modN*modN);
+    else t=(_m-1)/Math.max(modN-1,1);
+    return rMin+(rMax-rMin)*t;
+  }
+  var angRad=(ang+90)*Math.PI/180;
+  var fracs=_buildFractions(modN);
+  var allPts=fracs.cop.concat(fracs.ncp);
+  var best=null,bestD=22;
+  allPts.forEach(function(p){
+    var theta=2*Math.PI*p.r/(p.m||1)+angRad;
+    var rad=radius(p.m);
+    var x=cx+rad*Math.sin(theta),y=cy-rad*Math.cos(theta);
+    var d=Math.hypot(mx-x,my-y);
+    if(d<bestD){bestD=d;best={r:p.r,m:p.m,x:x,y:y};}
+  });
+  return best;
+}
+function _advLabelStr(pt){
+  var f=_advLabelFmt;
+  if(f==='r') return ''+pt.r;
+  if(f==='rM') return pt.r+'/'+pt.m;
+  if(f==='Mr') return pt.m+':'+pt.r;
+  if(f==='dec') return (pt.r/pt.m).toFixed(2);
+  if(f==='deg') return Math.round(360*pt.r/pt.m)+'°';
+  if(f==='gcd') return ''+_gcd(pt.r||pt.m,pt.m);
+  return ''+pt.r;
+}
+function _advTogglePin(pt){
+  if(!pt) return;
+  var key=pt.r+'_'+pt.m;
+  var idx=_advPinned.findIndex(function(p){return p.key===key;});
+  if(idx>=0) _advPinned.splice(idx,1);
+  else _advPinned.push({r:pt.r,m:pt.m,x:pt.x,y:pt.y,key:key,color:ADV_PIN_COLORS[_advPinned.length%ADV_PIN_COLORS.length]});
+  _advUpdateInfo(pt);
+  if(window.advDraw) window.advDraw();
+}
+function _advUpdateInfo(pt){
+  var el=document.getElementById('adv-info'); if(!el) return;
+  if(!pt){el.textContent='Click a point for details.';return;}
+  var g=_gcd(pt.r||pt.m,pt.m);
+  el.textContent='r='+pt.r+' / m='+pt.m+' | gcd='+g+' | θ='+(360*pt.r/pt.m).toFixed(2)+'° | '+(g===1?'coprime':'non-coprime')+(_advPinned.length?' | pins:'+_advPinned.length:'');
+}
+function advClearPins(){
+  _advPinned=[];
+  var el=document.getElementById('adv-info');
+  if(el) el.textContent='Click a point for details.';
+  if(window.advDraw) window.advDraw();
+}
+window.advClearPins=advClearPins;
+function _advDrawInspect(ctx,W,H,modN,ptXYFn){
+  if(_advHoverPt){
+    var xy=ptXYFn(_advHoverPt.r,_advHoverPt.m);
+    if(xy){
+      ctx.strokeStyle='rgba(255,255,255,0.85)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(xy.x,xy.y,10,0,2*Math.PI);ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(xy.x,xy.y,16,0,2*Math.PI);ctx.stroke();
+    }
+  }
+  if(!_advPinned.length) return;
+  var sps=_advPinned.map(function(p){var xy=ptXYFn(p.r,p.m)||{x:0,y:0};return {r:p.r,m:p.m,color:p.color,x:xy.x,y:xy.y};});
+  if(sps.length>1){
+    for(var i=0;i<sps.length-1;i++){
+      var a=sps[i],b=sps[i+1];
+      try{var grad=ctx.createLinearGradient(a.x,a.y,b.x,b.y);grad.addColorStop(0,a.color+'cc');grad.addColorStop(1,b.color+'cc');ctx.strokeStyle=grad;}
+      catch(e){ctx.strokeStyle='#fff';}
+      ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
+      var dth=Math.abs(360*a.r/a.m-360*b.r/b.m);if(dth>180)dth=360-dth;
+      ctx.font='8px JetBrains Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.7)';
+      ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText('Δθ='+dth.toFixed(1)+'°',(a.x+b.x)/2,(a.y+b.y)/2-3);
+    }
+  }
+  sps.forEach(function(p){
+    ctx.strokeStyle=p.color+'88';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,13,0,2*Math.PI);ctx.stroke();
+    ctx.strokeStyle=p.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,8,0,2*Math.PI);ctx.stroke();
+    ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,3,0,2*Math.PI);ctx.fill();
+    var lbl='r='+p.r+'/m='+p.m;
+    ctx.font='bold 8px JetBrains Mono,monospace';
+    var tw=ctx.measureText(lbl).width;
+    ctx.fillStyle='rgba(4,4,14,0.8)';ctx.fillRect(p.x-tw/2-3,p.y-25,tw+6,13);
+    ctx.fillStyle=p.color;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(lbl,p.x,p.y-13);
+  });
+  ctx.globalAlpha=1;
+}
+function _advDrawPathLabels(ctx,W,H,modN,ptXYFn){
+  if(!_advPathLabels) return;
+  var prime=+document.getElementById('adv-prime-sel').value||2;
+  var noff=+document.getElementById('adv-noffset-num').value||1;
+  var showSpiral=(document.getElementById('adv-spiral')||{}).checked;
+  var showMirrorSp=(document.getElementById('adv-spiral-mirror')||{}).checked;
+  var showNpath=(document.getElementById('adv-npath')||{}).checked;
+  var lsize=Math.max(8,+document.getElementById('adv-lsize').value||9);
+  ctx.textAlign='center';ctx.textBaseline='bottom';
+  for(var m=1;m<=modN;m++){
+    var pts=[];
+    if(showSpiral){
+      var rs=prime%m;if(rs>=1&&rs<m&&_gcd(rs,m)===1) pts.push({r:rs,col:'rgba(200,168,74,0.95)'});
+      if(showMirrorSp){var rm=(m-rs)%m;if(rm>=1&&rm<m&&_gcd(rm,m)===1) pts.push({r:rm,col:'rgba(144,112,216,0.9)'});}
+    }
+    if(showNpath&&(m%2)===(noff%2)){
+      var rhi=(m+noff)/2;if(Number.isInteger(rhi)&&rhi>=1&&rhi<m&&_gcd(rhi,m)===1) pts.push({r:rhi,col:'rgba(200,168,74,0.9)'});
+      var rlo=(m-noff)/2;if(Number.isInteger(rlo)&&rlo>=1&&rlo<m&&_gcd(rlo,m)===1) pts.push({r:rlo,col:'rgba(61,200,184,0.9)'});
+    }
+    pts.forEach(function(pt){
+      var xy=ptXYFn(pt.r,m);if(!xy) return;
+      var lbl=_advLabelStr({r:pt.r,m:m});
+      ctx.font='bold '+lsize+'px JetBrains Mono,monospace';
+      var tw=ctx.measureText(lbl).width;
+      ctx.fillStyle='rgba(4,4,14,0.75)';ctx.fillRect(xy.x-tw/2-2,xy.y-lsize-6,tw+4,lsize+4);
+      ctx.fillStyle=pt.col;ctx.fillText(lbl,xy.x,xy.y-3);
+    });
+  }
+  ctx.globalAlpha=1;
+}
+_advCanvas().addEventListener('mousemove',function(e){
+  if(!_advInspectMode) return;
+  var c=_advCanvas(),rect=c.getBoundingClientRect();
+  _advHoverPt=_advFindNearest((e.clientX-rect.left)*(c.width/rect.width),(e.clientY-rect.top)*(c.height/rect.height))||null;
+  if(window.advDraw) window.advDraw();
+});
+_advCanvas().addEventListener('mouseleave',function(){
+  _advHoverPt=null;
+  if(_advInspectMode&&window.advDraw) window.advDraw();
+});
+_advCanvas().addEventListener('click',function(e){
+  var c=_advCanvas(),rect=c.getBoundingClientRect();
+  var pt=_advFindNearest((e.clientX-rect.left)*(c.width/rect.width),(e.clientY-rect.top)*(c.height/rect.height));
+  if(_advInspectMode) _advTogglePin(pt); else _advUpdateInfo(pt);
+});
+_advCanvas().addEventListener('touchend',function(e){
+  e.preventDefault();
+  var c=_advCanvas(),rect=c.getBoundingClientRect(),t=e.changedTouches[0];
+  var pt=_advFindNearest((t.clientX-rect.left)*(c.width/rect.width),(t.clientY-rect.top)*(c.height/rect.height));
+  if(_advInspectMode) _advTogglePin(pt); else _advUpdateInfo(pt);
+},{passive:false});
+
+// ── Prime list ────────────────────────────────────────────────────────────
+var ADV_PRIMES=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97];
+function advStepPrime(dir){
+  var sel=document.getElementById('adv-prime-sel');
+  var cur=+sel.value;
+  var idx=ADV_PRIMES.indexOf(cur);
+  idx=Math.max(0,Math.min(ADV_PRIMES.length-1,idx+dir));
+  var np=ADV_PRIMES[idx];
+  // add option if needed
+  var opt=sel.querySelector('option[value="'+np+'"]');
+  if(!opt){opt=document.createElement('option');opt.value=np;opt.textContent=np;sel.appendChild(opt);}
+  sel.value=np; advDirty=true; advDraw();
+}
+function advSetN(n){
+  document.getElementById('adv-noffset').value=n;
+  document.getElementById('adv-noffset-num').value=n;
+  advDirty=true; advDraw();
+}
+function advStepN(dir){
+  var el=document.getElementById('adv-noffset-num');
+  el.value=Math.max(1,Math.min(999,+el.value+dir));
+  document.getElementById('adv-noffset').value=Math.min(+el.value,99);
+  advDirty=true; advDraw();
+}
+
+// ── Send to main canvas ───────────────────────────────────────────────────
+function advSendToMain(){
+  var modN=+document.getElementById('adv-modn-num').value||30;
+  var M=Math.min(modN,512);
+  // Update main state
+  if(typeof S==='undefined') return;
+  S.mmax=M;
+  document.getElementById('sl-mmax').value=Math.min(M,512);
+  document.getElementById('num-mmax').value=M;
+  // Sync prime spiral
+  var p=+document.getElementById('adv-prime-sel').value||2;
+  S.prime=p;
+  S.spiral=(document.getElementById('adv-spiral')||{}).checked;
+  S.mirror=(document.getElementById('adv-spiral-mirror')||{}).checked;
+  // Sync npath
+  var n=+document.getElementById('adv-noffset-num').value||1;
+  S.noffset=n; S.npath=(document.getElementById('adv-npath')||{}).checked;
+  document.getElementById('sl-noffset').value=Math.min(n,999);
+  document.getElementById('num-noffset').value=n;
+  // Rebuild and redraw
+  if(typeof _copCache!=='undefined') window._copCache={};
+  if(typeof rebuildPrimeSelect==='function') rebuildPrimeSelect();
+  if(typeof syncUI==='function') syncUI();
+  if(typeof _geomKey!=='undefined') window._geomKey='';
+  window.dirty=true;
+}
+
+// ── Draw spiral + npath overlays on adv-canvas ────────────────────────────
+function advDrawPaths(ctx, W, H, modN, ptXYFn, radius, angRad, _gcd){
+  var showSpiral=(document.getElementById('adv-spiral')||{}).checked;
+  var showMirrorSp=(document.getElementById('adv-spiral-mirror')||{}).checked;
+  var showNpath=(document.getElementById('adv-npath')||{}).checked;
+  var prime=+document.getElementById('adv-prime-sel').value||2;
+  var noff=+document.getElementById('adv-noffset-num').value||1;
+
+  // ── Prime spiral: r ≡ prime mod M across rings ─────────────────────────
+  if(showSpiral){
+    ['spiral','mirror'].forEach(function(which,wi){
+      if(which==='mirror'&&!showMirrorSp) return;
+      var col=wi===0?'rgba(200,168,74,0.85)':'rgba(144,112,216,0.75)';
+      ctx.strokeStyle=col; ctx.lineWidth=1.8; ctx.setLineDash([]);
+      ctx.beginPath();
+      var started=false;
+      for(var m=1;m<=modN;m++){
+        var r=which==='spiral'?(prime%m):((m-(prime%m))%m);
+        if(r<1||r>=m||_gcd(r,m)!==1) continue;
+        var xy=ptXYFn(r,m);
+        if(!xy) continue;
+        if(!started){ctx.moveTo(xy.x,xy.y);started=true;}
+        else ctx.lineTo(xy.x,xy.y);
+      }
+      ctx.stroke();
+      // Highlight dots on path
+      started=false;
+      for(var m2=1;m2<=modN;m2++){
+        var r2=which==='spiral'?(prime%m2):((m2-(prime%m2))%m2);
+        if(r2<1||r2>=m2||_gcd(r2,m2)!==1) continue;
+        var xy2=ptXYFn(r2,m2);
+        if(!xy2) continue;
+        var dotR=Math.max(2,W/250*(m2===modN?1.8:1));
+        ctx.beginPath(); ctx.arc(xy2.x,xy2.y,dotR,0,2*Math.PI);
+        ctx.fillStyle=col; ctx.globalAlpha=0.9; ctx.fill();
+      }
+      ctx.globalAlpha=1;
+    });
+  }
+
+  // ── ±n paths: r = (M±n)/2 ─────────────────────────────────────────────
+  if(showNpath){
+    ['hi','lo'].forEach(function(which,wi){
+      var col=wi===0?'rgba(200,168,74,0.9)':'rgba(61,200,184,0.9)';
+      ctx.strokeStyle=col; ctx.lineWidth=1.8; ctx.setLineDash([]);
+      ctx.beginPath();
+      var started=false;
+      for(var m=2;m<=modN;m++){
+        if((m%2)!==(noff%2)) continue;
+        var r=which==='hi'?(m+noff)/2:(m-noff)/2;
+        if(r<1||r>=m||_gcd(r,m)!==1) continue;
+        var xy=ptXYFn(r,m);
+        if(!xy) continue;
+        if(!started){ctx.moveTo(xy.x,xy.y);started=true;}
+        else ctx.lineTo(xy.x,xy.y);
+      }
+      ctx.stroke();
+      // Dots
+      for(var m3=2;m3<=modN;m3++){
+        if((m3%2)!==(noff%2)) continue;
+        var r3=which==='hi'?(m3+noff)/2:(m3-noff)/2;
+        if(r3<1||r3>=m3||_gcd(r3,m3)!==1) continue;
+        var xy3=ptXYFn(r3,m3);
+        if(!xy3) continue;
+        var dotR3=Math.max(2,W/250*(m3===modN?1.8:1));
+        ctx.beginPath(); ctx.arc(xy3.x,xy3.y,dotR3,0,2*Math.PI);
+        ctx.fillStyle=col; ctx.globalAlpha=0.95; ctx.fill();
+      }
+      ctx.globalAlpha=1;
+    });
+  }
+}
+
+// ── Self-contained draw loop for advanced canvas ────────────────────────────
+// Watches S.mmax, S.prime, S.noffset etc. and redraws when they change
+var _advLastKey = '';
+function _advKey(){
+  if(typeof S==='undefined') return '';
+  return [S.mmax,S.prime,S.noffset,S.spiral,S.mirror,S.npath,S.invert,
+          S.delta,S.color,_advCutAngle,_advGap].join('|');
+}
+function _advLoop(){
+  if(window._advCanvasActive){
+    var k=_advKey();
+    if(k!==_advLastKey){ _advLastKey=k; advDraw(); }
+  }
+  requestAnimationFrame(_advLoop);
+}
+requestAnimationFrame(_advLoop);
+window.advDraw=advDraw;
+window.advStepPrime=advStepPrime;
+window.advSetN=advSetN;
+window.advStepN=advStepN;
+window.advSendToMain=advSendToMain;
+window.advShowGap=advShowGap;
+window.advClearGap=advClearGap;
+window.advToggleUnfoldPlay=advToggleUnfoldPlay;
+window.advExport=advExport;
+window.advExportCSV=advExportCSV;
+window.advResizeCanvas=advResizeCanvas;
+
+// Expose gap state vars so HTML onclick handlers can set them
+Object.defineProperty(window,'_advInspectMode',{get:function(){return _advInspectMode;},set:function(v){_advInspectMode=v;}});
+Object.defineProperty(window,'_advRMode',{get:function(){return _advRMode;},set:function(v){_advRMode=v;}});
+Object.defineProperty(window,'_advOverlayAlpha',{get:function(){return _advOverlayAlpha;},set:function(v){_advOverlayAlpha=v;}});
+Object.defineProperty(window,'_advOverlayThick',{get:function(){return _advOverlayThick;},set:function(v){_advOverlayThick=v;}});
+Object.defineProperty(window,'_advStopBoundary',{get:function(){return _advStopBoundary;},set:function(v){_advStopBoundary=v;}});
+Object.defineProperty(window,'_advPathLabels',{get:function(){return _advPathLabels;},set:function(v){_advPathLabels=v;}});
+Object.defineProperty(window,'_advLabelFmt',{get:function(){return _advLabelFmt;},set:function(v){_advLabelFmt=v;}});
+
+// Init on tab open — draw adv canvas when tab is clicked
+document.getElementById('dtab-btn-advanced').addEventListener('click',function(){
+  setTimeout(function(){ if(typeof advDraw==='function') advDraw(); },60);
+});
+
+// Keep adv-canvas sized correctly when window resizes
+window.addEventListener('resize',function(){
+  if(_advCanvasActive) _resizeAdvMain();
+});
+
+})();
+</script>
+
 </body>
 </html>
-
-  </html>
