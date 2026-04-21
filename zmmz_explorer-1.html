@@ -667,7 +667,6 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
         <div class="section-title">Motion</div>
         <div class="row">
           <label><input type="checkbox" id="chk-spin-drawer" onchange="document.getElementById('chk-spin').checked=this.checked;S.spin=this.checked;dirty=true;"> Spin</label>
-          <label><input type="checkbox" id="chk-area-drawer" onchange="document.getElementById('chk-area').checked=this.checked;S.area=this.checked;dirty=true;"> Area shading</label>
         </div>
       </div>
 
@@ -1533,10 +1532,10 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
         <div class="section-title" style="margin-top:8px">Unfold</div>
         <div class="row">
           <span class="ctrl-label">Cut</span>
-          <input type="range" id="adv-cut" min="0" max="360" value="180"
+          <input type="range" id="adv-cut" min="0" max="360" value="90"
             oninput="document.getElementById('adv-cut-val').textContent=this.value+'°';advDirty=true;advDraw()"
             style="width:80px">
-          <span id="adv-cut-val" style="color:#f97316;font-size:9px;min-width:32px">180°</span>
+          <span id="adv-cut-val" style="color:#f97316;font-size:9px;min-width:32px">90°</span>
         </div>
         <div class="row">
           <button id="adv-unfold-play" onclick="advToggleUnfoldPlay()" style="font-size:9px;border-color:rgba(249,115,22,.4);color:#f97316">▶ Animate</button>
@@ -1585,6 +1584,10 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <canvas id="adv-canvas" width="700" height="700"
       style="display:block;max-width:100%;max-height:100%;width:auto;height:auto;cursor:crosshair;touch-action:none"
       title="Click a point to inspect it"></canvas>
+    <div id="adv-r-overlay" style="position:absolute;top:8px;right:8px;max-height:55%;overflow-y:auto;
+      background:rgba(5,5,16,0.88);border:1px solid rgba(74,144,217,.35);border-radius:3px;
+      font-family:'JetBrains Mono',monospace;font-size:9px;min-width:110px;max-width:180px;
+      display:none;pointer-events:auto"></div>
     <div id="adv-info" style="position:absolute;bottom:8px;left:8px;right:8px;font-family:var(--mono);font-size:8px;
       color:rgba(255,255,255,.4);line-height:1.7;padding:4px 8px;background:rgba(0,0,0,.5);
       border-radius:2px;pointer-events:none">Click a point for details.</div>
@@ -1608,6 +1611,8 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       <span style="font-family:\'JetBrains Mono\',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
       <button id="adv-strip-invert-btn" class="thm-btn" style="border-color:rgba(192,132,252,.3);color:#c084fc;padding:3px 7px;font-size:9px" onclick="_ctrlInvert()" title="Invert radius">&#8651; inv</button>
       <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
+      <button id="adv-strip-dim-btn" class="thm-btn" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:3px 7px;font-size:9px;background:rgba(255,255,255,.06)" onclick="_advToggleDim()" title="Toggle dim non-path points">&#9682; dim</button>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.4);letter-spacing:.1em">zoom</span>
       <button class="thm-btn" style="padding:3px 8px;font-size:11px" onclick="_advZoomStep(-0.15)" title="Zoom out">−</button>
       <input type="range" id="adv-zoom-sl" min="0.2" max="4" step="0.05" value="1"
@@ -1621,13 +1626,21 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
         style="width:60px;accent-color:#c8a84a"
         oninput="_advPtScale=+this.value;advDirty=true;advDraw()">
       <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
-      <button class="thm-btn" style="border-color:rgba(192,132,252,.3);color:#c084fc;padding:3px 7px;font-size:9px" onclick="_advResetView()" title="Reset zoom, pan, point size">↺ view</button>
+      <select id="adv-anim-sel" onchange="if(_advAnimActive){_advAnimStop();if(this.value){_advAnimStart(this.value);}}" style="font-family:'JetBrains Mono',monospace;font-size:8px;background:#0d0d20;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:2px 4px;border-radius:2px;max-width:110px" title="Adv animation presets">
+        <option value="">— anim —</option>
+        <option value="adv_prime_sweep">Spiral p sweep</option>
+        <option value="adv_n_sweep">±n sweep</option>
+        <option value="adv_mod_grow">Grow mod N</option>
+        <option value="adv_cut_spin">Cut animate</option>
+        <option value="adv_color_cycle">Color cycle</option>
+      </select>
+      <button id="adv-strip-play-btn" class="thm-btn" style="border-color:rgba(80,245,192,.4);color:#50f5c0;padding:3px 9px;font-size:11px;min-width:28px" onclick="_advStripPlayStop()" title="Play / Stop">▶</button><button class="thm-btn" style="border-color:rgba(192,132,252,.3);color:#c084fc;padding:3px 8px;font-size:9px;margin-left:1px" onclick="_advResetView()" title="Reset view">↺</button>
     </div>
   </div>
   <div id="canvas-area">
     <div id="canvas-wrap"></div>
     <div id="thm-strip">
-  <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:center;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:center;flex-wrap:wrap;padding:2px 0">
     <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#c8a84a;letter-spacing:.1em">p</span>
     <button class="thm-btn" style="border-color:rgba(200,168,74,.4);color:#c8a84a;padding:3px 10px;font-size:11px" onclick="stepPrime(-1)">◀</button>
     <span id="lbl-prime-strip" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c8a84a;min-width:22px;text-align:center;font-weight:bold">2</span>
@@ -1640,7 +1653,21 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="stepN(1)">▶</button>
     <button id="btn-strip-npath" class="thm-btn" style="border-color:rgba(61,200,184,.3);color:#3dc8b8;padding:3px 7px;font-size:9px" onclick="_stripToggleNpath()" title="Toggle ±n paths">±n</button>
     <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
-    <button class="thm-btn coral" onclick="animStop();document.getElementById('anim-indicator').style.display='none'" title="Stop animation">■</button>
+    <!-- Animation presets -->
+    <select id="anim-preset-sel" onchange="if(ANIM.active!==null||S.spin){animStop();if(this.value){animStart(this.value);var b=document.getElementById('btn-strip-play');if(b){b.textContent='■';b.style.color='#e05060';b.style.borderColor='rgba(224,80,96,.4)';}}}" style="font-family:'JetBrains Mono',monospace;font-size:8px;background:#0d0d20;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:2px 4px;border-radius:2px;max-width:110px" title="Animation presets">
+      <option value="">— pick anim —</option>
+      <option value="m_grow" selected>Grow M</option>
+      <option value="strip_sweep">Strip sweep</option>
+      <option value="spin">Spin</option>
+      <option value="spiral_trace">Spiral trace p</option>
+      <option value="m_grow">Grow M</option>
+      <option value="m_grow_spin">Grow → Spin</option>
+      <option value="lift_scan">Lift scan</option>
+      <option value="chain_sweep">Chain sweep</option>
+      <option value="chain_spin">Chain + Spin</option>
+      <option value="farey_sweep">Farey sweep</option>
+    </select>
+    <button id="btn-strip-play" class="thm-btn" style="border-color:rgba(80,245,192,.4);color:#50f5c0;padding:3px 9px;font-size:11px;min-width:28px" onclick="_stripPlayStop()" title="Play / Stop animation">▶</button><button class="thm-btn" style="border-color:rgba(192,132,252,.4);color:#c084fc;padding:3px 8px;font-size:9px;margin-left:1px" onclick="_ctrlReset()" title="Reset canvas">↺</button>
   </div>
   </div>
 </div>
@@ -1668,12 +1695,6 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       <option value="deg">θ°</option>
       <option value="gcd">gcd</option>
     </select>
-  </div>
-  <div class="ctrl-sep"></div>
-
-  <!-- Reset -->
-  <div class="ctrl-group">
-    <button onclick="_ctrlReset()" title="Reset" style="border-color:rgba(192,132,252,.4);color:#c084fc;">↺ Reset</button>
   </div>
   <div class="ctrl-sep"></div>
 
@@ -1761,7 +1782,6 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <button id="btn-lift-stop2" style="display:none"></button>
   <input type="range" id="sl-lift-speed" min="1" max="20" value="4" style="display:none">
   <input type="checkbox" id="chk-spin" style="display:none">
-  <input type="checkbox" id="chk-area" style="display:none">
   </div>
 
 <!-- Hidden elements required by JS wiring -->
@@ -2009,11 +2029,14 @@ function buildPoints(){
         x = rr * Math.cos(theta);
         y = rr * Math.sin(theta);
       } else if(S.view==='farey'){
-        x = r/M; y = 1/M; // [0,1] x [0,1]
-        x = x*2-1; y = y*2;
-      } else { // strip — fixed Y step per ring, independent of mmax
-        x = (r/M)*2-1;
-        y = (M - 1) * 0.12 - 1;  // fixed 0.12 world units per ring, starts at y=−1
+        // Farey half-plane: x = r/M in [-1,1], y = log(1/M) normalized so M=2 is near top
+        x = r/M * 2 - 1;
+        const logY = Math.log(2/M) / Math.log(2/mmax); // 1 at M=2, 0 at M=mmax
+        y = logY * 1.8 - 0.9; // map to [-0.9, 0.9]
+      } else { // strip — Y normalized so all rings fit in world [-1, 1]
+        // delta shifts x for spin/sweep animations
+        x = ((r/M) + S.delta*0.5)*2 - 1;
+        y = mmax > 1 ? 1 - 2*(M-1)/(mmax-1) : 0; // top=M2, bottom=Mmax
       }
 
       // PlayM filter — when active, dim/hide rings except current
@@ -2225,9 +2248,13 @@ function buildBuffers(){
           x1=Math.sqrt(M)*Math.cos(th1);y1=Math.sqrt(M)*Math.sin(th1);
           x2=Math.sqrt(M+1)*Math.cos(th2);y2=Math.sqrt(M+1)*Math.sin(th2);
         } else if(S.view==='farey'){
-          x1=r/M*2-1;y1=1/M*2;x2=r2/(M+1)*2-1;y2=1/(M+1)*2;
-        } else {
-          x1=(r/M)*2-1;y1=(M/S.mmax)*2-1;x2=(r2/(M+1))*2-1;y2=((M+1)/S.mmax)*2-1;
+          const logY1 = Math.log(2/M) / Math.log(2/S.mmax);
+          const logY2 = Math.log(2/(M+1)) / Math.log(2/S.mmax);
+          x1=r/M*2-1;  y1=logY1*1.8-0.9;
+          x2=r2/(M+1)*2-1; y2=logY2*1.8-0.9;
+        } else { // strip
+          x1=(r/M)*2-1;   y1=S.mmax>1?1-2*(M-1)/(S.mmax-1):0;
+          x2=(r2/(M+1))*2-1; y2=S.mmax>1?1-2*M/(S.mmax-1):0;
         }
         lineVerts.push(x1,y1,x2,y2);
         const a = S.liftAlpha;
@@ -2272,10 +2299,12 @@ function buildBuffers(){
 function buildTransform(w,h){
   const aspect = w / h;
   let scale;
-  if(S.view === 'farey' || S.view === 'strip'){
-    // Fixed scale independent of mmax — adding rings doesn't shrink the view
-    // User controls zoom entirely via the zoom slider
-    scale = S.zoom * 2 / 50; // fixed reference size = 50
+  if(S.view === 'farey'){
+    // Farey: world x ∈ [-1,1], y ∈ [-0.9,0.9] — treat like concentric
+    scale = S.zoom * 2 / 50;
+  } else if(S.view === 'strip'){
+    // Strip: world x,y ∈ [-1,1] — fit to screen
+    scale = S.zoom * 0.88;
   } else {
     scale = S.zoom * 2 / S.mmax;
   }
@@ -2298,7 +2327,8 @@ function geomStateKey(){
   return [S.mmax,S.view,S.color,S.chain,S.lifts,S.broken,S.noncop,S.invert,
           S.spiral,S.mirror,S.prime,S.npath,S.noffset,S.allnodd,S.allp,S.allpts,
           S.channel,S.rpath,S.customR,S.hue,S.sat,S.bri,S.liftThick,S.liftAlpha,
-          S.dim,S.dimAlpha,S.chords,S.gapStr].join('|');
+          S.dim,S.dimAlpha,S.chords,S.gapStr,
+          (S.view==='strip'||S.view==='farey')?S.delta:0].join('|');
 }
 let spinAngle = 0;
 let lastTime = 0;
@@ -2514,9 +2544,10 @@ function drawOverlay(w,h,mat){
       const rho = S.invert ? (S.mmax - M + 2) : M;
       const theta = (2*Math.PI*r/M) + S.delta*M*2*Math.PI;
       let px, py;
-      if(S.view==='concentric'||S.view==='strip'){ px=rho*Math.cos(theta); py=rho*Math.sin(theta); }
+      if(S.view==='concentric'){ px=rho*Math.cos(theta); py=rho*Math.sin(theta); }
+      else if(S.view==='strip'){ px=(r/M)*2-1; py=S.mmax>1?1-2*(M-1)/(S.mmax-1):0; }
       else if(S.view==='fermat'){ const rm=Math.sqrt(M); px=rm*Math.cos(theta); py=rm*Math.sin(theta); }
-      else { px=r/M*2-1; py=1/M*2; }
+      else { px=r/M*2-1; py=Math.log(2/M)/Math.log(2/Math.max(S.mmax,3))*1.8-0.9; }
       const [sx,sy] = worldToScreen(px,py,w,h,mat,dpr);
       pathPts.push({sx,sy,M,r});
       if(!started){ ctx2d.moveTo(sx,sy); started=true; } else ctx2d.lineTo(sx,sy);
@@ -2664,7 +2695,8 @@ function drawOverlay(w,h,mat){
         const th=2*Math.PI*r/M+S.delta*M*2*Math.PI;
         let px,py;
         if(S.view==='concentric'){px=rho*Math.cos(th);py=rho*Math.sin(th);}
-        else{px=r/M*2-1;py=1/M*2;}
+        else if(S.view==='strip'){px=(r/M)*2-1;py=S.mmax>1?1-2*(M-1)/(S.mmax-1):0;}
+        else{px=r/M*2-1;py=Math.log(2/M)/Math.log(2/Math.max(S.mmax,3))*1.8-0.9;}
         const [sx,sy]=worldToScreen(px,py,w,h,mat,dpr);
         ctx2d.fillStyle='rgba(255,255,0,0.9)';
         ctx2d.beginPath();ctx2d.arc(sx,sy,6*dpr,0,Math.PI*2);ctx2d.fill();
@@ -3560,8 +3592,6 @@ function syncUI(){
   if(spd){spd.value=S.ptsize*10;document.getElementById('lbl-ptsize-drawer').textContent=S.ptsize.toFixed(1);}
   const spnD=document.getElementById('chk-spin-drawer');
   if(spnD) spnD.checked=S.spin;
-  const arD=document.getElementById('chk-area-drawer');
-  if(arD) arD.checked=S.area;
   const sdD=document.getElementById('sl-delta-drawer');
   if(sdD) sdD.value=Math.round(S.delta*100);
 }
@@ -3696,11 +3726,11 @@ function autoFitZoom(resetPan){
   } else if(S.view === 'fermat'){
     zoom = 0.44 * Math.sqrt(m);
   } else if(S.view === 'farey'){
-    // With fixed scale (ref=50): zoom=22 gives comfortable initial view
     zoom = 22;
-    if(resetPan !== false) S.panY = -0.3;
-  } else { // strip
-    zoom = 18;
+    if(resetPan !== false){ S.panX = 0; S.panY = 0; }
+  } else { // strip — world [-1,1] so zoom=1 fills screen
+    zoom = 1.0;
+    if(resetPan !== false){ S.panX = 0; S.panY = 0; }
   }
   S.zoom = Math.max(0.05, Math.min(500, zoom));
   const sl = document.getElementById('sl-zoom');
@@ -4645,6 +4675,14 @@ function animStart(name){
       dirty=true;
     });
   }
+
+  else if(name==='strip_sweep'){
+    // Continuously sweep delta to scroll the strip/farey view horizontally
+    S.spin=true; dirty=true;
+    if(document.getElementById('chk-spin')) document.getElementById('chk-spin').checked=true;
+    document.getElementById('analysis-text').innerHTML=
+      '<strong>Strip sweep</strong> — continuous horizontal scroll through all residue angles.';
+  }
 }
 
 // ── URL parameter receiver ───────────────────────────────────────────────────
@@ -5298,7 +5336,7 @@ var _advGap = null;        // active gap overlay value
 var _advGapPairs = [];     // [{r1,r2}]
 var _advGapColor = '#4ecdc4';
 var _advUnfoldTimer = null;
-var _advCutAngle = 180;    // unfold cut angle
+var _advCutAngle = 90;    // unfold cut angle
 var _advFracCache = null;
 window.advDirty = true;
 
@@ -5606,7 +5644,7 @@ function advDraw(){
         var onPath=!_pathActive||_pathSet[p.r+'/'+p.m];
         var dotR=Math.max(1,(1-p.m/modN*0.15)*dotBase*(p.m===modN?1.4:1));
         var dotColor=_ptColor(p,modN,color);
-        ctx.globalAlpha=hasGap?0.1:(onPath?0.9:0.2);
+        ctx.globalAlpha=hasGap?0.1:(onPath||!_advDimNonPath?0.9:0.2);
         ctx.beginPath(); ctx.arc(x,y,dotR,0,2*Math.PI);
         ctx.fillStyle=dotColor; ctx.fill();
         // Label
@@ -5814,10 +5852,11 @@ function advApplyGap(gap){
     // Residue r=1 on every ring
     var pairs=[];
     for(var m=2;m<=modN;m++) pairs.push({r1:1,r2:1,m:m,p:null,gap:1});
-    _advGap=1; _advGapPairs=pairs; _advGapColor='#ffd700';
+    _advGap=1; _advGapPairs=pairs.sort(function(a,b){return a.r1-b.r1;}); _advGapColor='#ffd700';
   } else {
     var pairs=_sievePairsForGap(gap,modN);
     if(!pairs.length){ _advInfo('No prime pairs for gap '+gap+' (sieve to '+Math.max(modN*20,5000)+')'); return; }
+    pairs.sort(function(a,b){return a.r1-b.r1;});
     _advGap=gap; _advGapPairs=pairs; _advGapColor=GAP_COLORS[gap]||'#4a90d9';
   }
   _advSelectedR=new Set();
@@ -5838,6 +5877,7 @@ function advApplyMultiGap(raw){
     p.forEach(function(pair){allPairs.push(pair);});
   });
   if(!allPairs.length){ _advInfo('No pairs found for gap(s): '+gaps.join(',')); return; }
+  allPairs.sort(function(a,b){return a.r1-b.r1;});
   _advGap=gaps[0]; _advGapPairs=allPairs; _advGapColor=GAP_COLORS[gaps[0]]||'#4a90d9';
   _advSelectedR=new Set();
   _advUpdateGapInfo();
@@ -5851,6 +5891,8 @@ function advClearGap(){
   if(info) info.textContent='Click a point for details.';
   var rt=document.getElementById('adv-r-table');
   if(rt) rt.innerHTML='';
+  var ov=document.getElementById('adv-r-overlay');
+  if(ov){ov.style.display='none';ov.innerHTML='';}
   if(window.advDraw) window.advDraw();
 }
 window.advClearGap=advClearGap;
@@ -5948,6 +5990,18 @@ function _advUpdateRTable(){
       +'</div>';
   });
   el.innerHTML=html;
+  // Sync to floating canvas overlay
+  var ov=document.getElementById('adv-r-overlay');
+  if(ov){
+    if(html){
+      ov.style.display='block';
+      var gapName={1:'Gap 1',2:'Twin',4:'Cousin',6:'Sexy'}[_advGap]||('Gap '+_advGap);
+      ov.innerHTML='<div style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.08);color:'+_advGapColor+';font-size:8px;letter-spacing:.1em">'+gapName+'</div>'+html;
+    } else {
+      ov.style.display='none';
+      ov.innerHTML='';
+    }
+  }
 }
 
 // ── Adv gap drawing — called inside advDraw after main points ─────────────
@@ -6696,7 +6750,7 @@ var _advLastKey = '';
 function _advKey(){
   if(typeof S==='undefined') return '';
   return [S.mmax,S.prime,S.noffset,S.spiral,S.mirror,S.npath,S.invert,
-          S.delta,S.color,_advCutAngle,_advGap,_advZoom,_advPanX,_advPanY,_advRectPanX,_advRectPanY,_advPtScale,_advSpiralMode,_advNpathMode].join('|');
+          S.delta,S.color,_advCutAngle,_advGap,_advZoom,_advPanX,_advPanY,_advRectPanX,_advRectPanY,_advPtScale,_advSpiralMode,_advNpathMode,_advDimNonPath].join('|');
 }
 function _advLoop(){
   if(window._advCanvasActive){
@@ -6707,8 +6761,126 @@ function _advLoop(){
 }
 requestAnimationFrame(_advLoop);
 window.advDraw=advDraw;
-window._advResetView=_advResetView;
+function _advToggleDim(){
+  _advDimNonPath=!_advDimNonPath;
+  var btn=document.getElementById('adv-strip-dim-btn');
+  if(btn){
+    btn.style.background=_advDimNonPath?'rgba(255,255,255,.06)':'rgba(0,0,0,0)';
+    btn.style.opacity=_advDimNonPath?'1':'0.4';
+    btn.title=_advDimNonPath?'Dim ON — click to disable':'Dim OFF — click to enable';
+  }
+  advDirty=true; advDraw();
+}
+window._advToggleDim=_advToggleDim;
 window._advZoomStep=_advZoomStep;
+
+// ── WebGL strip play/stop toggle ──────────────────────────────────────────
+function _stripPlayStop(){
+  var btn=document.getElementById('btn-strip-play');
+  var sel=document.getElementById('anim-preset-sel');
+  var isPlaying=ANIM.active!==null||S.spin;
+  if(isPlaying){
+    animStop();
+  } else {
+    var name=(sel&&sel.value)?sel.value:'';
+    // Pick sensible default for current view
+    if(!name){
+      if(S.view==='strip'||S.view==='farey') name='spiral_trace';
+      else name='spin';
+    }
+    if(sel) sel.value=name;
+    animStart(name);
+    if(btn){btn.textContent='■';btn.style.color='#e05060';btn.style.borderColor='rgba(224,80,96,.4)';}
+  }
+}
+window._stripPlayStop=_stripPlayStop;
+
+// Patch animStop to reset the WebGL play button
+var _origAnimStop=animStop;
+animStop=function(){
+  _origAnimStop();
+  var btn=document.getElementById('btn-strip-play');
+  if(btn){btn.textContent='▶';btn.style.color='#50f5c0';btn.style.borderColor='rgba(80,245,192,.4)';}
+  var sel=document.getElementById('anim-preset-sel');
+  if(sel) sel.value='';
+};
+
+// ── Advanced canvas animation system ─────────────────────────────────────
+var _advAnimTimer=null;
+var _advAnimActive=null;
+
+function _advAnimStop(){
+  if(_advAnimTimer){clearInterval(_advAnimTimer);_advAnimTimer=null;}
+  // Also stop cut animation if running
+  if(typeof _advUnfoldTimer!=='undefined'&&_advUnfoldTimer){
+    cancelAnimationFrame(_advUnfoldTimer);_advUnfoldTimer=null;
+    var pb=document.getElementById('adv-unfold-play');
+    if(pb){pb.textContent='▶ Animate';pb.style.background='';}
+  }
+  _advAnimActive=null;
+  var btn=document.getElementById('adv-strip-play-btn');
+  if(btn){btn.textContent='▶';btn.style.color='#50f5c0';btn.style.borderColor='rgba(80,245,192,.4)';}
+  var sel=document.getElementById('adv-anim-sel');
+  if(sel) sel.value='';
+}
+window._advAnimStop=_advAnimStop;
+
+function _advAnimStart(name){
+  _advAnimStop();
+  _advAnimActive=name;
+  var btn=document.getElementById('adv-strip-play-btn');
+  if(btn){btn.textContent='■';btn.style.color='#e05060';btn.style.borderColor='rgba(224,80,96,.4)';}
+
+  if(name==='adv_prime_sweep'){
+    _advAnimTimer=setInterval(function(){ advStepPrime(1); },700);
+
+  } else if(name==='adv_n_sweep'){
+    var maxN=Math.max(2,Math.floor((+document.getElementById('adv-modn-num').value||30)/2));
+    advSetN(1);
+    _advAnimTimer=setInterval(function(){
+      var cur=+document.getElementById('adv-noffset-num').value||1;
+      advSetN(cur>=maxN?1:cur+1);
+    },500);
+
+  } else if(name==='adv_mod_grow'){
+    var target=+document.getElementById('adv-modn-num').value||30;
+    var cur=2;
+    document.getElementById('adv-modn-num').value=2;
+    document.getElementById('adv-modn').value=2;
+    advDirty=true; advDraw();
+    _advAnimTimer=setInterval(function(){
+      cur=Math.min(target,cur+(cur<20?1:cur<60?2:3));
+      document.getElementById('adv-modn-num').value=cur;
+      document.getElementById('adv-modn').value=Math.min(cur,300);
+      advDirty=true; advDraw();
+      if(cur>=target) _advAnimStop();
+    },80);
+
+  } else if(name==='adv_cut_spin'){
+    if(typeof advToggleUnfoldPlay==='function') advToggleUnfoldPlay();
+    _advAnimTimer=setInterval(function(){
+      if(typeof _advUnfoldTimer==='undefined'||!_advUnfoldTimer) _advAnimStop();
+    },300);
+
+  } else if(name==='adv_color_cycle'){
+    var modes=['rainbow-angle','rainbow-m','cop-density','gap-class','lift-chain','chi4','error_corr'];
+    var idx=0;
+    _advAnimTimer=setInterval(function(){
+      idx=(idx+1)%modes.length;
+      var s=document.getElementById('adv-colmode');
+      if(s){s.value=modes[idx];advDirty=true;advDraw();}
+    },1200);
+  }
+}
+window._advAnimStart=_advAnimStart;
+
+function _advStripPlayStop(){
+  if(_advAnimActive){ _advAnimStop(); return; }
+  var sel=document.getElementById('adv-anim-sel');
+  var name=(sel&&sel.value)?sel.value:'adv_prime_sweep';
+  _advAnimStart(name);
+}
+window._advStripPlayStop=_advStripPlayStop;
 window.advStepPrime=advStepPrime;
 window.advSetN=advSetN;
 window.advStepN=advStepN;
@@ -6733,6 +6905,7 @@ Object.defineProperty(window,'_advLabelFmt',{get:function(){return _advLabelFmt;
 // 3-state: 'on' (show with others), 'solo' (show, dim others), 'off' (hidden)
 var _advSpiralMode = 'on';
 var _advNpathMode  = 'on';
+var _advDimNonPath = true; // dim non-path points when spiral/npath active
 
 function _advSetSpiralBtn(mode){
   var btn=document.getElementById('adv-strip-spiral-btn');
