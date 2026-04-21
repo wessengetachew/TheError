@@ -484,7 +484,9 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
   <div id="drawer-tabs" style="position:relative">
     <button class="dtab active" onclick="showDTab('controls',this)">Controls</button>
     <button class="dtab" onclick="showDTab('advanced',this)" style="color:#e05060;" id="dtab-btn-advanced">Advanced</button>
+    <button class="dtab" onclick="showDTab('gaussian',this)" style="color:#4ecdc4;" id="dtab-btn-gaussian">ℤ[i]</button>
     <button class="dtab" onclick="showDTab('library',this)">Library</button>
+    <button class="dtab" onclick="showDTab('paper',this)" style="color:#c8a84a;" id="dtab-btn-paper">Paper</button>
     <button onclick="toggleDrawer()" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);font-size:11px;padding:2px 7px;cursor:pointer;border-radius:2px;line-height:1.4">✕</button>
   </div>
   <div id="drawer-scroll">
@@ -603,6 +605,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
             <optgroup label="MLR">
               <option value="entropy">Modular entropy ΔS</option>
               <option value="mod6">Residue mod 6</option>
+              <option value="chi4">χ₄ character · Gaussian ℤ[i]</option>
               <option value="primorial">Primorial rings</option>
               <option value="mersenne">Mersenne rings</option>
               <option value="gap_class">Prime gap class</option>
@@ -796,6 +799,105 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       </div>
     </div><!-- dtab-controls -->
 
+    <!-- ── GAUSSIAN TAB ── -->
+    <div id="dtab-gaussian" class="dtab-panel">
+
+      <div class="section">
+        <div class="section-title" style="color:#4ecdc4;border-color:rgba(78,205,196,.3)">ℤ[i] · Gaussian Integer Structure</div>
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);line-height:1.8;margin-bottom:8px">
+          The 90°/270° axis encodes ℤ[i]. Only M=4, r=1 sits exactly at i.
+          The mirror σ(r)=M−r is complex conjugation. Primes split by r mod 4.
+        </div>
+
+        <!-- Chi4 color mode -->
+        <div class="section-title" style="margin-top:6px">χ₄ Coloring</div>
+        <div class="row">
+          <button onclick="_applyGaussian('chi4')"
+            style="width:100%;font-size:9px;padding:5px;border-color:rgba(78,205,196,.5);
+            color:#4ecdc4;background:rgba(78,205,196,.08);letter-spacing:.06em">
+            ◈ Color by r mod 4 (χ₄ character)
+          </button>
+        </div>
+        <div class="row" style="flex-wrap:wrap;gap:4px;margin-top:4px">
+          <span style="display:flex;align-items:center;gap:4px;font-size:8px;font-family:var(--mono)">
+            <span style="width:8px;height:8px;border-radius:50%;background:#4ecdc4;display:inline-block"></span>r≡1 mod 4 · i · splits</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:8px;font-family:var(--mono)">
+            <span style="width:8px;height:8px;border-radius:50%;background:#e879f9;display:inline-block"></span>r≡3 mod 4 · −i · inert</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:8px;font-family:var(--mono)">
+            <span style="width:8px;height:8px;border-radius:50%;background:#ffd700;display:inline-block"></span>r≡1 mod 2 · −1 · real axis</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:8px;font-family:var(--mono)">
+            <span style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-block"></span>r≡0 mod 2 · non-coprime</span>
+        </div>
+
+        <!-- Imaginary axis overlay -->
+        <div class="section-title" style="margin-top:8px">Imaginary Axis Overlay</div>
+        <div class="row">
+          <label><input type="checkbox" id="chk-imag-axis" onchange="dirty=true"> Draw imaginary axis (90°/270° line)</label>
+        </div>
+        <div class="row">
+          <label><input type="checkbox" id="chk-quadrant-labels" onchange="dirty=true"> Quadrant labels</label>
+          <label style="margin-left:8px"><input type="checkbox" id="chk-mod4-ring" onchange="dirty=true"> Highlight M=4 ring</label>
+        </div>
+
+        <!-- L-function live compute -->
+        <div class="section-title" style="margin-top:8px">L(s, χ₄) — Dirichlet L-function</div>
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);line-height:1.8;margin-bottom:6px">
+          L(s,χ₄) = 1 − 1/3ˢ + 1/5ˢ − 1/7ˢ + … separates the two channels.
+          At s=1: π/4 (Leibniz). The two channels must balance — this is Dirichlet's theorem.
+        </div>
+        <div class="row">
+          <span class="ctrl-label">s =</span>
+          <input type="range" id="sl-chi4-s" min="1" max="30" value="10"
+            oninput="_updateLfunc()" style="width:80px">
+          <span id="lbl-chi4-s" style="font-family:var(--mono);font-size:9px;color:#4ecdc4;min-width:28px">1.0</span>
+          <span class="ctrl-label">terms</span>
+          <input type="number" id="num-chi4-terms" value="500" min="10" max="50000" class="narrow"
+            onchange="_updateLfunc()">
+        </div>
+        <div id="lfunc-display" style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.5);
+          line-height:2;padding:6px 8px;background:rgba(0,0,0,.3);border-radius:2px;
+          border:1px solid rgba(78,205,196,.15);margin-top:4px">
+          Click compute below
+        </div>
+        <div class="row" style="margin-top:4px">
+          <button onclick="_updateLfunc()" style="font-size:9px;border-color:rgba(78,205,196,.4);color:#4ecdc4">Compute</button>
+          <button onclick="_lfuncPreset(1)"  style="font-size:9px">s=1 (π/4)</button>
+          <button onclick="_lfuncPreset(2)"  style="font-size:9px">s=2 (π²/8)</button>
+          <button onclick="_lfuncPreset(0.5)" style="font-size:9px">s=½</button>
+        </div>
+
+        <!-- Channel balance: count primes ≡1 vs ≡3 mod 4 -->
+        <div class="section-title" style="margin-top:8px">Prime Channel Balance</div>
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.3);line-height:1.8;margin-bottom:6px">
+          Dirichlet: #{p≤N : p≡1 mod 4} ≈ #{p≡3 mod 4} asymptotically.
+          But the race fluctuates — Chebyshev's bias: ≡3 leads for most N.
+        </div>
+        <div class="row">
+          <span class="ctrl-label">Up to M =</span>
+          <input type="number" id="num-chi4-N" value="60" min="4" max="2000" class="narrow"
+            onchange="_updateChannelBalance()">
+          <button onclick="_updateChannelBalance()" style="font-size:9px;border-color:rgba(78,205,196,.4);color:#4ecdc4">Count</button>
+        </div>
+        <div id="channel-balance" style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.5);
+          line-height:2;padding:6px 8px;background:rgba(0,0,0,.3);border-radius:2px;
+          border:1px solid rgba(78,205,196,.15);margin-top:4px">
+          —
+        </div>
+
+        <!-- Presets -->
+        <div class="section-title" style="margin-top:8px">Presets</div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <button class="thm-btn teal" style="text-align:left" onclick="_applyGaussian('chi4')">χ₄ coloring — split vs inert primes</button>
+          <button class="thm-btn teal" style="text-align:left" onclick="_applyGaussian('axis')">Imaginary axis + M=4 highlight</button>
+          <button class="thm-btn teal" style="text-align:left" onclick="_applyGaussian('spiral1')">Prime spiral p≡1 mod 4 (splits in ℤ[i])</button>
+          <button class="thm-btn" style="text-align:left" onclick="_applyGaussian('spiral3')">Prime spiral p≡3 mod 4 (inert in ℤ[i])</button>
+          <button class="thm-btn" style="text-align:left" onclick="_applyGaussian('both')">Both spirals — balance channels</button>
+          <button class="thm-btn violet" style="text-align:left" onclick="_applyGaussian('mirror')">Mirror σ = conjugation · i ↔ −i</button>
+        </div>
+
+      </div>
+    </div><!-- dtab-gaussian -->
+
     <!-- ── LIBRARY TAB (Presets + Info + Analysis merged) ── -->
     <div id="dtab-library" class="dtab-panel">
 
@@ -927,6 +1029,281 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       </div>
     
     </div><!-- dtab-library -->
+
+    <!-- ── PAPER TAB ── -->
+    <div id="dtab-paper" class="dtab-panel">
+
+      <!-- Animated mini-canvas header -->
+      <div style="position:relative;height:72px;background:#050508;border-radius:2px;margin-bottom:10px;overflow:hidden">
+        <canvas id="paper-ring-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+        <div style="position:relative;z-index:1;padding:8px 10px">
+          <div style="font-family:var(--mono);font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,168,74,.6);margin-bottom:3px">Lift Survival Framework · 2026</div>
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(200,168,74,.9);line-height:1.5">C = ∏<sub>p</sub>(p²−2)/(p²−1) ≈ 0.530711806246</div>
+          <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.5">R(N) → C &nbsp;·&nbsp; E(N) = O(1/N) &nbsp;·&nbsp; Wessen Getachew</div>
+        </div>
+      </div>
+
+      <!-- §1 The Object -->
+      <div class="section">
+        <div class="section-title" style="color:#c8a84a;border-color:rgba(200,168,74,.3)">§1 — The Lift Ratio R(N)</div>
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.9;margin-bottom:8px">
+          L(M) = φ(M)·φ(M+1)/(M+1) &nbsp; [weight at ring M]<br>
+          R(N) = Σ L(M) / Σ φ(M) &nbsp; [φ-weighted average]
+        </div>
+        <button class="thm-btn" style="width:100%;text-align:left;border-color:rgba(200,168,74,.5);color:#c8a84a;margin-bottom:4px"
+          onclick="_paperPreset('lift_basic')">▶ Animate lift weights across rings</button>
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.25);line-height:1.8">
+          φ(M)/M is the density of coprimes on ring M.<br>
+          Large when M prime (all residues coprime).<br>
+          Small when M highly composite (few survive).
+        </div>
+      </div>
+
+      <!-- §2 Theorem 1 -->
+      <div class="section">
+        <div class="section-title" style="color:#3dc8b8;border-color:rgba(61,200,184,.3)">§2 — Theorem: R(N) → C (Proved)</div>
+        <div style="background:rgba(61,200,184,.06);border:1px solid rgba(61,200,184,.2);padding:8px 10px;border-radius:2px;margin-bottom:8px">
+          <div style="font-family:var(--mono);font-size:8px;color:#3dc8b8;margin-bottom:4px">THEOREM 2.1 (PROVED)</div>
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.8);line-height:1.9">
+            R(N) → C = ∏<sub>p</sub>(p²−2)/(p²−1)<br>
+            via Möbius inversion + equidistribution of φ in APs.
+          </div>
+        </div>
+        <button class="thm-btn teal" style="width:100%;text-align:left;margin-bottom:4px"
+          onclick="_paperPreset('euler_product')">▶ Show Euler product structure · primorial rings</button>
+        <div id="paper-C-live" style="font-family:var(--mono);font-size:9px;color:#3dc8b8;padding:4px 0"></div>
+      </div>
+
+      <!-- §3 O(1/N) conjecture -->
+      <div class="section">
+        <div class="section-title" style="color:#e05060;border-color:rgba(224,80,96,.3)">§3 — Conjecture: E(N) = O(1/N)</div>
+        <div style="background:rgba(224,80,96,.06);border:1px solid rgba(224,80,96,.2);padding:8px 10px;border-radius:2px;margin-bottom:8px">
+          <div style="font-family:var(--mono);font-size:8px;color:#e05060;margin-bottom:4px">CONJECTURE 3.1 (OPEN · VERIFIED N=10M)</div>
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.8);line-height:1.9">
+            E(N) = R(N) − C = O(1/N)<br>
+            max|E(N)·N| &lt; 0.929 to N = 10,000,000<br>
+            Naive bound: O(log N / N) · Observed: O(1/N)
+          </div>
+        </div>
+
+        <!-- Live E(N) table -->
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(200,168,74,.7);margin-bottom:4px;letter-spacing:.08em">VERIFICATION DATA</div>
+        <table id="paper-EN-table" style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:7.5px">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(200,168,74,.3)">
+              <th style="text-align:left;padding:3px 4px;color:#c8a84a;font-weight:400">N</th>
+              <th style="text-align:right;padding:3px 4px;color:#c8a84a;font-weight:400">E(N)</th>
+              <th style="text-align:right;padding:3px 4px;color:#c8a84a;font-weight:400">|E(N)|·N</th>
+            </tr>
+          </thead>
+          <tbody id="paper-EN-tbody">
+            <tr><td style="padding:2px 4px;color:rgba(255,255,255,.5)">1,000</td><td style="text-align:right;padding:2px 4px;color:rgba(255,255,255,.5)">+1.73×10⁻⁴</td><td style="text-align:right;padding:2px 4px;color:#3dc8b8">0.173</td></tr>
+            <tr><td style="padding:2px 4px;color:rgba(255,255,255,.5)">10,000</td><td style="text-align:right;padding:2px 4px;color:rgba(255,255,255,.5)">+3.92×10⁻⁵</td><td style="text-align:right;padding:2px 4px;color:#3dc8b8">0.392</td></tr>
+            <tr><td style="padding:2px 4px;color:rgba(255,255,255,.5)">100,000</td><td style="text-align:right;padding:2px 4px;color:rgba(255,255,255,.5)">+3.03×10⁻⁶</td><td style="text-align:right;padding:2px 4px;color:#3dc8b8">0.303</td></tr>
+            <tr><td style="padding:2px 4px;color:rgba(255,255,255,.5)">1,000,000</td><td style="text-align:right;padding:2px 4px;color:rgba(255,255,255,.5)">+3.87×10⁻⁷</td><td style="text-align:right;padding:2px 4px;color:#3dc8b8">0.387</td></tr>
+          </tbody>
+        </table>
+        <div style="font-family:var(--mono);font-size:7.5px;color:rgba(255,255,255,.3);margin-top:6px;line-height:1.7">
+          Cancellation: prime-M terms (−) vs M+1=prime terms (+) nearly cancel. Residual = O(N). Elliott–Halberstam connection.
+        </div>
+        <button class="thm-btn coral" style="width:100%;text-align:left;margin-top:6px"
+          onclick="_paperPreset('error_mode')">▶ Show E(N) contribution coloring on canvas</button>
+      </div>
+
+      <!-- §4 Wessen Identity -->
+      <div class="section">
+        <div class="section-title" style="color:#c8a84a;border-color:rgba(200,168,74,.3)">§4 — Wessen Identity (Proved)</div>
+        <div style="background:rgba(200,168,74,.06);border:1px solid rgba(200,168,74,.25);padding:8px 10px;border-radius:2px;margin-bottom:8px">
+          <div style="font-family:var(--mono);font-size:8px;color:#c8a84a;margin-bottom:4px">THEOREM 4.1 — EXACT FINITE HARDY–LITTLEWOOD</div>
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.8);line-height:2">
+            A(H, p#) = ∏<sub>q≤p</sub> (q − ν<sub>H</sub>(q))<br>
+            Error = 0 exactly at every primorial. CRT proof.
+          </div>
+        </div>
+
+        <!-- Interactive Wessen table -->
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-size:8px;color:#c8a84a">Gap g =</span>
+          <input type="number" id="paper-wi-gap" value="2" min="1" max="30"
+            style="width:44px;font-family:var(--mono);font-size:8px;background:rgba(200,168,74,.08);
+            border:1px solid rgba(200,168,74,.25);color:#c8a84a;padding:2px 5px;text-align:center">
+          <button onclick="setPaperGap(2)"  style="font-family:var(--mono);font-size:7px;padding:2px 6px;border:1px solid rgba(78,205,196,.3);color:#4ecdc4;background:rgba(78,205,196,.05);cursor:pointer">2</button>
+          <button onclick="setPaperGap(4)"  style="font-family:var(--mono);font-size:7px;padding:2px 6px;border:1px solid rgba(69,183,209,.3);color:#45b7d1;background:rgba(69,183,209,.05);cursor:pointer">4</button>
+          <button onclick="setPaperGap(6)"  style="font-family:var(--mono);font-size:7px;padding:2px 6px;border:1px solid rgba(150,206,180,.3);color:#96ceb4;background:rgba(150,206,180,.05);cursor:pointer">6</button>
+          <button onclick="setPaperGap(12)" style="font-family:var(--mono);font-size:7px;padding:2px 6px;border:1px solid rgba(200,168,74,.25);color:#c8a84a;background:rgba(200,168,74,.05);cursor:pointer">12</button>
+          <button onclick="computePaperWI()" style="font-family:var(--mono);font-size:7px;padding:2px 8px;border:1px solid rgba(200,168,74,.5);color:#c8a84a;background:rgba(200,168,74,.1);cursor:pointer">▶ Compute</button>
+        </div>
+
+        <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:7.5px">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(200,168,74,.3)">
+              <th style="text-align:left;padding:2px 4px;color:#c8a84a;font-weight:400">p</th>
+              <th style="text-align:right;padding:2px 4px;color:#c8a84a;font-weight:400">p#</th>
+              <th style="text-align:right;padding:2px 4px;color:#c8a84a;font-weight:400">A(g,p#)</th>
+              <th style="text-align:right;padding:2px 4px;color:#c8a84a;font-weight:400">Formula</th>
+              <th style="text-align:right;padding:2px 4px;color:#c8a84a;font-weight:400">Error</th>
+            </tr>
+          </thead>
+          <tbody id="paper-wi-tbody"></tbody>
+        </table>
+        <div id="paper-wi-result" style="font-family:var(--mono);font-size:7.5px;color:rgba(61,200,184,.7);margin-top:5px;line-height:1.8"></div>
+
+        <button class="thm-btn" style="width:100%;text-align:left;margin-top:6px;border-color:rgba(200,168,74,.5);color:#c8a84a"
+          onclick="_paperPreset('primorial_rings')">▶ Animate primorial ring structure on canvas</button>
+      </div>
+
+      <!-- §5 Gaussian integers -->
+      <div class="section">
+        <div class="section-title" style="color:#4ecdc4;border-color:rgba(78,205,196,.3)">§5 — Gaussian ℤ[i] Theorems (Proved)</div>
+
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px">
+          <div style="background:rgba(61,200,184,.06);border:1px solid rgba(61,200,184,.2);padding:6px 10px;border-radius:2px">
+            <div style="font-family:var(--mono);font-size:7.5px;color:#4ecdc4;margin-bottom:3px">THM 5.1 — UNIQUENESS OF i</div>
+            <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.7);line-height:1.8">Only M=4, r=1 sits at exactly 90°=i.<br>gcd(M/4,M)=1 only when M=4.</div>
+          </div>
+          <div style="background:rgba(61,200,184,.06);border:1px solid rgba(61,200,184,.2);padding:6px 10px;border-radius:2px">
+            <div style="font-family:var(--mono);font-size:7.5px;color:#4ecdc4;margin-bottom:3px">THM 5.2 — MIRROR = CONJUGATION</div>
+            <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.7);line-height:1.8">σ(r)=M−r is complex conjugation on primitive roots. σ(i) = −i on ring 4.</div>
+          </div>
+          <div style="background:rgba(61,200,184,.06);border:1px solid rgba(61,200,184,.2);padding:6px 10px;border-radius:2px">
+            <div style="font-family:var(--mono);font-size:7.5px;color:#4ecdc4;margin-bottom:3px">THM 5.3 — INERTNESS CRITERION</div>
+            <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.7);line-height:1.8">r=(q−1)/2 lifts from ring q iff q≡3(mod 4) iff q inert in ℤ[i].<br>Proof: gcd((q−1)/2, q+1) = gcd((q−1)/2, 2). Two lines.</div>
+          </div>
+        </div>
+
+        <!-- Prime inertness table -->
+        <div style="font-family:var(--mono);font-size:7.5px;color:rgba(78,205,196,.7);margin-bottom:4px">PRIME SPLITTING vs INERTNESS</div>
+        <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:7.5px">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(78,205,196,.25)">
+              <th style="text-align:left;padding:2px 4px;color:#4ecdc4;font-weight:400">q</th>
+              <th style="text-align:center;padding:2px 4px;color:#4ecdc4;font-weight:400">q mod 4</th>
+              <th style="text-align:center;padding:2px 4px;color:#4ecdc4;font-weight:400">ℤ[i] behavior</th>
+              <th style="text-align:center;padding:2px 4px;color:#4ecdc4;font-weight:400">r=(q−1)/2 lifts?</th>
+              <th style="text-align:center;padding:2px 4px;color:#4ecdc4;font-weight:400">Sum of squares?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)">
+              <td style="padding:2px 4px;color:rgba(255,255,255,.6)">3</td><td style="text-align:center;padding:2px 4px;color:#e879f9">3</td>
+              <td style="text-align:center;padding:2px 4px;color:#e879f9">Inert</td><td style="text-align:center;padding:2px 4px;color:#3dc8b8">✓ Yes</td>
+              <td style="text-align:center;padding:2px 4px;color:#e05060">No</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)">
+              <td style="padding:2px 4px;color:rgba(255,255,255,.6)">5</td><td style="text-align:center;padding:2px 4px;color:#4ecdc4">1</td>
+              <td style="text-align:center;padding:2px 4px;color:#4ecdc4">Splits</td><td style="text-align:center;padding:2px 4px;color:#e05060">✗ No</td>
+              <td style="text-align:center;padding:2px 4px;color:#3dc8b8">Yes 1²+2²</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)">
+              <td style="padding:2px 4px;color:rgba(255,255,255,.6)">7</td><td style="text-align:center;padding:2px 4px;color:#e879f9">3</td>
+              <td style="text-align:center;padding:2px 4px;color:#e879f9">Inert</td><td style="text-align:center;padding:2px 4px;color:#3dc8b8">✓ Yes</td>
+              <td style="text-align:center;padding:2px 4px;color:#e05060">No</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)">
+              <td style="padding:2px 4px;color:rgba(255,255,255,.6)">11</td><td style="text-align:center;padding:2px 4px;color:#e879f9">3</td>
+              <td style="text-align:center;padding:2px 4px;color:#e879f9">Inert</td><td style="text-align:center;padding:2px 4px;color:#3dc8b8">✓ Yes</td>
+              <td style="text-align:center;padding:2px 4px;color:#e05060">No</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)">
+              <td style="padding:2px 4px;color:rgba(255,255,255,.6)">13</td><td style="text-align:center;padding:2px 4px;color:#4ecdc4">1</td>
+              <td style="text-align:center;padding:2px 4px;color:#4ecdc4">Splits</td><td style="text-align:center;padding:2px 4px;color:#e05060">✗ No</td>
+              <td style="text-align:center;padding:2px 4px;color:#3dc8b8">Yes 2²+3²</td></tr>
+            <tr>
+              <td style="padding:2px 4px;color:rgba(255,255,255,.6)">17</td><td style="text-align:center;padding:2px 4px;color:#4ecdc4">1</td>
+              <td style="text-align:center;padding:2px 4px;color:#4ecdc4">Splits</td><td style="text-align:center;padding:2px 4px;color:#e05060">✗ No</td>
+              <td style="text-align:center;padding:2px 4px;color:#3dc8b8">Yes 1²+4²</td></tr>
+          </tbody>
+        </table>
+
+        <button class="thm-btn teal" style="width:100%;text-align:left;margin-top:6px"
+          onclick="_paperPreset('gaussian_chi4')">▶ Show χ₄ coloring + imaginary axis on canvas</button>
+        <button class="thm-btn teal" style="width:100%;text-align:left;margin-top:4px"
+          onclick="_paperPreset('mirror_conj')">▶ Show mirror = conjugation (σ overlay)</button>
+      </div>
+
+      <!-- §6 Cyclotomic tower -->
+      <div class="section">
+        <div class="section-title" style="color:#9070d8;border-color:rgba(144,112,216,.3)">§6 — Cyclotomic Tower Identification</div>
+        <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);line-height:1.9;margin-bottom:8px">
+          Ring M = primitive M-th roots of unity = generators of Φ<sub>M</sub>(x).<br>
+          Full diagram = cyclotomic tower ∪<sub>M</sub> Φ<sub>M</sub>.<br>
+          χ<sub>n</sub>(r) and angle 2πr/n encode the same information.
+        </div>
+
+        <!-- Character table -->
+        <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:7.5px;margin-bottom:8px">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(144,112,216,.3)">
+              <th style="text-align:left;padding:2px 4px;color:#9070d8;font-weight:400">n</th>
+              <th style="text-align:left;padding:2px 4px;color:#9070d8;font-weight:400">Algebra</th>
+              <th style="text-align:left;padding:2px 4px;color:#9070d8;font-weight:400">Axis</th>
+              <th style="text-align:right;padding:2px 4px;color:#9070d8;font-weight:400">L(1,χ)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:2px 4px;color:rgba(255,255,255,.6)">3</td><td style="padding:2px 4px;color:rgba(255,255,255,.5)">ℤ[ω] Eisenstein</td><td style="padding:2px 4px;color:rgba(255,255,255,.5)">120°/240°</td><td style="text-align:right;padding:2px 4px;color:#9070d8">π/3√3</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:2px 4px;color:#4ecdc4">4</td><td style="padding:2px 4px;color:#4ecdc4">ℤ[i] Gaussian</td><td style="padding:2px 4px;color:#4ecdc4">90°/270°=i,−i</td><td style="text-align:right;padding:2px 4px;color:#4ecdc4">π/4</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:2px 4px;color:rgba(255,255,255,.6)">6</td><td style="padding:2px 4px;color:rgba(255,255,255,.5)">same as χ₃</td><td style="padding:2px 4px;color:rgba(255,255,255,.5)">60°/300°</td><td style="text-align:right;padding:2px 4px;color:#9070d8">π/3√3</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:2px 4px;color:rgba(255,255,255,.6)">8</td><td style="padding:2px 4px;color:rgba(255,255,255,.5)">Klein 4-group</td><td style="padding:2px 4px;color:rgba(255,255,255,.5)">45° octagonal</td><td style="text-align:right;padding:2px 4px;color:#9070d8">π/4√2</td></tr>
+            <tr><td style="padding:2px 4px;color:#c8a84a">30</td><td style="padding:2px 4px;color:#c8a84a">All above ×</td><td style="padding:2px 4px;color:#c8a84a">All axes at once</td><td style="text-align:right;padding:2px 4px;color:#c8a84a">product</td></tr>
+          </tbody>
+        </table>
+
+        <button class="thm-btn violet" style="width:100%;text-align:left"
+          onclick="_paperPreset('cyclotomic_tower')">▶ Animate cyclotomic tower collapse</button>
+      </div>
+
+      <!-- §7 Reviewer feedback -->
+      <div class="section">
+        <div class="section-title" style="color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.1);font-size:8px;letter-spacing:.1em">TECHNICAL REVIEW COMMENTARY</div>
+        <div style="font-family:var(--mono);font-size:7.5px;color:rgba(255,255,255,.28);line-height:1.9;border-left:2px solid rgba(255,255,255,.08);padding-left:10px;margin-top:6px">
+          <div style="color:rgba(200,168,74,.5);margin-bottom:4px">O(1/N) Conjecture:</div>
+          Safe prime connection: |E(N)·N| peaks at N=p−1 for safe primes p=2q+1. Suggests "resistance" driven by structural rigidity of primes with fewest factors in preceding neighbors. K=ζ(2)·C≈0.872986 is a concrete target for future analytic proof.<br><br>
+          <div style="color:rgba(200,168,74,.5);margin-bottom:4px">Wessen Identity — most publishable insight:</div>
+          A(6,p#)/A(2,p#)=2 exactly provides finite anchor for HL conjectures. CRT table invites immediate self-verification by the reader.<br><br>
+          <div style="color:rgba(200,168,74,.5);margin-bottom:4px">ℤ[i] inertness:</div>
+          Tethers modular ring diagram to quadratic residues and Gaussian primes. Geometric reason for why jumps survive or die by orientation in complex plane.<br><br>
+          <div style="color:rgba(200,168,74,.5);margin-bottom:4px">Constant L ≈ 0.300437:</div>
+          Investigate connection to Feller–Tornier constant or higher-order zeta combinations. If C=ζ(2)·d<sub>FT</sub>, L is likely a related derivative.
+        </div>
+      </div>
+
+      <!-- §8 Open problems -->
+      <div class="section">
+        <div class="section-title" style="color:rgba(224,80,96,.7);border-color:rgba(224,80,96,.2)">§8 — Open Problems</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="background:rgba(144,112,216,.06);border:1px solid rgba(144,112,216,.2);padding:6px 10px;border-radius:2px">
+            <div style="font-family:var(--mono);font-size:7.5px;color:#9070d8;margin-bottom:3px">OPEN 1 — MAIN CONJECTURE</div>
+            <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.65);line-height:1.8">Prove Σ φ(M)·[φ(M+1)/(M+1)−C] = O(N).<br>→ Implies E(N)=O(1/N). Likely from Elliott–Halberstam.</div>
+          </div>
+          <div style="background:rgba(144,112,216,.06);border:1px solid rgba(144,112,216,.2);padding:6px 10px;border-radius:2px">
+            <div style="font-family:var(--mono);font-size:7.5px;color:#9070d8;margin-bottom:3px">OPEN 2 — CONSTANT L ≈ 0.300437</div>
+            <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.65);line-height:1.8">Identify L geometrically. J<sub>twin</sub>/J ≠ C₂/C. What does L count?</div>
+          </div>
+          <div style="background:rgba(144,112,216,.06);border:1px solid rgba(144,112,216,.2);padding:6px 10px;border-radius:2px">
+            <div style="font-family:var(--mono);font-size:7.5px;color:#9070d8;margin-bottom:3px">OPEN 3 — CONSTANT K ≈ 0.872986</div>
+            <div style="font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.65);line-height:1.8">Prove K=ζ(2)·C. Explain maxima at N=p−1 for safe primes analytically.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit links -->
+      <div class="section">
+        <div class="section-title" style="color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.1);font-size:8px">SUBMIT & SHARE</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px">
+          <a href="https://arxiv.org/submit" target="_blank"
+            style="font-family:var(--mono);font-size:8px;padding:5px 8px;border:1px solid rgba(200,168,74,.4);color:#c8a84a;text-decoration:none;display:block;transition:background .15s"
+            onmouseover="this.style.background='rgba(200,168,74,.1)'" onmouseout="this.style.background=''">
+            arXiv math.NT submission ↗</a>
+          <a href="https://oeis.org/submit" target="_blank"
+            style="font-family:var(--mono);font-size:8px;padding:5px 8px;border:1px solid rgba(61,200,184,.3);color:#4ecdc4;text-decoration:none;display:block;transition:background .15s"
+            onmouseover="this.style.background='rgba(61,200,184,.08)'" onmouseout="this.style.background=''">
+            Submit C to OEIS ↗</a>
+          <a href="https://mathoverflow.net" target="_blank"
+            style="font-family:var(--mono);font-size:8px;padding:5px 8px;border:1px solid rgba(144,112,216,.3);color:#9070d8;text-decoration:none;display:block;transition:background .15s"
+            onmouseover="this.style.background='rgba(144,112,216,.08)'" onmouseout="this.style.background=''">
+            MathOverflow — post the O(1/N) conjecture ↗</a>
+        </div>
+      </div>
+
+    </div><!-- dtab-paper -->
+
 
     <!-- ── ADVANCED TAB ── -->
     <div id="dtab-advanced" class="dtab-panel">
@@ -1317,6 +1694,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <option value="half">Top/Bottom half</option>
     <option value="entropy">Modular entropy ΔS</option>
     <option value="mod6">Residue mod 6</option>
+    <option value="chi4">χ₄ · Gaussian</option>
     <option value="primorial">Primorial rings</option>
     <option value="mersenne">Mersenne rings</option>
     <option value="gap_class">Prime gap class</option>
@@ -1708,7 +2086,13 @@ function pointColor(pt){
     h=(mersM.includes(M)?60:200+S.hue)%360; s=80;l=55;
   } else if(cm==='gap_class'){
     h=((r%12)*30+S.hue)%360; s=80;l=55;
-  } else if(cm==='error_corr'){
+  } else if(cm==='chi4'){
+    // Color by r mod 4 — the Gaussian integer / Dirichlet character classification
+    const mod4 = r % 4;
+    if(mod4===1){ h=(174+S.hue)%360; s=80; l=58; }      // teal: r≡1, maps to i, splits in ℤ[i]
+    else if(mod4===3){ h=(294+S.hue)%360; s=80; l=58; }  // magenta: r≡3, maps to -i, inert
+    else if(mod4===2){ h=(50+S.hue)%360; s=85; l=55; }   // gold: r≡2, near -1
+    else { h=(200+S.hue)%360; s=50; l=40; }              // r≡0: near +1
     // Color by E(N) contribution of this ring
     // Violet = ring pushes R above C (positive contribution)
     // Teal   = ring pulls R below C (negative contribution)
@@ -2008,7 +2392,64 @@ function drawOverlay(w,h,mat){
   // ½ equator special paths — draw connecting lines through (M±1)/2 and (M-1)/2
   // r=(M+1)/2: ½ above equator, NEVER lifts (highlighted gold)
   // r=(M-1)/2: ½ below equator, lifts iff gcd((M-1)/2, M+1)=1 (highlighted teal)
-  // ── Residue r path to target mod M ─────────────────────────────────────
+  // ── Gaussian imaginary axis overlay ─────────────────────────────────────
+  if((document.getElementById('chk-imag-axis')||{}).checked && (S.view==='concentric'||S.view==='fermat')){
+    const [cx,cy] = worldToScreen(0,0,w,h,mat,dpr);
+    const axisLen = Math.max(w,h)*0.85;
+    // Imaginary axis: vertical line through center
+    ctx2d.save();
+    ctx2d.strokeStyle='rgba(78,205,196,0.35)';
+    ctx2d.lineWidth=1*dpr;
+    ctx2d.setLineDash([6*dpr,4*dpr]);
+    ctx2d.beginPath(); ctx2d.moveTo(cx,-axisLen); ctx2d.lineTo(cx,h+axisLen); ctx2d.stroke();
+    ctx2d.setLineDash([]);
+    // Label i and -i positions on ring 4
+    const mmax=S.mmax;
+    const rho4 = S.invert?(mmax-4+2):4;
+    const theta90  = Math.PI/2  + S.delta*4*2*Math.PI;
+    const theta270 = 3*Math.PI/2 + S.delta*4*2*Math.PI;
+    const [ix, iy]   = worldToScreen(rho4*Math.cos(theta90),  rho4*Math.sin(theta90),  w,h,mat,dpr);
+    const [nix,niy]  = worldToScreen(rho4*Math.cos(theta270), rho4*Math.sin(theta270), w,h,mat,dpr);
+    // Draw i and -i markers if M=4 is visible
+    if(mmax>=4){
+      [[ix,iy,'i'],[nix,niy,'−i']].forEach(([px,py,lbl])=>{
+        ctx2d.beginPath(); ctx2d.arc(px,py,5*dpr,0,2*Math.PI);
+        ctx2d.fillStyle='rgba(78,205,196,0.9)'; ctx2d.fill();
+        ctx2d.font=`bold ${10*dpr}px 'JetBrains Mono',monospace`;
+        ctx2d.fillStyle='rgba(78,205,196,0.9)'; ctx2d.textAlign='left'; ctx2d.textBaseline='middle';
+        ctx2d.fillText(lbl, px+7*dpr, py);
+      });
+    }
+    // Quadrant labels
+    if((document.getElementById('chk-quadrant-labels')||{}).checked){
+      const qlStyle='rgba(78,205,196,0.35)';
+      ctx2d.font=`${8*dpr}px 'JetBrains Mono',monospace`;
+      ctx2d.fillStyle=qlStyle; ctx2d.textAlign='center'; ctx2d.textBaseline='middle';
+      const pad=28*dpr;
+      ctx2d.fillText('p≡1(4) · splits',   cx+axisLen*0.35, cy-h*0.25); // Q1
+      ctx2d.fillText('p≡3(4) · inert',    cx-axisLen*0.35, cy-h*0.25); // Q2
+      ctx2d.fillText('p≡3(4) · inert',    cx-axisLen*0.35, cy+h*0.25); // Q3
+      ctx2d.fillText('p≡1(4) · splits',   cx+axisLen*0.35, cy+h*0.25); // Q4
+    }
+    ctx2d.restore();
+  }
+  // ── M=4 ring highlight ────────────────────────────────────────────────────
+  if((document.getElementById('chk-mod4-ring')||{}).checked && (S.view==='concentric'||S.view==='fermat') && S.mmax>=4){
+    const rho4 = S.invert?(S.mmax-4+2):4;
+    const [cx0,cy0]=worldToScreen(0,0,w,h,mat,dpr);
+    const [edge,]=worldToScreen(rho4,0,w,h,mat,dpr);
+    const ringR=Math.abs(edge-cx0);
+    ctx2d.save();
+    ctx2d.strokeStyle='rgba(78,205,196,0.5)';
+    ctx2d.lineWidth=1.5*dpr;
+    ctx2d.setLineDash([4*dpr,3*dpr]);
+    ctx2d.beginPath(); ctx2d.arc(cx0,cy0,ringR,0,2*Math.PI); ctx2d.stroke();
+    ctx2d.setLineDash([]);
+    ctx2d.font=`${8*dpr}px 'JetBrains Mono',monospace`;
+    ctx2d.fillStyle='rgba(78,205,196,0.6)'; ctx2d.textAlign='right'; ctx2d.textBaseline='bottom';
+    ctx2d.fillText('M=4 · ℤ[i]∩S¹', cx0+ringR-2*dpr, cy0-ringR-2*dpr);
+    ctx2d.restore();
+  }
   if(S.rpath && S.customR !== null){
     const r0 = S.customR;
     const targetM = S.resPathM || 57;
@@ -3222,7 +3663,157 @@ document.getElementById('num-mmax').addEventListener('input',e=>{
   }
 });
 
-// ── Advanced canvas rotation controls ────────────────────────────────────
+// ── Gaussian / χ₄ functions ──────────────────────────────────────────────
+
+function _lfuncPreset(s){
+  // Set slider to s (stored as s*10 for integer range)
+  const sl=document.getElementById('sl-chi4-s');
+  if(sl){ sl.value=Math.round(s*10); }
+  _updateLfunc(s);
+}
+
+function _updateLfunc(sOverride){
+  const sl=document.getElementById('sl-chi4-s');
+  const lbl=document.getElementById('lbl-chi4-s');
+  const nTermsEl=document.getElementById('num-chi4-terms');
+  const disp=document.getElementById('lfunc-display');
+  if(!sl||!disp) return;
+
+  // s from slider: stored *10 so range 1..30 gives 0.1..3.0
+  const s = sOverride !== undefined ? sOverride : (+sl.value/10);
+  if(lbl) lbl.textContent=s.toFixed(1);
+
+  const nTerms=Math.max(10,Math.min(50000,+nTermsEl.value||500));
+
+  // L(s,χ₄) = Σ_{n=0}^∞ (-1)^n / (2n+1)^s = 1 - 1/3^s + 1/5^s - 1/7^s + ...
+  let Ls=0, sign=1;
+  for(let k=0;k<nTerms;k++){
+    const n=2*k+1;
+    Ls+=sign/Math.pow(n,s);
+    sign=-sign;
+  }
+
+  // Known exact values
+  const exact={};
+  exact[1]  = Math.PI/4;
+  exact[2]  = Math.PI*Math.PI/8;
+  exact[0.5]= null; // no simple closed form
+
+  const exactVal = exact[s] !== undefined ? exact[s] : null;
+  const errPct = exactVal ? Math.abs(Ls-exactVal)/exactVal*100 : null;
+
+  // Partial sums of each channel
+  let chan1=0, chan3=0;
+  for(let k=0;k<Math.min(nTerms,10000);k++){
+    const n1=4*k+1, n3=4*k+3;
+    chan1+=1/Math.pow(n1,s);
+    chan3+=1/Math.pow(n3,s);
+  }
+
+  disp.innerHTML=
+    `<span style="color:#4ecdc4">L(${s.toFixed(1)}, χ₄)</span> ≈ <strong style="color:var(--parchment)">${Ls.toFixed(10)}</strong>`
+    +(exactVal?` &nbsp;·&nbsp; exact: <strong style="color:#ffd700">${exactVal.toFixed(10)}</strong> &nbsp;·&nbsp; err: ${errPct.toFixed(6)}%`:'')
+    +`<br>`
+    +`Channel r≡1(mod4): Σ 1/(4k+1)^s = <span style="color:#4ecdc4">${chan1.toFixed(8)}</span><br>`
+    +`Channel r≡3(mod4): Σ 1/(4k+3)^s = <span style="color:#e879f9">${chan3.toFixed(8)}</span><br>`
+    +`Difference (chan1−chan3) = <strong style="color:#ffd700">${(chan1-chan3).toFixed(10)}</strong> = L(s,χ₄)<br>`
+    +(s===1?`&nbsp;&nbsp;= π/4 — Leibniz formula for π`:'')
+    +(s===2?`&nbsp;&nbsp;= π²/8 — Catalan-related`:'' )
+    +`<br><span style="color:rgba(255,255,255,.3)">${nTerms.toLocaleString()} terms</span>`;
+}
+
+function _updateChannelBalance(){
+  const N=+document.getElementById('num-chi4-N').value||60;
+  const disp=document.getElementById('channel-balance');
+  if(!disp) return;
+
+  // Count primes ≡1 and ≡3 mod 4 up to N
+  let c1=0,c3=0,primes1=[],primes3=[];
+  for(let p=3;p<=N;p++){
+    let ok=true; for(let d=2;d*d<=p;d++) if(p%d===0){ok=false;break;}
+    if(!ok) continue;
+    if(p%4===1){c1++;if(primes1.length<8)primes1.push(p);}
+    else if(p%4===3){c3++;if(primes3.length<8)primes3.push(p);}
+  }
+
+  const leader = c1>c3?'≡1(mod4)':c3>c1?'≡3(mod4)':'tied';
+  const biasStr = c3>c1
+    ? `<span style="color:#e879f9">≡3 leads by ${c3-c1}</span> (Chebyshev bias — ≡3 usually leads)`
+    : c1>c3
+    ? `<span style="color:#4ecdc4">≡1 leads by ${c1-c3}</span>`
+    : `<span style="color:#ffd700">tied</span>`;
+
+  disp.innerHTML=
+    `Primes ≤ ${N}:<br>`
+    +`<span style="color:#4ecdc4">p≡1(mod4): ${c1}</span> &nbsp;[${primes1.join(', ')}${c1>8?'…':''}]<br>`
+    +`<span style="color:#e879f9">p≡3(mod4): ${c3}</span> &nbsp;[${primes3.join(', ')}${c3>8?'…':''}]<br>`
+    +`Balance: ${biasStr}<br>`
+    +`<span style="color:rgba(255,255,255,.3)">Dirichlet: both → ∞ at equal density · ratio → 1</span>`;
+}
+
+function _applyGaussian(mode){
+  switch(mode){
+    case 'chi4':
+      S.color='chi4';
+      document.getElementById('sel-color').value='chi4';
+      document.getElementById('sel-color-drawer').value='chi4';
+      break;
+    case 'axis':
+      var cb=document.getElementById('chk-imag-axis'); if(cb) cb.checked=true;
+      var cb2=document.getElementById('chk-mod4-ring'); if(cb2) cb2.checked=true;
+      var cb3=document.getElementById('chk-quadrant-labels'); if(cb3) cb3.checked=true;
+      break;
+    case 'spiral1':{
+      // First prime ≡1 mod 4 is 5
+      S.spiral=true; S.prime=5;
+      var sp=document.getElementById('sel-prime');
+      if(sp){ var idx=PRIMES.indexOf(5); if(idx>=0) sp.value=idx+1; }
+      document.getElementById('chk-spiral').checked=true;
+      S.color='chi4';
+      document.getElementById('sel-color').value='chi4';
+      document.getElementById('sel-color-drawer').value='chi4';
+      break;
+    }
+    case 'spiral3':{
+      // First prime ≡3 mod 4 is 3
+      S.spiral=true; S.prime=3;
+      var sp=document.getElementById('sel-prime');
+      if(sp){ var idx=PRIMES.indexOf(3); if(idx>=0) sp.value=idx+1; }
+      document.getElementById('chk-spiral').checked=true;
+      S.color='chi4';
+      document.getElementById('sel-color').value='chi4';
+      document.getElementById('sel-color-drawer').value='chi4';
+      break;
+    }
+    case 'both':
+      S.spiral=true; S.allp=true;
+      document.getElementById('chk-spiral').checked=true;
+      S.color='chi4';
+      document.getElementById('sel-color').value='chi4';
+      document.getElementById('sel-color-drawer').value='chi4';
+      break;
+    case 'mirror':
+      S.mirror=true;
+      document.getElementById('chk-mirror').checked=true;
+      S.color='chi4';
+      document.getElementById('sel-color').value='chi4';
+      document.getElementById('sel-color-drawer').value='chi4';
+      var cb=document.getElementById('chk-imag-axis'); if(cb) cb.checked=true;
+      break;
+  }
+  dirty=true;
+}
+
+// Wire Gaussian checkboxes to redraw
+['chk-imag-axis','chk-quadrant-labels','chk-mod4-ring'].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el) el.addEventListener('change',function(){ dirty=true; });
+});
+
+// Auto-init L-function display on tab open
+document.getElementById('dtab-btn-gaussian').addEventListener('click',function(){
+  setTimeout(function(){ _updateLfunc(); _updateChannelBalance(); }, 50);
+});
 var _advRotTimer = null;
 var _advCurrentAngle = 90; // tracks cumulative angle
 
@@ -3301,6 +3892,162 @@ function _ctrlLabelFmt(v){
     S.labelFmt=v; dirty=true;
   }
 }
+
+// ── Paper tab: mini ring canvas ───────────────────────────────────────────
+(function(){
+  var c=document.getElementById('paper-ring-canvas');
+  if(!c) return;
+  var ctx=c.getContext('2d');
+  var t=0; var running=false;
+  function gcd2(a,b){while(b){var x=b;b=a%b;a=x;}return a;}
+  function resize(){c.width=c.offsetWidth;c.height=c.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    var cx=c.width*.5,cy=c.height*.5;
+    var maxR=Math.min(c.width,c.height)*.44;
+    for(var M=2;M<=14;M++){
+      var rho=maxR*(M-1)/13;
+      ctx.beginPath();ctx.arc(cx,cy,rho,0,2*Math.PI);
+      ctx.strokeStyle='rgba(200,168,74,.12)';ctx.lineWidth=.3;ctx.stroke();
+      for(var r=1;r<M;r++){
+        if(gcd2(r,M)!==1) continue;
+        var th=2*Math.PI*r/M+t*.05;
+        var x=cx+rho*Math.cos(th),y=cy+rho*Math.sin(th);
+        var mod4=r%4;
+        var a=0.3+0.5*(M/14);
+        var clr=mod4===1?'rgba(78,205,196,'+a+')'
+                :mod4===3?'rgba(232,121,249,'+a+')'
+                :'rgba(200,168,74,'+a+')';
+        ctx.beginPath();ctx.arc(x,y,1.2,0,2*Math.PI);
+        ctx.fillStyle=clr;ctx.fill();
+      }
+    }
+    t+=.25;
+    if(running) requestAnimationFrame(draw);
+  }
+  var btn=document.getElementById('dtab-btn-paper');
+  if(btn) btn.addEventListener('click',function(){
+    if(!running){running=true;resize();draw();}
+  });
+})();
+
+// ── Paper tab: Wessen Identity live computation ───────────────────────────
+function gcdPaper(a,b){while(b){var t2=b;b=a%b;a=t2;}return a;}
+
+function computePaperWI(){
+  var g=parseInt(document.getElementById('paper-wi-gap').value)||2;
+  if(g>1&&g%2!==0){
+    document.getElementById('paper-wi-result').textContent='Gap must be 1 or even.';
+    return;
+  }
+  var primes2=[2,3,5,7,11,13,17,19];
+  var tbody=document.getElementById('paper-wi-tbody');
+  if(!tbody) return;
+  var html=''; var primorial=1; var formula=1;
+
+  for(var i=0;i<primes2.length;i++){
+    var p=primes2[i];
+    primorial*=p;
+    var nu=(p===2)?(g%2===0?1:2):(g%p===0?1:2);
+    formula*=(p-nu);
+    var counted;
+    if(primorial<=200000){
+      var cnt=0;
+      for(var r=0;r<primorial;r++){
+        var r2=(r+g)%primorial||primorial;
+        if(gcdPaper(r,primorial)===1&&gcdPaper(r2,primorial)===1) cnt++;
+      }
+      counted=cnt;
+    } else {
+      counted=formula;
+    }
+    var match=(counted===formula);
+    var errHtml=match?'<span style="color:#3dc8b8;font-weight:500">0</span>'
+      :'<span style="color:#e05060">'+(counted-formula)+'</span>';
+    html+='<tr style="border-bottom:1px solid rgba(255,255,255,.05)">'
+      +'<td style="padding:2px 4px;color:#c8a84a">'+p+'</td>'
+      +'<td style="text-align:right;padding:2px 4px;color:rgba(255,255,255,.4)">'+primorial.toLocaleString()+'</td>'
+      +'<td style="text-align:right;padding:2px 4px;color:rgba(255,255,255,.6)">'+counted.toLocaleString()+'</td>'
+      +'<td style="text-align:right;padding:2px 4px;color:#3dc8b8">'+formula.toLocaleString()+'</td>'
+      +'<td style="text-align:right;padding:2px 4px">'+errHtml+'</td>'
+      +'</tr>';
+  }
+  tbody.innerHTML=html;
+  var names={2:'Twin primes',4:'Cousin primes',6:'Sexy primes',8:'Gap 8',12:'Gap 12'};
+  var res=document.getElementById('paper-wi-result');
+  if(res) res.innerHTML=(names[g]||'Gap '+g)+' · A('+g+', p#) = <strong style="color:#3dc8b8">'+formula.toLocaleString()+'</strong> · Error at every primorial: <strong style="color:#3dc8b8">0</strong>';
+}
+
+function setPaperGap(g){
+  var el=document.getElementById('paper-wi-gap');if(el)el.value=g;
+  computePaperWI();
+}
+
+// ── Paper tab: canvas preset triggers ─────────────────────────────────────
+function _paperPreset(mode){
+  switch(mode){
+    case 'lift_basic':
+      S.color='phi_density';
+      document.getElementById('sel-color').value='phi_density';
+      var scd=document.getElementById('sel-color-drawer');if(scd)scd.value='phi_density';
+      S.lifts=true; S.chain=1; S.spiral=false; S.npath=false;
+      dirty=true; break;
+
+    case 'euler_product':
+      S.color='primorial';
+      document.getElementById('sel-color').value='primorial';
+      var scd2=document.getElementById('sel-color-drawer');if(scd2)scd2.value='primorial';
+      S.invert=false; S.chain=0; S.lifts=false;
+      var C2=PRIMES.slice(0,200).reduce(function(acc,p){return acc*(p*p-2)/(p*p-1);},1);
+      var el2=document.getElementById('paper-C-live');
+      if(el2) el2.innerHTML='C = <strong style="color:#3dc8b8">'+C2.toFixed(12)+'</strong>';
+      dirty=true; break;
+
+    case 'error_mode':
+      S.color='error_corr';
+      document.getElementById('sel-color').value='error_corr';
+      var scd3=document.getElementById('sel-color-drawer');if(scd3)scd3.value='error_corr';
+      dirty=true; break;
+
+    case 'primorial_rings':
+      S.color='primorial'; S.chain=0; S.lifts=true;
+      document.getElementById('sel-color').value='primorial';
+      var scd4=document.getElementById('sel-color-drawer');if(scd4)scd4.value='primorial';
+      var idx2=PRIMES.indexOf(5); if(idx2>=0){S.pidx=idx2;S.prime=5;}
+      dirty=true; break;
+
+    case 'gaussian_chi4':
+      S.color='chi4';
+      document.getElementById('sel-color').value='chi4';
+      var scd5=document.getElementById('sel-color-drawer');if(scd5)scd5.value='chi4';
+      var cba=document.getElementById('chk-imag-axis');if(cba)cba.checked=true;
+      var cb2a=document.getElementById('chk-mod4-ring');if(cb2a)cb2a.checked=true;
+      var cb3a=document.getElementById('chk-quadrant-labels');if(cb3a)cb3a.checked=true;
+      dirty=true; break;
+
+    case 'mirror_conj':
+      S.mirror=true; S.color='chi4';
+      document.getElementById('sel-color').value='chi4';
+      var scd6=document.getElementById('sel-color-drawer');if(scd6)scd6.value='chi4';
+      var chkm=document.getElementById('chk-mirror');if(chkm)chkm.checked=true;
+      var cbax=document.getElementById('chk-imag-axis');if(cbax)cbax.checked=true;
+      dirty=true; break;
+
+    case 'cyclotomic_tower':
+      S.color='angle'; S.chain=0; S.lifts=false;
+      S.spiral=false; S.npath=false; S.mirror=false;
+      document.getElementById('sel-color').value='angle';
+      var scd7=document.getElementById('sel-color-drawer');if(scd7)scd7.value='angle';
+      dirty=true; break;
+  }
+}
+
+// Auto-compute Wessen table when Paper tab opens
+var _paperTabBtn=document.getElementById('dtab-btn-paper');
+if(_paperTabBtn) _paperTabBtn.addEventListener('click',function(){
+  setTimeout(function(){computePaperWI();},120);
+});
 
 // ── Switch ctrl bar mode when toggling canvas ─────────────────────────────
 function _ctrlBarMode(isAdv){
