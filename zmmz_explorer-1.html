@@ -1575,6 +1575,22 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       color:rgba(255,255,255,.4);line-height:1.7;padding:4px 8px;background:rgba(0,0,0,.5);
       border-radius:2px;pointer-events:none">Click a point for details.</div>
   </div>
+  <!-- Adv bottom strip -->
+  <div id="adv-strip" style="display:none;background:#08081a;border-top:1px solid rgba(255,255,255,.06);padding:4px 8px;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:center;flex-wrap:wrap">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#c8a84a;letter-spacing:.1em">p</span>
+      <button class="thm-btn" style="border-color:rgba(200,168,74,.4);color:#c8a84a;padding:3px 10px;font-size:11px" onclick="advStepPrime(-1)">&#9664;</button>
+      <span id="adv-strip-prime-lbl" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c8a84a;min-width:22px;text-align:center;font-weight:bold">7</span>
+      <button class="thm-btn" style="border-color:rgba(200,168,74,.4);color:#c8a84a;padding:3px 10px;font-size:11px" onclick="advStepPrime(1)">&#9654;</button>
+      <button id="adv-strip-spiral-btn" class="thm-btn" style="border-color:rgba(200,168,74,.3);color:#c8a84a;padding:3px 7px;font-size:9px;background:rgba(200,168,74,.1)" onclick="_advStripToggleSpiral()" title="Toggle prime spiral">&#8635;p</button>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#3dc8b8;letter-spacing:.1em">n</span>
+      <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="advStepN(-1)">&#9664;</button>
+      <span id="adv-strip-n-lbl" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3dc8b8;min-width:22px;text-align:center;font-weight:bold">1</span>
+      <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="advStepN(1)">&#9654;</button>
+      <button id="adv-strip-npath-btn" class="thm-btn" style="border-color:rgba(61,200,184,.3);color:#3dc8b8;padding:3px 7px;font-size:9px;background:rgba(61,200,184,.1)" onclick="_advStripToggleNpath()" title="Toggle &#177;n paths">&#177;n</button>
+    </div>
+  </div>
   <div id="canvas-area">
     <div id="canvas-wrap"></div>
     <div id="thm-strip">
@@ -4590,6 +4606,7 @@ function toggleAdvCanvas(){
   if(_advCanvasActive){
     canvasArea.style.display='none';
     mainPanel.style.display='flex';
+    document.getElementById('adv-strip').style.display='block';
     btn.textContent='◈ WebGL';
     btn.style.background='rgba(224,80,96,.25)';
     _ctrlBarMode(true);
@@ -4601,6 +4618,7 @@ function toggleAdvCanvas(){
     });
   } else {
     mainPanel.style.display='none';
+    document.getElementById('adv-strip').style.display='none';
     canvasArea.style.display='';
     btn.textContent='◈ Advanced';
     btn.style.background='rgba(10,10,20,0.92)';
@@ -5341,8 +5359,9 @@ function advDraw(){
     var _cutY=_rectCy+((_cutTh2/Math.PI)-1)*(_rectH/2);
     ctx.beginPath(); ctx.moveTo(_rectX,_cutY); ctx.lineTo(_rectX+_rectW,_cutY);
     ctx.strokeStyle='#f97316'; ctx.lineWidth=1.5; ctx.setLineDash([6,3]); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle='rgba(249,115,22,0.6)'; ctx.font='7px JetBrains Mono,monospace';
-    ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillText('cut '+cutDeg.toFixed(0)+'°',_rectX+3,_cutY-1);
+    var _cutSz=Math.max(7,Math.round(W*0.011));
+    ctx.fillStyle='rgba(249,115,22,0.6)'; ctx.font=_cutSz+'px JetBrains Mono,monospace';
+    ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillText('cut '+cutDeg.toFixed(0)+'°',_rectX+Math.round(W*0.004),_cutY-1);
     ctx.globalAlpha=1;
     [0.25,0.5,0.75].forEach(function(f){
       var gy=_rectCy-_rectH/2+f*_rectH;
@@ -5587,9 +5606,10 @@ function advDraw(){
   _advDrawInspect(ctx, W, H, modN, _advPtXYFn);
 
   // Attribution
-  ctx.fillStyle='rgba(200,168,74,0.3)'; ctx.font='7px JetBrains Mono,monospace';
+  var _attrSz=Math.max(7,Math.round(W*0.013));
+  ctx.fillStyle='rgba(200,168,74,0.35)'; ctx.font=_attrSz+'px JetBrains Mono,monospace';
   ctx.textAlign='right'; ctx.textBaseline='bottom';
-  ctx.fillText('wessengetachew.github.io',W-4,H-3);
+  ctx.fillText('wessengetachew.github.io',W-Math.round(W*0.006),H-Math.round(H*0.004));
   ctx.restore();
 }
 
@@ -5897,9 +5917,22 @@ document.getElementById('adv-cut').addEventListener('input',function(){
 // ── Export ────────────────────────────────────────────────────────────────
 function advExport(){
   var c=_advCanvas();
+  var W=c.width, H=c.height;
+  var scale=2;
+  var out=document.createElement('canvas');
+  out.width=W*scale; out.height=H*scale;
+  var octx=out.getContext('2d');
+  octx.scale(scale,scale);
+  octx.drawImage(c,0,0);
+  // Scaled watermark
+  var sz=Math.max(9,Math.round(W*0.013*scale));
+  octx.font='bold '+sz+'px JetBrains Mono,monospace';
+  octx.fillStyle='rgba(200,168,74,0.5)';
+  octx.textAlign='right'; octx.textBaseline='bottom';
+  octx.fillText('wessengetachew.github.io',W-6,H-4);
   var a=document.createElement('a');
   a.download='zmmz_advanced_mod'+document.getElementById('adv-modn-num').value+'.png';
-  a.href=c.toDataURL('image/png'); a.click();
+  a.href=out.toDataURL('image/png'); a.click();
 }
 function advExportCSV(){
   var modN=+document.getElementById('adv-modn-num').value||30;
@@ -6002,7 +6035,7 @@ function _advDrawInspect(ctx,W,H,modN,ptXYFn){
       ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
       ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
       var dth=Math.abs(360*a.r/a.m-360*b.r/b.m);if(dth>180)dth=360-dth;
-      ctx.font='8px JetBrains Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.7)';
+      ctx.font=Math.max(8,Math.round(W*0.012))+'px JetBrains Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.7)';
       ctx.textAlign='center';ctx.textBaseline='bottom';
       ctx.fillText('Δθ='+dth.toFixed(1)+'°',(a.x+b.x)/2,(a.y+b.y)/2-3);
     }
@@ -6079,20 +6112,26 @@ function advStepPrime(dir){
   var idx=ADV_PRIMES.indexOf(cur);
   idx=Math.max(0,Math.min(ADV_PRIMES.length-1,idx+dir));
   var np=ADV_PRIMES[idx];
-  // add option if needed
   var opt=sel.querySelector('option[value="'+np+'"]');
   if(!opt){opt=document.createElement('option');opt.value=np;opt.textContent=np;sel.appendChild(opt);}
-  sel.value=np; advDirty=true; advDraw();
+  sel.value=np;
+  var lbl=document.getElementById('adv-strip-prime-lbl');
+  if(lbl) lbl.textContent=np;
+  advDirty=true; advDraw();
 }
 function advSetN(n){
   document.getElementById('adv-noffset').value=n;
   document.getElementById('adv-noffset-num').value=n;
+  var lbl=document.getElementById('adv-strip-n-lbl');
+  if(lbl) lbl.textContent=n;
   advDirty=true; advDraw();
 }
 function advStepN(dir){
   var el=document.getElementById('adv-noffset-num');
   el.value=Math.max(1,Math.min(999,+el.value+dir));
   document.getElementById('adv-noffset').value=Math.min(+el.value,99);
+  var lbl=document.getElementById('adv-strip-n-lbl');
+  if(lbl) lbl.textContent=el.value;
   advDirty=true; advDraw();
 }
 
@@ -6234,6 +6273,32 @@ Object.defineProperty(window,'_advPathLabels',{get:function(){return _advPathLab
 Object.defineProperty(window,'_advLabelFmt',{get:function(){return _advLabelFmt;},set:function(v){_advLabelFmt=v;}});
 
 // Init on tab open — draw adv canvas when tab is clicked
+function _advStripToggleSpiral(){
+  var chk=document.getElementById('adv-spiral');
+  if(!chk) return;
+  chk.checked=!chk.checked;
+  var btn=document.getElementById('adv-strip-spiral-btn');
+  if(btn) btn.style.background=chk.checked?'rgba(200,168,74,.1)':'rgba(0,0,0,0)';
+  advDirty=true; advDraw();
+}
+function _advStripToggleNpath(){
+  var chk=document.getElementById('adv-npath');
+  if(!chk) return;
+  chk.checked=!chk.checked;
+  var btn=document.getElementById('adv-strip-npath-btn');
+  if(btn) btn.style.background=chk.checked?'rgba(61,200,184,.1)':'rgba(0,0,0,0)';
+  advDirty=true; advDraw();
+}
+// Sync initial strip labels from drawer values
+(function(){
+  var pl=document.getElementById('adv-strip-prime-lbl');
+  var nl=document.getElementById('adv-strip-n-lbl');
+  var sel=document.getElementById('adv-prime-sel');
+  var nnum=document.getElementById('adv-noffset-num');
+  if(pl&&sel) pl.textContent=sel.value||'7';
+  if(nl&&nnum) nl.textContent=nnum.value||'1';
+})();
+
 document.getElementById('dtab-btn-advanced').addEventListener('click',function(){
   setTimeout(function(){ if(typeof advDraw==='function') advDraw(); },60);
 });
