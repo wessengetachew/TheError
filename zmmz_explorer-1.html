@@ -161,14 +161,19 @@ html, body { width:100%; height:100%; overflow:hidden; }
   display: flex;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+#drawer-tabs::-webkit-scrollbar { display: none; }
 .dtab {
-  flex: 1;
+  flex: 0 0 auto;
   font-family: 'Courier New', monospace;
   font-size: 9px;
   letter-spacing: .1em;
   text-transform: uppercase;
-  padding: 9px 4px;
+  padding: 9px 10px;
   text-align: center;
   cursor: pointer;
   color: rgba(160,160,210,0.9);
@@ -179,6 +184,7 @@ html, body { width:100%; height:100%; overflow:hidden; }
   border-right: none;
   transition: color .15s;
   min-height: 36px;
+  white-space: nowrap;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(74,158,255,0.2);
 }
@@ -487,6 +493,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <button class="dtab" onclick="showDTab('gaussian',this)" style="color:#4ecdc4;" id="dtab-btn-gaussian">ℤ[i]</button>
     <button class="dtab" onclick="showDTab('library',this)">Library</button>
     <button class="dtab" onclick="showDTab('paper',this)" style="color:#c8a84a;" id="dtab-btn-paper">Paper</button>
+    <button class="dtab" onclick="showDTab('ai',this)" style="color:#50f5c0;" id="dtab-btn-ai">AI</button>
     <button onclick="toggleDrawer()" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);font-size:11px;padding:2px 7px;cursor:pointer;border-radius:2px;line-height:1.4">✕</button>
   </div>
   <div id="drawer-scroll">
@@ -1023,6 +1030,9 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
           φ(M): <span id="sl-phi">—</span><br>
           T(M): <span id="sl-tm">—</span><br>
           C(n): <span id="sl-cn">—</span><br>
+          R(N): <span id="sl-rn" style="color:#3dc8b8">—</span><br>
+          E(N): <span id="sl-en" style="color:#e05060">—</span><br>
+          |E·N|: <span id="sl-en-n" style="color:#c8a84a">—</span><br>
           pts: <span id="sl-pts">—</span><br>
           M max: <span id="sl-mshow">—</span>
         </div>
@@ -1456,9 +1466,9 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
         </div>
         <div class="row">
           <span class="ctrl-label">n</span>
-          <input type="range" id="adv-noffset" min="1" max="99" value="1" style="width:80px"
+          <input type="range" id="adv-noffset" min="1" max="99999" value="1" style="width:80px"
             oninput="document.getElementById('adv-noffset-num').value=this.value;advDirty=true;advDraw()">
-          <input type="number" id="adv-noffset-num" value="1" min="1" max="999" class="narrow"
+          <input type="number" id="adv-noffset-num" value="1" min="1" class="narrow"
             onchange="document.getElementById('adv-noffset').value=Math.min(+this.value,99);advDirty=true;advDraw()">
           <button onclick="advStepN(-1)">◀</button>
           <button onclick="advStepN(1)">▶</button>
@@ -1561,6 +1571,10 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       </div>
 
     </div><!-- dtab-advanced -->
+
+    <div id="dtab-ai" class="dtab-panel">
+      <div id="ai-panel-content"></div>
+    </div><!-- dtab-ai -->
 
   </div><!-- drawer-scroll -->
 </div><!-- drawer -->
@@ -1753,7 +1767,6 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 <!-- Hidden elements required by JS wiring -->
 <div id="anim-indicator" style="display:none"></div>
 <div id="from-banner" style="display:none"></div>
-<div id="ai-panel-content" style="display:none"></div>
 <input type="number" id="num-path-mod" value="57" style="display:none">
 <button id="btn-respath-anim" style="display:none"></button>
 <span id="lbl-prime-bar" style="display:none">2</span>
@@ -1810,12 +1823,15 @@ const PRIMES = [];
     if(!sieve[i]){ PRIMES.push(i); for(let j=2*i;j<=10000;j+=i) sieve[j]=1; }
   }
 })();
-function isPrime(n){ return n>=2 && PRIMES[PRIMES.indexOf(n)]===n; }
+function isPrime(n){ return n>=2 && PRIME_SET.has(n); }
+const PRIME_SET = new Set(PRIMES);
+const _phiCache = {};
 function phi(n){
-  let r=n;
-  for(let p of PRIMES){ if(p*p>n) break; if(n%p===0){ r=r/p*(p-1); while(n%p===0) n/=p; } }
-  if(n>1) r=r/n*(n-1);
-  return r;
+  if(_phiCache[n]) return _phiCache[n];
+  let r=n, rem=n;
+  for(const p of PRIMES){ if(p*p>rem) break; if(rem%p===0){ r=r/p*(p-1); while(rem%p===0) rem/=p; } }
+  if(rem>1) r=r/rem*(rem-1);
+  return (_phiCache[n]=r);
 }
 function gcd(a,b){ while(b){let t=b;b=a%b;a=t;} return a; }
 function coprimes(M){ const r=[]; for(let i=1;i<M;i++) if(gcd(i,M)===1) r.push(i); return r; }
@@ -2122,24 +2138,20 @@ function pointColor(pt){
   } else if(cm==='gap_class'){
     h=((r%12)*30+S.hue)%360; s=80;l=55;
   } else if(cm==='chi4'){
-    // Color by r mod 4 — the Gaussian integer / Dirichlet character classification
+    // χ₄ Dirichlet character — color by r mod 4 (Gaussian integer classification)
     const mod4 = r % 4;
-    if(mod4===1){ h=(174+S.hue)%360; s=80; l=58; }      // teal: r≡1, maps to i, splits in ℤ[i]
-    else if(mod4===3){ h=(294+S.hue)%360; s=80; l=58; }  // magenta: r≡3, maps to -i, inert
-    else if(mod4===2){ h=(50+S.hue)%360; s=85; l=55; }   // gold: r≡2, near -1
-    else { h=(200+S.hue)%360; s=50; l=40; }              // r≡0: near +1
-    // Color by E(N) contribution of this ring
-    // Violet = ring pushes R above C (positive contribution)
-    // Teal   = ring pulls R below C (negative contribution)
-    // Brightness = magnitude of contribution
+    if(mod4===1){ h=(174+S.hue)%360; s=80; l=58; }      // teal: r≡1 mod 4, splits in ℤ[i]
+    else if(mod4===3){ h=(294+S.hue)%360; s=80; l=58; }  // magenta: r≡3 mod 4, inert in ℤ[i]
+    else if(mod4===2){ h=(50+S.hue)%360; s=85; l=55; }   // gold: r≡2 mod 4, near −1
+    else { h=(200+S.hue)%360; s=50; l=40; }              // r≡0 mod 4: near +1
+  } else if(cm==='error_corr'){
+    // E(N) contribution coloring — ring-level: violet=pushes R above C, teal=pulls below
     buildRingEC(S.mmax);
     const ec = _ringEC[M];
     if(ec){
-      const sign = ec.E >= 0 ? 1 : -1;
-      const mag = Math.min(1, Math.abs(ec.eContrib) * M * 20); // scale for visibility
-      h = sign > 0 ? (280+S.hue)%360 : (170+S.hue)%360; // violet vs teal
+      const mag = Math.min(1, Math.abs(ec.eContrib) * M * 20);
+      h = ec.E >= 0 ? (280+S.hue)%360 : (170+S.hue)%360;
       s = 85; l = 35 + mag * 30;
-      // Prime rings (spiral dropout points) get gold highlight
       if(ec.spiralDrop){ h=(50+S.hue)%360; s=95; l=60; }
     } else {
       h=200; s=50; l=40;
@@ -2286,7 +2298,7 @@ function geomStateKey(){
   return [S.mmax,S.view,S.color,S.chain,S.lifts,S.broken,S.noncop,S.invert,
           S.spiral,S.mirror,S.prime,S.npath,S.noffset,S.allnodd,S.allp,S.allpts,
           S.channel,S.rpath,S.customR,S.hue,S.sat,S.bri,S.liftThick,S.liftAlpha,
-          S.dim,S.dimAlpha,S.chords,S.gapStr,S.delta].join('|');
+          S.dim,S.dimAlpha,S.chords,S.gapStr].join('|');
 }
 let spinAngle = 0;
 let lastTime = 0;
@@ -3158,10 +3170,29 @@ function updateStatsPanel(){
   const ph=phi(M);
   document.getElementById('sl-phi').textContent=ph;
   document.getElementById('sl-tm').textContent=(ph/M).toFixed(4);
-  // C(n) approximation
+  // C(N) via Euler product up to M
   let C=1;
   for(const p of PRIMES){ if(p>M) break; C*=(1-1/(p*(p-1))); }
   document.getElementById('sl-cn').textContent=C.toFixed(6);
+  // R(N) and E(N) from precomputed ring data
+  buildRingEC(M);
+  const ec=_ringEC[M];
+  if(ec){
+    const RN=ec.R, EN=ec.E;
+    const slRN=document.getElementById('sl-rn');
+    const slEN=document.getElementById('sl-en');
+    const slENn=document.getElementById('sl-en-n');
+    if(slRN) slRN.textContent=RN.toFixed(8);
+    if(slEN){
+      slEN.textContent=(EN>=0?'+':'')+EN.toExponential(3);
+      slEN.style.color=EN>=0?'#e879f9':'#3dc8b8';
+    }
+    if(slENn){
+      const absEN=Math.abs(EN)*M;
+      slENn.textContent=absEN.toFixed(4);
+      slENn.style.color=absEN>0.5?'#e05060':'#c8a84a';
+    }
+  }
   document.getElementById('sl-pts').textContent=ptCount;
   document.getElementById('sl-mshow').textContent=M;
 
@@ -3190,16 +3221,10 @@ function exportViewPNG(viewName, filename, callback){
 
   // True 4K
   const EXP=3840;
-  // dpr must be factored out of CSS dimensions so worldToScreen maps correctly.
-  // CSS pixels x dpr = physical pixels. If we set CSS = EXP we tell
-  // worldToScreen "w = 3840 CSS px" and it multiplies by dpr again ->
-  // center maps to physical pixel EXP instead of EXP/2 (bottom-right corner bug).
-  const _expDpr = Math.min(devicePixelRatio, 2);
-  const EXP_CSS = Math.round(EXP / _expDpr);
   canvas.width=EXP; canvas.height=EXP;
-  canvas.style.width=EXP_CSS+'px'; canvas.style.height=EXP_CSS+'px';
+  canvas.style.width=EXP+'px'; canvas.style.height=EXP+'px';
   overlay.width=EXP; overlay.height=EXP;
-  overlay.style.width=EXP_CSS+'px'; overlay.style.height=EXP_CSS+'px';
+  overlay.style.width=EXP+'px'; overlay.style.height=EXP+'px';
   if(gl) gl.viewport(0,0,EXP,EXP);
 
   autoFitZoom();
@@ -3213,8 +3238,19 @@ function exportViewPNG(viewName, filename, callback){
   // Three RAF cycles: GL render → overlay render → composite & save
   requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
     // Composite: GL canvas + overlay into one offscreen canvas
+    const M=S.mmax;
+    const ph=phi(M);
+    // Compute C(N)
+    let Cv=1; for(const p of PRIMES){ if(p>M) break; Cv*=(p*p-2)/(p*p-1); }
+    // Compute R(N), E(N)
+    buildRingEC(M);
+    const ec=_ringEC[M];
+    const RN=ec?ec.R:Cv, EN=ec?ec.E:0;
+
+    const LEG=Math.round(EXP*0.38);
+    const OUT_W=EXP+LEG;
     const out = document.createElement('canvas');
-    out.width = EXP; out.height = EXP;
+    out.width = OUT_W; out.height = EXP;
     const octx = out.getContext('2d');
 
     // Draw GL layer
@@ -3223,16 +3259,66 @@ function exportViewPNG(viewName, filename, callback){
     // Draw overlay (labels, lift lines, pinned points, error bar, etc.)
     octx.drawImage(overlay, 0, 0, EXP, EXP);
 
-    // Watermark
-    octx.font = 'bold 28px JetBrains Mono, monospace';
-    octx.fillStyle = 'rgba(200,168,74,0.55)';
-    octx.textAlign = 'right';
-    octx.fillText('wessengetachew.github.io', EXP-24, EXP-24);
+    // ── Legend panel ──────────────────────────────────────────────────────
+    const LX=EXP, LW=LEG, U=4, PAD=24*U;
+    octx.fillStyle='#050510';
+    octx.fillRect(LX,0,LW,EXP);
+    octx.strokeStyle='rgba(200,168,74,0.25)'; octx.lineWidth=2*U;
+    octx.beginPath(); octx.moveTo(LX,0); octx.lineTo(LX,EXP); octx.stroke();
+
+    let ly=PAD*1.8;
+    function wfnt(sz,bold){ octx.font=(bold?'bold ':'')+Math.round(sz*U)+'px JetBrains Mono,monospace'; }
+    function wfL(text,sz,col,bold){ wfnt(sz,bold); octx.fillStyle=col||'rgba(255,255,255,0.85)'; octx.textAlign='left'; octx.textBaseline='top'; octx.fillText(text,LX+PAD,ly); }
+    function wfR(text,sz,col,bold){ wfnt(sz,bold); octx.fillStyle=col||'rgba(255,255,255,0.85)'; octx.textAlign='right'; octx.textBaseline='top'; octx.fillText(text,LX+LW-PAD,ly); }
+    function wrule(col){ octx.strokeStyle=col||'rgba(255,255,255,0.08)'; octx.lineWidth=U; octx.beginPath(); octx.moveTo(LX+PAD,ly); octx.lineTo(LX+LW-PAD,ly); octx.stroke(); }
+    function wadv(px){ ly+=px*U; }
+    function wparam(label,val,col){ wfL(label,12,'rgba(255,255,255,0.4)'); wfR(val,12,col||'rgba(255,255,255,0.85)'); wadv(16); }
+
+    // Title
+    wadv(2);
+    wfL('Modular Residue Structure',22,'#c8a84a',true); wadv(26);
+    const vLabel={concentric:'Concentric Rings',fermat:'Fermat Spiral',farey:'Farey Half-Plane',strip:'Unfolded Strip'}[S.view]||S.view;
+    wfL('Z/MZ  \u00b7  '+vLabel,13,'rgba(255,255,255,0.45)'); wadv(18);
+    wfL('wessengetachew.github.io',11,'rgba(255,255,255,0.22)'); wadv(28);
+    wrule('rgba(200,168,74,0.3)'); wadv(24);
+
+    // Parameters
+    wfL('PARAMETERS',10,'rgba(255,255,255,0.25)',true); wadv(16);
+    wparam('Modulus M',''+M,'#4ecdc4');
+    wparam('\u03c6(M)',''+ph,'#4ecdc4');
+    wparam('\u03c6(M)/M',(ph/M).toFixed(6),'#4ecdc4');
+    wadv(8);
+
+    // C constant + R(N) / E(N)
+    wrule('rgba(78,205,196,0.2)'); wadv(20);
+    wfL('LIFT SURVIVAL CONSTANT',10,'rgba(78,205,196,0.5)',true); wadv(18);
+    wfL('C = \u220f\u209a (p\u00b2\u22122)/(p\u00b2\u22121)',15,'rgba(255,255,255,0.7)'); wadv(22);
+    wfL('C('+M+') \u2248 '+Cv.toFixed(10),20,'#3dc8b8',true); wadv(16);
+    wfL('C(\u221e) = 0.530711806246\u2026',10,'rgba(255,255,255,0.25)'); wadv(22);
+    wrule('rgba(255,255,255,0.06)'); wadv(16);
+    wfL('R(N)',12,'rgba(255,255,255,0.4)'); wfR(RN.toFixed(10),12,'#3dc8b8'); wadv(16);
+    wfL('E(N) = R\u2212C',12,'rgba(255,255,255,0.4)'); wfR((EN>=0?'+':'')+EN.toExponential(4),12,EN>=0?'#e879f9':'#3dc8b8'); wadv(16);
+    wfL('|E(N)|\u00b7N',12,'rgba(255,255,255,0.4)'); wfR((Math.abs(EN)*M).toFixed(6),12,'#c8a84a'); wadv(24);
+
+    // Active overlays
+    wrule('rgba(200,168,74,0.2)'); wadv(20);
+    wfL('ACTIVE OVERLAYS',10,'rgba(255,255,255,0.25)',true); wadv(16);
+    if(S.spiral){ wfL('Prime Spiral  r\u2261p (mod M)',12,'#c8a84a'); wfR('p = '+S.prime,12,'#c8a84a'); wadv(16); }
+    if(S.npath){  wfL('\u00b1n Lift Paths  (M\u00b1n)/2',12,'#3dc8b8');  wfR('n = '+S.noffset,12,'#3dc8b8');  wadv(16); }
+    if(S.lifts)  { wfL('Lift lines',12,'rgba(255,255,255,0.35)'); wadv(14); }
+    if(S.chords) { wfL('Gap chords',12,'rgba(255,255,255,0.35)'); wadv(14); }
+    wfL('Color: '+S.color,11,'rgba(255,255,255,0.25)'); wadv(20);
+
+    // Footer
+    octx.strokeStyle='rgba(255,255,255,0.06)'; octx.lineWidth=U;
+    octx.beginPath(); octx.moveTo(LX+PAD,EXP-PAD*2); octx.lineTo(LX+LW-PAD,EXP-PAD*2); octx.stroke();
+    wfnt(10,false); octx.fillStyle='rgba(200,168,74,0.4)'; octx.textAlign='left'; octx.textBaseline='bottom';
+    octx.fillText('Lift Survival Framework  \u00b7  wessengetachew.github.io',LX+PAD,EXP-PAD*0.8);
 
     const url = out.toDataURL('image/png');
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename || 'zmmz_4k.png';
+    a.download = filename || ('zmmz_M'+S.mmax+'_'+S.view+'_4k.png');
     a.click();
 
     // Restore
@@ -4969,6 +5055,8 @@ function runProbe(probe){
 
 // ── Build AI panel HTML ───────────────────────────────────────────────────
 function buildAIPanel(){
+  const el=document.getElementById('ai-panel-content');
+  if(el && el.children.length) return; // already built
   const categories = [...new Set(AI_PROBES.map(p=>p.category))];
   let html = `
   <div style="padding:8px 6px 4px;border-bottom:1px solid rgba(80,245,192,.15);margin-bottom:10px">
@@ -6363,12 +6451,30 @@ _advCanvas().addEventListener('touchend',function(e){
 
 // ── Prime list ────────────────────────────────────────────────────────────
 var ADV_PRIMES=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97];
+function _nextPrime(p){
+  var n=p+1; if(n<2) n=2;
+  outer: while(true){
+    for(var d=2;d*d<=n;d++) if(n%d===0){n++;continue outer;}
+    return n;
+  }
+}
+function _prevPrime(p){
+  if(p<=2) return 2;
+  var n=p-1;
+  outer: while(n>=2){
+    var ok=true;
+    for(var d=2;d*d<=n;d++) if(n%d===0){ok=false;break;}
+    if(ok) return n;
+    n--;
+  }
+  return 2;
+}
 function advStepPrime(dir){
   var sel=document.getElementById('adv-prime-sel');
-  var cur=+sel.value;
-  var idx=ADV_PRIMES.indexOf(cur);
-  idx=Math.max(0,Math.min(ADV_PRIMES.length-1,idx+dir));
-  var np=ADV_PRIMES[idx];
+  var cur=+sel.value||2;
+  var np=dir>0?_nextPrime(cur):_prevPrime(cur);
+  // Extend ADV_PRIMES if needed
+  if(ADV_PRIMES.indexOf(np)<0) ADV_PRIMES.push(np);
   var opt=sel.querySelector('option[value="'+np+'"]');
   if(!opt){opt=document.createElement('option');opt.value=np;opt.textContent=np;sel.appendChild(opt);}
   sel.value=np;
@@ -6377,7 +6483,7 @@ function advStepPrime(dir){
   advDirty=true; advDraw();
 }
 function advSetN(n){
-  document.getElementById('adv-noffset').value=n;
+  document.getElementById('adv-noffset').value=Math.min(n,99999);
   document.getElementById('adv-noffset-num').value=n;
   var lbl=document.getElementById('adv-strip-n-lbl');
   if(lbl) lbl.textContent=n;
@@ -6385,10 +6491,11 @@ function advSetN(n){
 }
 function advStepN(dir){
   var el=document.getElementById('adv-noffset-num');
-  el.value=Math.max(1,Math.min(999,+el.value+dir));
-  document.getElementById('adv-noffset').value=Math.min(+el.value,99);
+  var v=Math.max(1,+el.value+dir);
+  el.value=v;
+  document.getElementById('adv-noffset').value=Math.min(v,99999);
   var lbl=document.getElementById('adv-strip-n-lbl');
-  if(lbl) lbl.textContent=el.value;
+  if(lbl) lbl.textContent=v;
   advDirty=true; advDraw();
 }
 
@@ -6692,6 +6799,9 @@ function _advStripToggleNpath(){
 
 document.getElementById('dtab-btn-advanced').addEventListener('click',function(){
   setTimeout(function(){ if(typeof advDraw==='function') advDraw(); },60);
+});
+document.getElementById('dtab-btn-ai').addEventListener('click',function(){
+  if(typeof buildAIPanel==='function') buildAIPanel();
 });
 
 // Keep adv-canvas sized correctly when window resizes
