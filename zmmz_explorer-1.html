@@ -1634,7 +1634,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
         <option value="adv_cut_spin">Cut animate</option>
         <option value="adv_color_cycle">Color cycle</option>
       </select>
-      <button id="adv-strip-play-btn" class="thm-btn" style="border-color:rgba(80,245,192,.4);color:#50f5c0;padding:3px 9px;font-size:11px;min-width:28px" onclick="_advStripPlayStop()" title="Play / Stop">▶</button><button class="thm-btn" style="border-color:rgba(192,132,252,.3);color:#c084fc;padding:3px 8px;font-size:9px;margin-left:1px" onclick="_advResetView()" title="Reset view">↺</button>
+      <button id="adv-strip-play-btn" class="thm-btn" style="border-color:rgba(80,245,192,.4);color:#50f5c0;padding:3px 9px;font-size:11px;min-width:28px" onclick="_advStripPlayStop()" title="Play / Stop">▶</button><button class="thm-btn" style="border-color:rgba(192,132,252,.3);color:#c084fc;padding:3px 8px;font-size:9px;margin-left:1px" onclick="_advAnimStop();_ctrlReset();_advResetView();" title="Reset canvas + view">↺</button>
     </div>
   </div>
   <div id="canvas-area">
@@ -1656,9 +1656,8 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
     <!-- Animation presets -->
     <select id="anim-preset-sel" onchange="if(ANIM.active!==null||S.spin){animStop();if(this.value){animStart(this.value);var b=document.getElementById('btn-strip-play');if(b){b.textContent='■';b.style.color='#e05060';b.style.borderColor='rgba(224,80,96,.4)';}}}" style="font-family:'JetBrains Mono',monospace;font-size:8px;background:#0d0d20;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:2px 4px;border-radius:2px;max-width:110px" title="Animation presets">
       <option value="">— pick anim —</option>
-      <option value="m_grow" selected>Grow M</option>
-      <option value="strip_sweep">Strip sweep</option>
       <option value="spin">Spin</option>
+      <option value="strip_sweep">Strip sweep</option>
       <option value="spiral_trace">Spiral trace p</option>
       <option value="m_grow">Grow M</option>
       <option value="m_grow_spin">Grow → Spin</option>
@@ -1666,6 +1665,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       <option value="chain_sweep">Chain sweep</option>
       <option value="chain_spin">Chain + Spin</option>
       <option value="farey_sweep">Farey sweep</option>
+      <option value="strip_sweep">Strip sweep</option>
     </select>
     <button id="btn-strip-play" class="thm-btn" style="border-color:rgba(80,245,192,.4);color:#50f5c0;padding:3px 9px;font-size:11px;min-width:28px" onclick="_stripPlayStop()" title="Play / Stop animation">▶</button><button class="thm-btn" style="border-color:rgba(192,132,252,.4);color:#c084fc;padding:3px 8px;font-size:9px;margin-left:1px" onclick="_ctrlReset()" title="Reset canvas">↺</button>
   </div>
@@ -4650,7 +4650,11 @@ function animStart(name){
   }
 
   else if(name==='farey_sweep'){
-    S.view='farey'; let ch=1; let dir=1;
+    S.view='farey';
+    var vsel=document.getElementById('sel-view');
+    if(vsel) vsel.value='farey';
+    autoFitZoom(); dirty=true;
+    let ch=1; let dir=1;
     iv(1500,()=>{
       S.channel=ch; S.color='angle';
       document.getElementById('num-channel').value=ch;
@@ -6727,8 +6731,9 @@ function _advResetView(){
   var lb=document.getElementById('adv-zoom-lbl');
   var ps=document.getElementById('adv-pts-sl');
   if(sl){sl.value=1;} if(lb){lb.textContent='1.00×';} if(ps){ps.value=1;}
-  advDirty=true; advDraw();
+  window.advDirty=true; if(window.advDraw) window.advDraw();
 }
+window._advResetView=_advResetView;
 // Watches S.mmax, S.prime, S.noffset etc. and redraws when they change
 var _advZoom = 1;
 var _advPanX = 0;
