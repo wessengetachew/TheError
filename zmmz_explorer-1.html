@@ -1393,7 +1393,7 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
             <option value="log">Log</option>
             <option value="quadratic">Quadratic</option>
           </select>
-          <label><input type="checkbox" id="adv-invert"> Invert</label>
+          <label><input type="checkbox" id="adv-invert" onchange="advDirty=true;advDraw()"> Invert</label>
         </div>
 
         <!-- Labels -->
@@ -1589,6 +1589,10 @@ input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
       <span id="adv-strip-n-lbl" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3dc8b8;min-width:22px;text-align:center;font-weight:bold">1</span>
       <button class="thm-btn" style="border-color:rgba(61,200,184,.4);color:#3dc8b8;padding:3px 10px;font-size:11px" onclick="advStepN(1)">&#9654;</button>
       <button id="adv-strip-npath-btn" class="thm-btn" style="border-color:rgba(61,200,184,.3);color:#3dc8b8;padding:3px 7px;font-size:9px;background:rgba(61,200,184,.1)" onclick="_advStripToggleNpath()" title="Toggle &#177;n paths">&#177;n</button>
+      <span style="font-family:\'JetBrains Mono\',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
+      <button id="adv-strip-label-btn" class="thm-btn" style="border-color:rgba(200,168,74,.3);color:#c8a84a;padding:3px 7px;font-size:9px" onclick="togglePathLabel()" title="Cycle path labels">&#9672; Label</button>
+      <span style="font-family:\'JetBrains Mono\',monospace;font-size:8px;color:rgba(255,255,255,.15);padding:0 4px">|</span>
+      <button id="adv-strip-invert-btn" class="thm-btn" style="border-color:rgba(192,132,252,.3);color:#c084fc;padding:3px 7px;font-size:9px" onclick="_ctrlInvert()" title="Invert radius">&#8651; inv</button>
     </div>
   </div>
   <div id="canvas-area">
@@ -6059,25 +6063,30 @@ function _advDrawPathLabels(ctx,W,H,modN,ptXYFn){
   var showSpiral=(document.getElementById('adv-spiral')||{}).checked;
   var showMirrorSp=(document.getElementById('adv-spiral-mirror')||{}).checked;
   var showNpath=(document.getElementById('adv-npath')||{}).checked;
-  var lsize=Math.max(8,+document.getElementById('adv-lsize').value||9);
-  ctx.textAlign='center';ctx.textBaseline='bottom';
+  var view=document.getElementById('adv-view').value;
+  var lsize=Math.max(8,Math.round(W*0.013));
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
   for(var m=1;m<=modN;m++){
     var pts=[];
     if(showSpiral){
-      var rs=prime%m;if(rs>=1&&rs<m&&_gcd(rs,m)===1) pts.push({r:rs,col:'rgba(200,168,74,0.95)'});
-      if(showMirrorSp){var rm=(m-rs)%m;if(rm>=1&&rm<m&&_gcd(rm,m)===1) pts.push({r:rm,col:'rgba(144,112,216,0.9)'});}
+      var rs=prime%m; if(rs>=1&&rs<m&&_gcd(rs,m)===1) pts.push({r:rs,col:'rgba(200,168,74,0.95)'});
+      if(showMirrorSp){var rm=(m-rs)%m; if(rm>=1&&rm<m&&_gcd(rm,m)===1) pts.push({r:rm,col:'rgba(144,112,216,0.9)'});}
     }
     if(showNpath&&(m%2)===(noff%2)){
-      var rhi=(m+noff)/2;if(Number.isInteger(rhi)&&rhi>=1&&rhi<m&&_gcd(rhi,m)===1) pts.push({r:rhi,col:'rgba(200,168,74,0.9)'});
-      var rlo=(m-noff)/2;if(Number.isInteger(rlo)&&rlo>=1&&rlo<m&&_gcd(rlo,m)===1) pts.push({r:rlo,col:'rgba(61,200,184,0.9)'});
+      var rhi=(m+noff)/2; if(Number.isInteger(rhi)&&rhi>=1&&rhi<m&&_gcd(rhi,m)===1) pts.push({r:rhi,col:'rgba(200,168,74,0.9)'});
+      var rlo=(m-noff)/2; if(Number.isInteger(rlo)&&rlo>=1&&rlo<m&&_gcd(rlo,m)===1) pts.push({r:rlo,col:'rgba(61,200,184,0.9)'});
     }
     pts.forEach(function(pt){
-      var xy=ptXYFn(pt.r,m);if(!xy) return;
+      var xy=ptXYFn(pt.r,m); if(!xy) return;
       var lbl=_advLabelStr({r:pt.r,m:m});
       ctx.font='bold '+lsize+'px JetBrains Mono,monospace';
       var tw=ctx.measureText(lbl).width;
-      ctx.fillStyle='rgba(4,4,14,0.75)';ctx.fillRect(xy.x-tw/2-2,xy.y-lsize-6,tw+4,lsize+4);
-      ctx.fillStyle=pt.col;ctx.fillText(lbl,xy.x,xy.y-3);
+      function drawLbl(x,y){
+        ctx.fillStyle='rgba(4,4,14,0.75)'; ctx.fillRect(x-tw/2-2,y-lsize-6,tw+4,lsize+4);
+        ctx.fillStyle=pt.col; ctx.fillText(lbl,x,y-3);
+      }
+      if(view!=='rect') drawLbl(xy.x, xy.y);
+      if((view==='split'||view==='rect')&&xy.rx!==undefined) drawLbl(xy.rx, xy.ry);
     });
   }
   ctx.globalAlpha=1;
@@ -6169,69 +6178,63 @@ function advDrawPaths(ctx, W, H, modN, ptXYFn, radius, angRad, _gcd){
   var showNpath=(document.getElementById('adv-npath')||{}).checked;
   var prime=+document.getElementById('adv-prime-sel').value||2;
   var noff=+document.getElementById('adv-noffset-num').value||1;
+  var view=document.getElementById('adv-view').value;
 
-  // ── Prime spiral: r ≡ prime mod M across rings ─────────────────────────
-  if(showSpiral){
-    ['spiral','mirror'].forEach(function(which,wi){
-      if(which==='mirror'&&!showMirrorSp) return;
-      var col=wi===0?'rgba(200,168,74,0.85)':'rgba(144,112,216,0.75)';
-      ctx.strokeStyle=col; ctx.lineWidth=1.8; ctx.setLineDash([]);
-      ctx.beginPath();
-      var started=false;
+  // resolve x/y respecting split/rect layout
+  function px(xy){ return (view==='rect'&&xy.rx!==undefined)?xy.rx:xy.x; }
+  function py(xy){ return (view==='rect'&&xy.ry!==undefined)?xy.ry:xy.y; }
+
+  function drawPath(getR, col, lineW){
+    // circle pass
+    if(view!=='rect'){
+      ctx.strokeStyle=col; ctx.lineWidth=lineW; ctx.setLineDash([]);
+      ctx.beginPath(); var started=false;
       for(var m=1;m<=modN;m++){
-        var r=which==='spiral'?(prime%m):((m-(prime%m))%m);
-        if(r<1||r>=m||_gcd(r,m)!==1) continue;
-        var xy=ptXYFn(r,m);
-        if(!xy) continue;
-        if(!started){ctx.moveTo(xy.x,xy.y);started=true;}
-        else ctx.lineTo(xy.x,xy.y);
+        var r=getR(m); if(r<1||r>=m||_gcd(r,m)!==1) continue;
+        var xy=ptXYFn(r,m); if(!xy) continue;
+        if(!started){ctx.moveTo(xy.x,xy.y);started=true;} else ctx.lineTo(xy.x,xy.y);
       }
       ctx.stroke();
-      // Highlight dots on path
-      started=false;
-      for(var m2=1;m2<=modN;m2++){
-        var r2=which==='spiral'?(prime%m2):((m2-(prime%m2))%m2);
-        if(r2<1||r2>=m2||_gcd(r2,m2)!==1) continue;
-        var xy2=ptXYFn(r2,m2);
-        if(!xy2) continue;
-        var dotR=Math.max(2,W/250*(m2===modN?1.8:1));
-        ctx.beginPath(); ctx.arc(xy2.x,xy2.y,dotR,0,2*Math.PI);
+    }
+    // rect pass (split or rect view)
+    if(view==='split'||view==='rect'){
+      ctx.strokeStyle=col; ctx.lineWidth=lineW; ctx.setLineDash([3,3]);
+      ctx.beginPath(); var started2=false;
+      for(var m=1;m<=modN;m++){
+        var r=getR(m); if(r<1||r>=m||_gcd(r,m)!==1) continue;
+        var xy=ptXYFn(r,m); if(!xy||xy.rx===undefined) continue;
+        if(!started2){ctx.moveTo(xy.rx,xy.ry);started2=true;} else ctx.lineTo(xy.rx,xy.ry);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    // dots on both
+    for(var m=1;m<=modN;m++){
+      var r=getR(m); if(r<1||r>=m||_gcd(r,m)!==1) continue;
+      var xy=ptXYFn(r,m); if(!xy) continue;
+      var dotR=Math.max(2,W/250*(m===modN?1.8:1));
+      if(view!=='rect'){
+        ctx.beginPath(); ctx.arc(xy.x,xy.y,dotR,0,2*Math.PI);
         ctx.fillStyle=col; ctx.globalAlpha=0.9; ctx.fill();
       }
-      ctx.globalAlpha=1;
-    });
+      if((view==='split'||view==='rect')&&xy.rx!==undefined){
+        ctx.beginPath(); ctx.arc(xy.rx,xy.ry,dotR,0,2*Math.PI);
+        ctx.fillStyle=col; ctx.globalAlpha=0.9; ctx.fill();
+      }
+    }
+    ctx.globalAlpha=1;
   }
 
-  // ── ±n paths: r = (M±n)/2 ─────────────────────────────────────────────
+  // ── Prime spiral ────────────────────────────────────────────────────────
+  if(showSpiral){
+    drawPath(function(m){return prime%m;}, 'rgba(200,168,74,0.85)', 1.8);
+    if(showMirrorSp)
+      drawPath(function(m){return (m-(prime%m))%m;}, 'rgba(144,112,216,0.75)', 1.8);
+  }
+
+  // ── ±n paths ────────────────────────────────────────────────────────────
   if(showNpath){
-    ['hi','lo'].forEach(function(which,wi){
-      var col=wi===0?'rgba(200,168,74,0.9)':'rgba(61,200,184,0.9)';
-      ctx.strokeStyle=col; ctx.lineWidth=1.8; ctx.setLineDash([]);
-      ctx.beginPath();
-      var started=false;
-      for(var m=2;m<=modN;m++){
-        if((m%2)!==(noff%2)) continue;
-        var r=which==='hi'?(m+noff)/2:(m-noff)/2;
-        if(r<1||r>=m||_gcd(r,m)!==1) continue;
-        var xy=ptXYFn(r,m);
-        if(!xy) continue;
-        if(!started){ctx.moveTo(xy.x,xy.y);started=true;}
-        else ctx.lineTo(xy.x,xy.y);
-      }
-      ctx.stroke();
-      // Dots
-      for(var m3=2;m3<=modN;m3++){
-        if((m3%2)!==(noff%2)) continue;
-        var r3=which==='hi'?(m3+noff)/2:(m3-noff)/2;
-        if(r3<1||r3>=m3||_gcd(r3,m3)!==1) continue;
-        var xy3=ptXYFn(r3,m3);
-        if(!xy3) continue;
-        var dotR3=Math.max(2,W/250*(m3===modN?1.8:1));
-        ctx.beginPath(); ctx.arc(xy3.x,xy3.y,dotR3,0,2*Math.PI);
-        ctx.fillStyle=col; ctx.globalAlpha=0.95; ctx.fill();
-      }
-      ctx.globalAlpha=1;
-    });
+    drawPath(function(m){return (m%2)!==(noff%2)?-1:(m+noff)/2;}, 'rgba(200,168,74,0.9)', 1.8);
+    drawPath(function(m){return (m%2)!==(noff%2)?-1:(m-noff)/2;}, 'rgba(61,200,184,0.9)',  1.8);
   }
 }
 
