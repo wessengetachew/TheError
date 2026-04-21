@@ -3190,10 +3190,16 @@ function exportViewPNG(viewName, filename, callback){
 
   // True 4K
   const EXP=3840;
+  // dpr must be factored out of CSS dimensions so worldToScreen maps correctly.
+  // CSS pixels x dpr = physical pixels. If we set CSS = EXP we tell
+  // worldToScreen "w = 3840 CSS px" and it multiplies by dpr again ->
+  // center maps to physical pixel EXP instead of EXP/2 (bottom-right corner bug).
+  const _expDpr = Math.min(devicePixelRatio, 2);
+  const EXP_CSS = Math.round(EXP / _expDpr);
   canvas.width=EXP; canvas.height=EXP;
-  canvas.style.width=EXP+'px'; canvas.style.height=EXP+'px';
+  canvas.style.width=EXP_CSS+'px'; canvas.style.height=EXP_CSS+'px';
   overlay.width=EXP; overlay.height=EXP;
-  overlay.style.width=EXP+'px'; overlay.style.height=EXP+'px';
+  overlay.style.width=EXP_CSS+'px'; overlay.style.height=EXP_CSS+'px';
   if(gl) gl.viewport(0,0,EXP,EXP);
 
   autoFitZoom();
