@@ -392,6 +392,31 @@ body.op-active{overflow:hidden;}
 </style>
 </head>
 <body>
+<style>
+#tab-nav{position:fixed;top:0;left:0;right:0;height:44px;background:rgba(10,10,15,.96);backdrop-filter:blur(12px);border-bottom:1px solid #1e1e35;display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:300;gap:4px;}
+.tabs{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;flex:1;}.tabs::-webkit-scrollbar{display:none;}
+.tab{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:0 12px;height:44px;display:flex;align-items:center;gap:5px;color:rgba(160,160,210,.7);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;}
+.tab:hover{color:#e0e0f0;}.tab.active{color:#c084fc;border-bottom-color:#c084fc;}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6;flex-shrink:0;}
+.nav-right{font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.06em;white-space:nowrap;}
+body{padding-top:44px;}
+</style>
+<div id="tab-nav">
+  <div class="tabs">
+    <a href="index.html" class="tab tab-opener"><span class="tab-dot"></span>Opener</a>
+    <a href="EN_explorer-1-2.html" class="tab tab-explorer"><span class="tab-dot"></span>Explorer</a>
+    <a href="EN_explorer-updated.html" class="tab tab-deep"><span class="tab-dot"></span>Deep Analysis</a>
+    <a href="zmmz_explorer-1.html" class="tab tab-canvas"><span class="tab-dot"></span>Geometric Canvas</a>
+    <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>ζ(2)</a>
+    <a href="gcd_explorer.html" class="tab"><span class="tab-dot"></span>GCD</a>
+    <a href="lift_paper-48.html" class="tab active"><span class="tab-dot"></span>Lift Paper</a>
+    <a href="k_explorer.html" class="tab"><span class="tab-dot"></span>K Constant</a>
+    <a href="spectral_theory-1.html" class="tab"><span class="tab-dot"></span>Spectral</a>
+    <a href="dchi_explorer.html" class="tab"><span class="tab-dot"></span>D_χ Explorer</a>
+  </div>
+  <span class="nav-right">C ≈ 0.530711806246</span>
+</div>
+
 
 <div id="opener">
   <div id="opener-canvas-wrap">
