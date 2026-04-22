@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>D_χ Explorer — Character-Weighted Jump Theorem · Wessen Getachew</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cinzel+Decorative:wght@400;700&display=swap');
+:root {
+  --bg: #0a0a0f;
+  --panel: #0f0f1a;
+  --border: #1e1e35;
+  --accent: #4a9eff;
+  --accent2: #c084fc;
+  --teal: #3dc8b8;
+  --gold: #c8a84a;
+  --coral: #e05060;
+  --text: #e0e0f0;
+  --muted: #6060a0;
+  --nav-h: 44px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-size: 11px; }
+
+/* NAV */
+#tab-nav {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h);
+  background: rgba(10,10,15,.96); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 12px; z-index: 300; gap: 4px;
+}
+.tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; flex: 1; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .12em;
+  text-transform: uppercase; padding: 0 12px; height: var(--nav-h);
+  display: flex; align-items: center; gap: 5px;
+  color: rgba(160,160,210,.7); text-decoration: none;
+  border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: color .15s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+.tab-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .6; flex-shrink: 0; }
+.nav-right { font-size: 9px; color: rgba(255,255,255,.2); letter-spacing: .06em; white-space: nowrap; }
+
+/* BODY */
+#page-body {
+  position: fixed; top: var(--nav-h); left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* HERO HEADER */
+#hero {
+  background: linear-gradient(135deg, #0a0a0f 0%, #0d0d20 50%, #0f0a1a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 24px 14px;
+  flex-shrink: 0;
+}
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 300; letter-spacing: .04em;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.hero-title em { color: var(--accent2); font-style: italic; }
+.hero-sub {
+  font-size: 9px; color: var(--muted); letter-spacing: .14em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.formula-strip {
+  display: flex; gap: 24px; flex-wrap: wrap; align-items: baseline;
+}
+.formula-block {
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
+  border-radius: 3px; padding: 6px 12px;
+  font-size: 10px; line-height: 1.8;
+}
+.formula-block .lbl { font-size: 8px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+.formula-block .eq { color: var(--text); }
+.formula-block .eq em { color: var(--accent2); font-style: normal; }
+.formula-block .eq .gold { color: var(--gold); }
+.formula-block .eq .teal { color: var(--teal); }
+
+/* MAIN CONTENT */
+#main { display: flex; flex: 1; min-height: 0; }
+
+/* SIDEBAR */
+#sidebar {
+  width: 260px; flex-shrink: 0; background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+#sidebar-scroll { flex: 1; overflow-y: auto; padding: 10px; scrollbar-width: thin; }
+#sidebar-scroll::-webkit-scrollbar { width: 3px; }
+#sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border); }
+
+.sec-title {
+  font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent); border-bottom: 1px solid var(--border);
+  padding-bottom: 3px; margin-bottom: 8px; margin-top: 12px;
+}
+.sec-title:first-child { margin-top: 0; }
+.row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+.lbl { font-size: 9px; color: var(--muted); min-width: 40px; }
+input[type=range] { flex: 1; accent-color: var(--accent2); min-width: 60px; }
+input[type=number] { background: #080810; border: 1px solid var(--border); color: var(--text); padding: 2px 4px; font-family: inherit; font-size: 10px; width: 60px; border-radius: 2px; }
+select { background: #0d0d20; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 10px; padding: 2px 5px; border-radius: 2px; cursor: pointer; }
+button { background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 3px 8px; cursor: pointer; font-family: inherit; font-size: 10px; border-radius: 2px; }
+button:hover { background: rgba(255,255,255,.06); }
+.btn-run { border-color: rgba(192,132,252,.5); color: var(--accent2); background: rgba(192,132,252,.08); padding: 5px 14px; width: 100%; font-size: 11px; margin-top: 4px; }
+.btn-run:hover { background: rgba(192,132,252,.15); }
+
+/* Character selector buttons */
+.chi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px; }
+.chi-btn {
+  border: 1px solid var(--border); background: rgba(255,255,255,.03);
+  color: var(--muted); padding: 5px 6px; cursor: pointer; border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; text-align: center;
+  transition: all .15s; line-height: 1.4;
+}
+.chi-btn:hover { background: rgba(255,255,255,.07); color: var(--text); }
+.chi-btn.active { border-color: var(--accent2); color: var(--accent2); background: rgba(192,132,252,.1); }
+.chi-btn .chi-name { font-size: 11px; display: block; }
+.chi-btn .chi-desc { font-size: 8px; opacity: .6; display: block; }
+
+/* Stats */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px; }
+.stat-card {
+  background: rgba(0,0,0,.3); border: 1px solid var(--border);
+  border-radius: 2px; padding: 5px 7px;
+}
+.stat-card .s-label { font-size: 7px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.stat-card .s-val { font-size: 12px; font-weight: 500; margin-top: 2px; }
+
+/* Info boxes */
+.info-box {
+  background: rgba(0,0,0,.3); border: 1px solid var(--border);
+  border-radius: 2px; padding: 6px 8px; font-size: 9px;
+  color: var(--muted); line-height: 1.7; margin-bottom: 6px;
+}
+.info-box strong { color: var(--text); }
+.info-box .gold { color: var(--gold); }
+.info-box .teal { color: var(--teal); }
+.info-box .coral { color: var(--coral); }
+.info-box .purple { color: var(--accent2); }
+
+/* CANVAS AREA */
+#canvas-area {
+  flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+}
+#chart-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  background: rgba(10,10,20,.8); flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
+}
+#chart-tabs::-webkit-scrollbar { display: none; }
+.chart-tab {
+  font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 8px 14px; cursor: pointer; white-space: nowrap;
+  color: var(--muted); border-bottom: 2px solid transparent;
+  transition: all .15s; user-select: none;
+}
+.chart-tab:hover { color: var(--text); }
+.chart-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+#charts { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.chart-pane { display: none; flex: 1; flex-direction: column; }
+.chart-pane.active { display: flex; }
+
+canvas.chart-canvas {
+  flex: 1; width: 100%; min-height: 0;
+  background: #050510;
+}
+
+/* Annotation bar below chart */
+.chart-annotation {
+  flex-shrink: 0; padding: 6px 16px;
+  background: rgba(5,5,16,.9); border-top: 1px solid var(--border);
+  font-size: 9px; color: var(--muted); line-height: 1.8;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.chart-annotation .ann-main { color: var(--text); }
+.chart-annotation .ann-val { color: var(--accent2); font-size: 11px; }
+
+/* Jump table */
+#jump-table-wrap {
+  flex: 1; overflow-y: auto; padding: 12px 16px; min-height: 0;
+}
+table.jtable { width: 100%; border-collapse: collapse; font-size: 10px; }
+table.jtable th { text-align: left; padding: 4px 8px; color: var(--gold); font-weight: 400; font-size: 9px; letter-spacing: .1em; border-bottom: 1px solid var(--border); }
+table.jtable td { padding: 3px 8px; border-bottom: 1px solid rgba(255,255,255,.04); }
+table.jtable tr:hover td { background: rgba(255,255,255,.03); }
+.jump-pos { color: var(--teal); }
+.jump-neg { color: var(--coral); }
+.jump-zero { color: var(--muted); }
+
+/* Theory pane */
+#theory-pane {
+  flex: 1; overflow-y: auto; padding: 20px 24px; min-height: 0;
+}
+.thm-block {
+  border-left: 3px solid var(--accent2); background: rgba(192,132,252,.04);
+  padding: 12px 16px; margin-bottom: 16px; border-radius: 0 3px 3px 0;
+}
+.thm-block .thm-label { font-size: 9px; color: var(--accent2); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 6px; }
+.thm-block .thm-body { font-size: 11px; line-height: 1.9; color: var(--text); }
+.thm-block .thm-body em { color: var(--gold); font-style: normal; }
+.note-block {
+  border-left: 3px solid var(--teal); background: rgba(61,200,184,.04);
+  padding: 10px 14px; margin-bottom: 14px; border-radius: 0 3px 3px 0;
+  font-size: 10px; line-height: 1.8; color: var(--muted);
+}
+.note-block strong { color: var(--teal); }
+.section-head {
+  font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300;
+  color: var(--text); margin: 20px 0 10px; letter-spacing: .03em;
+}
+.section-head em { color: var(--accent2); font-style: italic; }
+
+/* Mobile */
+@media (max-width: 700px) {
+  #sidebar { display: none; }
+  #hero { padding: 12px 14px 10px; }
+  .formula-strip { gap: 10px; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div id="tab-nav">
+  <div class="tabs">
+    <a href="index.html" class="tab tab-opener"><span class="tab-dot"></span>Opener</a>
+    <a href="EN_explorer-1-2.html" class="tab tab-explorer"><span class="tab-dot"></span>Explorer</a>
+    <a href="EN_explorer-updated.html" class="tab tab-deep"><span class="tab-dot"></span>Deep Analysis</a>
+    <a href="zmmz_explorer-1.html" class="tab tab-canvas"><span class="tab-dot"></span>Geometric Canvas</a>
+    <a href="zeta_explorer.html" class="tab"><span class="tab-dot"></span>ζ(2)</a>
+    <a href="gcd_explorer.html" class="tab"><span class="tab-dot"></span>GCD</a>
+    <a href="lift_paper-48.html" class="tab"><span class="tab-dot"></span>Lift Paper</a>
+    <a href="k_explorer.html" class="tab"><span class="tab-dot"></span>K Constant</a>
+    <a href="spectral_theory-1.html" class="tab"><span class="tab-dot"></span>Spectral</a>
+    <a href="dchi_explorer.html" class="tab active"><span class="tab-dot"></span>D_χ Explorer</a>
+  </div>
+  <span class="nav-right">J_χ = Σ_p χ(p)/p(p−1)</span>
+</div>
+
+<div id="page-body">
+
+  <!-- HERO -->
+  <div id="hero">
+    <div class="hero-title">D<em>_χ</em>(x) — Character-Weighted Jump Theorem</div>
+    <div class="hero-sub">Dirichlet character generalization · Wessen Getachew</div>
+    <div class="formula-strip">
+      <div class="formula-block">
+        <div class="lbl">Definition</div>
+        <div class="eq">D<em>_χ</em>(x) = −Σ<sub>p&gt;x+1, χ(p)≠0</sub> <em>χ(p)</em> / (p²−x−1)</div>
+      </div>
+      <div class="formula-block">
+        <div class="lbl">Jump Theorem</div>
+        <div class="eq">Jump at x=p−1: <span class="gold">+χ(p)/p(p−1)</span> · [χ(p)≠0]</div>
+      </div>
+      <div class="formula-block">
+        <div class="lbl">J_χ Identity</div>
+        <div class="eq">J<em>_χ</em> = Σ<sub>p</sub><em>χ(p)</em>/p(p−1) = Σ<sub>k≥2</sub> P(k,<em>χ</em>)</div>
+      </div>
+      <div class="formula-block">
+        <div class="lbl">C_χ(N)</div>
+        <div class="eq">C<em>_χ</em>(N) = Π<sub>p≤N</sub> (1 − <span class="teal">χ(p)</span>/(p²−1))</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="main">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div id="sidebar-scroll">
+
+        <div class="sec-title">Character χ</div>
+        <div class="chi-grid">
+          <button class="chi-btn active" data-chi="principal" onclick="setChi('principal',this)">
+            <span class="chi-name">χ₁</span>
+            <span class="chi-desc">Principal<br>χ(p)=1 all p</span>
+          </button>
+          <button class="chi-btn" data-chi="chi4" onclick="setChi('chi4',this)">
+            <span class="chi-name">χ₄</span>
+            <span class="chi-desc">mod 4<br>±1 by p mod 4</span>
+          </button>
+          <button class="chi-btn" data-chi="chi3" onclick="setChi('chi3',this)">
+            <span class="chi-name">χ₃</span>
+            <span class="chi-desc">mod 3<br>±1 by p mod 3</span>
+          </button>
+          <button class="chi-btn" data-chi="chi5" onclick="setChi('chi5',this)">
+            <span class="chi-name">χ₅</span>
+            <span class="chi-desc">mod 5<br>±1,i by p mod 5</span>
+          </button>
+          <button class="chi-btn" data-chi="chi8" onclick="setChi('chi8',this)">
+            <span class="chi-name">χ₈</span>
+            <span class="chi-desc">mod 8<br>Kronecker (−1/p)</span>
+          </button>
+          <button class="chi-btn" data-chi="liouville" onclick="setChi('liouville',this)">
+            <span class="chi-name">λ</span>
+            <span class="chi-desc">Liouville<br>λ(p)=−1 all p</span>
+          </button>
+        </div>
+
+        <div class="sec-title">Parameters</div>
+        <div class="row">
+          <span class="lbl">N max</span>
+          <input type="range" id="sl-N" min="100" max="5000" value="1000" oninput="document.getElementById('num-N').value=this.value">
+          <input type="number" id="num-N" value="1000" min="100" max="20000" onchange="document.getElementById('sl-N').value=Math.min(+this.value,5000)">
+        </div>
+        <div class="row">
+          <span class="lbl">x step</span>
+          <input type="range" id="sl-step" min="1" max="20" value="5" oninput="document.getElementById('lbl-step').textContent=this.value">
+          <span id="lbl-step" style="font-size:9px;color:var(--muted);min-width:18px">5</span>
+        </div>
+        <div class="row">
+          <span class="lbl">Show</span>
+          <select id="sel-overlay">
+            <option value="Dchi">D_χ(x)</option>
+            <option value="jumps">Jump positions</option>
+            <option value="Jchi">J_χ running sum</option>
+            <option value="Cchi">C_χ(N) product</option>
+            <option value="compare">Compare all χ</option>
+          </select>
+        </div>
+        <button class="btn-run" onclick="runAll()">▶ Compute</button>
+
+        <div class="sec-title" style="margin-top:14px">Live Statistics</div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="s-label">J_χ</div>
+            <div class="s-val" id="stat-Jchi" style="color:var(--accent2)">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">C_χ(N)</div>
+            <div class="s-val" id="stat-Cchi" style="color:var(--teal)">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">+jumps</div>
+            <div class="s-val" id="stat-pos" style="color:var(--teal)">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">−jumps</div>
+            <div class="s-val" id="stat-neg" style="color:var(--coral)">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">primes ≤ N</div>
+            <div class="s-val" id="stat-pi">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="s-label">χ(p)=0</div>
+            <div class="s-val" id="stat-zero" style="color:var(--muted)">—</div>
+          </div>
+        </div>
+
+        <div class="sec-title">Character Description</div>
+        <div class="info-box" id="chi-desc-box">
+          <strong>χ₁ — Principal character</strong><br>
+          χ(p) = 1 for all primes. Recovers the original Jump Theorem exactly.<br>
+          J_χ₁ = J = Σ 1/p(p−1) ≈ <span class="gold">0.7732</span>.<br>
+          All primes cause positive jumps of equal weight.
+        </div>
+
+        <div class="sec-title">Export</div>
+        <div class="row">
+          <button onclick="exportPNG()" style="flex:1;border-color:rgba(200,168,74,.4);color:var(--gold)">↓ PNG</button>
+          <button onclick="exportCSV()" style="flex:1;border-color:rgba(61,200,184,.4);color:var(--teal)">↓ CSV</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div id="canvas-area">
+      <div id="chart-tabs">
+        <div class="chart-tab active" onclick="showPane('dchi',this)">D_χ(x)</div>
+        <div class="chart-tab" onclick="showPane('jumps',this)">Jump Positions</div>
+        <div class="chart-tab" onclick="showPane('jchi',this)">J_χ Running</div>
+        <div class="chart-tab" onclick="showPane('cchi',this)">C_χ(N) Product</div>
+        <div class="chart-tab" onclick="showPane('compare',this)">Compare χ</div>
+        <div class="chart-tab" onclick="showPane('jumptable',this)">Jump Table</div>
+        <div class="chart-tab" onclick="showPane('theory',this)">Theory</div>
+      </div>
+
+      <div id="charts">
+
+        <!-- D_χ(x) -->
+        <div class="chart-pane active" id="pane-dchi">
+          <canvas class="chart-canvas" id="cv-dchi"></canvas>
+          <div class="chart-annotation">
+            <span class="ann-main">D<sub>χ</sub>(x) — smooth except at x=p−1 where χ(p)≠0. Each discontinuity = a prime in the support of χ.</span>
+            <span class="ann-val" id="ann-dchi">—</span>
+          </div>
+        </div>
+
+        <!-- Jump positions -->
+        <div class="chart-pane" id="pane-jumps">
+          <canvas class="chart-canvas" id="cv-jumps"></canvas>
+          <div class="chart-annotation">
+            <span class="ann-main">Jump size χ(p)/p(p−1) at each prime. Teal = positive (χ(p)=+1), coral = negative (χ(p)=−1), gray = zero (χ(p)=0).</span>
+            <span class="ann-val" id="ann-jumps">—</span>
+          </div>
+        </div>
+
+        <!-- J_χ running -->
+        <div class="chart-pane" id="pane-jchi">
+          <canvas class="chart-canvas" id="cv-jchi"></canvas>
+          <div class="chart-annotation">
+            <span class="ann-main">Running sum J_χ(N) = Σ_{p≤N} χ(p)/p(p−1). Converges to J_χ as N→∞.</span>
+            <span class="ann-val" id="ann-jchi">—</span>
+          </div>
+        </div>
+
+        <!-- C_χ(N) product -->
+        <div class="chart-pane" id="pane-cchi">
+          <canvas class="chart-canvas" id="cv-cchi"></canvas>
+          <div class="chart-annotation">
+            <span class="ann-main">Euler-style product C_χ(N) = Π_{p≤N}(1 − χ(p)/(p²−1)). For principal χ→C≈0.5307; for Liouville λ: C_λ=Π(p²/(p²−1))=ζ(2)=π²/6≈1.6449.</span>
+            <span class="ann-val" id="ann-cchi">—</span>
+          </div>
+        </div>
+
+        <!-- Compare -->
+        <div class="chart-pane" id="pane-compare">
+          <canvas class="chart-canvas" id="cv-compare"></canvas>
+          <div class="chart-annotation">
+            <span class="ann-main">J_χ(N) running sum for all characters simultaneously. Shows how each character "tunes" the detector.</span>
+            <span class="ann-val" id="ann-compare">—</span>
+          </div>
+        </div>
+
+        <!-- Jump table -->
+        <div class="chart-pane" id="pane-jumptable">
+          <div id="jump-table-wrap">
+            <table class="jtable" id="jtable">
+              <thead><tr>
+                <th>Prime p</th>
+                <th>p mod q</th>
+                <th>χ(p)</th>
+                <th>Jump χ(p)/p(p−1)</th>
+                <th>J_χ running</th>
+                <th>C_χ factor</th>
+              </tr></thead>
+              <tbody id="jtable-body"><tr><td colspan="6" style="color:var(--muted);padding:20px;text-align:center">Click ▶ Compute to populate</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Theory -->
+        <div class="chart-pane" id="pane-theory">
+          <div id="theory-pane">
+            <div class="section-head">The Character-Weighted Jump Theorem</div>
+
+            <div class="thm-block">
+              <div class="thm-label">Theorem — D_χ Jump Formula (Wessen Getachew)</div>
+              <div class="thm-body">
+                Let χ be a Dirichlet character. Define<br><br>
+                D<sub>χ</sub>(x) = −Σ<sub>p &gt; x+1, χ(p)≠0</sub> <em>χ(p)</em> / (p² − x − 1)<br><br>
+                Then D<sub>χ</sub>(x) is smooth on ℝ \ {p−1 : χ(p)≠0}, and at each such p−1,<br><br>
+                D<sub>χ</sub>(x⁺) − D<sub>χ</sub>(x⁻) = <em>χ(p) / p(p−1)</em><br><br>
+                Composites and primes with χ(p)=0 cause no jump. For χ=χ₁ (principal), this reduces exactly to the original Jump Theorem.
+              </div>
+            </div>
+
+            <div class="thm-block">
+              <div class="thm-label">Theorem — J_χ Series Identity</div>
+              <div class="thm-body">
+                J<sub>χ</sub> = Σ<sub>p</sub> χ(p)/p(p−1) = Σ<sub>k≥2</sub> P(k,χ)<br><br>
+                where P(k,χ) = Σ<sub>p</sub> χ(p)/p<sup>k</sup> is the prime zeta function twisted by χ.<br><br>
+                Proof: expand 1/(p(p−1)) = Σ<sub>k≥2</sub> 1/p<sup>k</sup> and swap sums (justified by absolute convergence since |χ(p)|≤1).
+              </div>
+            </div>
+
+            <div class="note-block">
+              <strong>Connection to Dirichlet L-functions.</strong> The constant J<sub>χ</sub> is related to the logarithmic derivative L'/L(s,χ) at s=2. While not identical to L'(2,χ)/L(2,χ), it is a discrete sum over primes that appears naturally in explicit formulae for the character-weighted error term E<sub>χ</sub>(N). This opens the door to studying the Generalised Riemann Hypothesis via the geometric lift framework.
+            </div>
+
+            <div class="section-head">The <em>C_χ</em> Euler Product</div>
+
+            <div class="thm-block">
+              <div class="thm-label">Definition — Generalised Lift Constant</div>
+              <div class="thm-body">
+                C<sub>χ</sub>(N) = Π<sub>p≤N</sub> (1 − χ(p)/(p²−1))<br><br>
+                For χ=χ₁: C<sub>χ₁</sub>(∞) = C = Π<sub>p</sub>(p²−2)/(p²−1) ≈ <em>0.530711806246</em><br><br>
+                For non-principal χ: C<sub>χ</sub> measures the character-weighted density of lift-surviving residues. J<sub>χ</sub> = −(d/ds log C<sub>χ</sub>(s))|<sub>s→∞</sub> in a suitable sense.
+              </div>
+            </div>
+
+            <div class="note-block">
+              <strong>The "Quantum Spin" Interpretation.</strong> The principal character D<sub>χ₁</sub>(x) acts as a classical gravity detector — it reacts to every prime with equal weight. The character-weighted D<sub>χ</sub>(x) is a quantum spin detector: by tuning χ, it reads not just the prime's position but its arithmetic congruence class. For χ₄ (mod 4), positive jumps at p≡1(4) and negative jumps at p≡3(4) make the detector "see" the spin of the prime — split vs. inert in ℤ[i].
+            </div>
+
+            <div class="note-block">
+              <strong>Liouville character λ.</strong> Since λ(p)=−1 for all primes, C_λ(N) = Π_{p≤N}(1+1/(p²−1)) = Π_{p≤N} p²/(p²−1) → ζ(2) = π²/6 ≈ 1.6449 as N→∞. This connects the character-weighted lift framework directly to the Basel problem. Meanwhile J_λ = −J ≈ −0.7732, the exact negative of the principal constant.
+            </div>
+
+            <div class="section-head">Parity and <em>GRH</em></div>
+
+            <div class="note-block">
+              <strong>Parity obstruction.</strong> For the non-principal character mod 4, jumps alternate in sign. This cancellation can overcome the parity obstruction for certain prime subsets — because χ distinguishes numbers with even vs. odd prime factor count in a given residue class. The error term E<sub>χ</sub>(N) = R<sub>χ</sub>(N) − C<sub>χ</sub> would then be related to sums over zeros of L(s,χ), connecting the lift framework directly to GRH.
+            </div>
+
+            <div class="note-block">
+              <strong>Novelty statement.</strong> While the individual components (Dirichlet characters, prime zeta functions, L-functions) are classical, the specific structure D<sub>χ</sub>(x) as a dynamic diagnostic tool for prime congruence classes, and the identity J<sub>χ</sub> = Σ_{k≥2} P(k,χ) as a decomposition of the lift constant, appear to be original to this framework.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- #charts -->
+    </div><!-- #canvas-area -->
+
+  </div><!-- #main -->
+</div><!-- #page-body -->
+
+<script>
+'use strict';
+
+// ── Sieve ──────────────────────────────────────────────────────────────────
+let PRIMES = [];
+let SIEVE_MAX = 0;
+function sieve(n){
+  if(n <= SIEVE_MAX) return;
+  const s = new Uint8Array(n+1);
+  const ps = [];
+  for(let i=2;i<=n;i++){
+    if(!s[i]){ ps.push(i); for(let j=2*i;j<=n;j+=i) s[j]=1; }
+  }
+  PRIMES = ps; SIEVE_MAX = n;
+}
+
+// ── Characters ────────────────────────────────────────────────────────────
+const CHARS = {
+  principal: {
+    name:'χ₁ — Principal',
+    mod:1,
+    fn: p => 1,
+    color:'#c8a84a',
+    desc:`<strong>χ₁ — Principal character</strong><br>
+χ(p) = 1 for all primes. Recovers the original Jump Theorem exactly.<br>
+J_χ₁ = J = Σ 1/p(p−1) ≈ <span class="gold">0.7732</span>.<br>
+All primes cause positive jumps of equal weight.`
+  },
+  chi4: {
+    name:'χ₄ — mod 4',
+    mod:4,
+    fn: p => {
+      if(p===2) return 0;
+      const r = p%4; return r===1?1:r===3?-1:0;
+    },
+    color:'#e879f9',
+    desc:`<strong>χ₄ — Dirichlet character mod 4</strong><br>
+χ(2)=0, χ(p)=+1 if p≡1(mod 4), χ(p)=−1 if p≡3(mod 4).<br>
+Jumps alternate sign: splits in ℤ[i] (p≡1) push D_χ up, inert primes (p≡3) pull it down.<br>
+J_χ₄ = Σ_{p≡1(4)} 1/p(p−1) − Σ_{p≡3(4)} 1/p(p−1).`
+  },
+  chi3: {
+    name:'χ₃ — mod 3',
+    mod:3,
+    fn: p => {
+      if(p===3) return 0;
+      const r = p%3; return r===1?1:r===2?-1:0;
+    },
+    color:'#3dc8b8',
+    desc:`<strong>χ₃ — Dirichlet character mod 3</strong><br>
+χ(3)=0, χ(p)=+1 if p≡1(mod 3), χ(p)=−1 if p≡2(mod 3).<br>
+Dirichlet's theorem: equal density of primes mod 3 in each class — jumps balance asymptotically.<br>
+J_χ₃ = 0 (by L(1,χ₃)=π/(3√3) and symmetry).`
+  },
+  chi5: {
+    name:'χ₅ — mod 5',
+    mod:5,
+    fn: p => {
+      if(p===5) return 0;
+      const r = p%5;
+      // Real part of χ₅: +1 if r∈{1,4}, -1 if r∈{2,3}
+      return (r===1||r===4)?1:(r===2||r===3)?-1:0;
+    },
+    color:'#45b7d1',
+    desc:`<strong>χ₅ — Real character mod 5</strong><br>
+χ(p)=+1 if p≡±1(mod 5), χ(p)=−1 if p≡±2(mod 5).<br>
+Connected to the quintic reciprocity law and factorisation in ℤ[ζ₅].`
+  },
+  chi8: {
+    name:'χ₈ — Kronecker',
+    mod:8,
+    fn: p => {
+      if(p===2) return 0;
+      const r = p%8;
+      return (r===1||r===7)?1:(r===3||r===5)?-1:0;
+    },
+    color:'#96ceb4',
+    desc:`<strong>χ₈ — Kronecker symbol (−2/p)</strong><br>
+χ(p)=+1 if p≡±1(mod 8), χ(p)=−1 if p≡±3(mod 8).<br>
+Governs splitting of 2 in quadratic fields ℚ(√±2).`
+  },
+  liouville: {
+    name:'λ — Liouville',
+    mod:1,
+    fn: p => -1,  // λ(p) = -1 for all primes
+    color:'#fd79a8',
+    desc:`<strong>λ — Liouville character</strong><br>
+λ(p) = −1 for all primes (completely multiplicative).<br>
+D_λ(x) = −D_χ₁(x): every prime causes a negative jump.<br>
+J_λ = −J ≈ −0.7732. C_λ relates to 1/ζ(2) product.`
+  }
+};
+
+let chiKey = 'principal';
+let chiObj = CHARS.principal;
+
+function setChi(key, el){
+  chiKey = key; chiObj = CHARS[key];
+  document.querySelectorAll('.chi-btn').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('chi-desc-box').innerHTML = chiObj.desc;
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────
+let DATA = null;
+
+function compute(){
+  const N = +document.getElementById('num-N').value || 1000;
+  const step = +document.getElementById('sl-step').value || 5;
+  sieve(N+10);
+
+  const chi = chiObj.fn;
+  const ps = PRIMES.filter(p=>p<=N);
+
+  // Per-prime data
+  const jumpData = ps.map(p=>({
+    p, chi: chi(p), jump: chi(p)/(p*(p-1))
+  }));
+
+  // Running J_χ and C_χ
+  let jRun = 0, cRun = 1;
+  const jRunArr = [], cRunArr = [];
+  jumpData.forEach(d=>{
+    jRun += d.jump;
+    jRunArr.push({p:d.p, j:jRun});
+    if(Math.abs(d.chi) > 0){
+      cRun *= (1 - d.chi/(d.p*d.p - 1));
+    }
+    cRunArr.push({p:d.p, c:cRun});
+  });
+
+  // D_χ(x) over x range
+  const xArr = [], dchiArr = [];
+  const xMax = Math.min(N, ps[ps.length-1] - 1);
+  for(let x=0; x<=xMax; x+=step){
+    let val = 0;
+    for(const d of jumpData){
+      if(d.p > x+1 && d.chi !== 0){
+        val -= d.chi / (d.p*d.p - x - 1);
+      }
+    }
+    xArr.push(x); dchiArr.push(val);
+  }
+
+  // Stats
+  const posJ = jumpData.filter(d=>d.chi>0).length;
+  const negJ = jumpData.filter(d=>d.chi<0).length;
+  const zeroJ = jumpData.filter(d=>d.chi===0).length;
+
+  // Compare: compute J_χ running for all chars up to N
+  const allChiData = {};
+  for(const [k,c] of Object.entries(CHARS)){
+    let jr = 0;
+    allChiData[k] = ps.map(p=>{ jr += c.fn(p)/(p*(p-1)); return {p,j:jr}; });
+  }
+
+  DATA = { N, step, ps, jumpData, jRunArr, cRunArr, xArr, dchiArr, posJ, negJ, zeroJ, jFinal:jRun, cFinal:cRun, allChiData };
+}
+
+function updateStats(){
+  if(!DATA) return;
+  document.getElementById('stat-Jchi').textContent = DATA.jFinal.toFixed(6);
+  document.getElementById('stat-Cchi').textContent = DATA.cFinal.toFixed(6);
+  document.getElementById('stat-pos').textContent = DATA.posJ;
+  document.getElementById('stat-neg').textContent = DATA.negJ;
+  document.getElementById('stat-pi').textContent = DATA.ps.length;
+  document.getElementById('stat-zero').textContent = DATA.zeroJ;
+  document.getElementById('ann-dchi').textContent = `D_χ at x=${DATA.xArr[DATA.xArr.length-1]}: ${DATA.dchiArr[DATA.dchiArr.length-1].toFixed(6)}`;
+  document.getElementById('ann-jchi').textContent = `J_χ(${DATA.N}) = ${DATA.jFinal.toFixed(8)}`;
+  document.getElementById('ann-cchi').textContent = `C_χ(${DATA.N}) = ${DATA.cFinal.toFixed(8)}`;
+  document.getElementById('ann-jumps').textContent = `+${DATA.posJ} pos, −${DATA.negJ} neg, ${DATA.zeroJ} zero`;
+  document.getElementById('ann-compare').textContent = `J values at N=${DATA.N}`;
+}
+
+// ── Drawing helpers ────────────────────────────────────────────────────────
+function getCanvas(id){
+  const cv = document.getElementById(id);
+  const w = cv.parentElement.clientWidth, h = cv.parentElement.clientHeight - 36; // minus annotation
+  cv.width = w; cv.height = Math.max(h, 100);
+  return {cv, ctx: cv.getContext('2d'), W:cv.width, H:cv.height};
+}
+
+const GRID = 'rgba(255,255,255,0.04)';
+const AXIS = 'rgba(255,255,255,0.15)';
+const MONO = "'JetBrains Mono',monospace";
+
+function drawGrid(ctx, W, H, xMin, xMax, yMin, yMax){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#050510'; ctx.fillRect(0,0,W,H);
+
+  const toX = x=>(x-xMin)/(xMax-xMin)*W;
+  const toY = y=>H-(y-yMin)/(yMax-yMin)*H;
+
+  // Zero line
+  if(yMin<0&&yMax>0){
+    const zy = toY(0);
+    ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+    ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(0,zy); ctx.lineTo(W,zy); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Grid lines
+  ctx.strokeStyle=GRID; ctx.lineWidth=0.5;
+  const nX=8, nY=6;
+  for(let i=0;i<=nX;i++){
+    const gx=i/nX*W; ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke();
+  }
+  for(let i=0;i<=nY;i++){
+    const gy=i/nY*H; ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke();
+  }
+
+  // Axis labels
+  ctx.font=`9px ${MONO}`; ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.textBaseline='top'; ctx.textAlign='left';
+  ctx.fillText(yMax.toFixed(3), 4, 2);
+  ctx.textBaseline='bottom';
+  ctx.fillText(yMin.toFixed(3), 4, H-2);
+  ctx.textAlign='right';
+  ctx.textBaseline='bottom';
+  ctx.fillText(Math.round(xMax), W-2, H-2);
+  ctx.textAlign='left';
+  ctx.fillText(Math.round(xMin), 2, H-2);
+
+  return {toX, toY};
+}
+
+// ── Chart renderers ────────────────────────────────────────────────────────
+function drawDchi(){
+  if(!DATA) return;
+  const {cv,ctx,W,H} = getCanvas('cv-dchi');
+  const {xArr:xs, dchiArr:ys} = DATA;
+  const yMin=Math.min(...ys)*1.1, yMax=Math.max(...ys)*1.1;
+  const {toX,toY} = drawGrid(ctx,W,H, xs[0], xs[xs.length-1], Math.min(yMin,-0.1), Math.max(yMax,0.1));
+
+  // Draw D_χ line
+  ctx.strokeStyle = chiObj.color; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+  ctx.beginPath();
+  xs.forEach((x,i)=>{ const gx=toX(x),gy=toY(ys[i]); i===0?ctx.moveTo(gx,gy):ctx.lineTo(gx,gy); });
+  ctx.stroke();
+
+  // Mark jump positions
+  DATA.jumpData.forEach(d=>{
+    if(d.chi===0) return;
+    const gx=toX(d.p-1);
+    ctx.strokeStyle = d.chi>0?'rgba(61,200,184,0.7)':'rgba(224,80,96,0.7)';
+    ctx.lineWidth=1; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke();
+    ctx.setLineDash([]);
+    // Label for small N
+    if(DATA.N<=500){
+      ctx.fillStyle = d.chi>0?'#3dc8b8':'#e05060';
+      ctx.font=`8px ${MONO}`; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText('p='+d.p, gx, 4);
+    }
+  });
+
+  // Chart title
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font=`10px ${MONO}`;
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`D_χ(x)  [${chiObj.name}]  N=${DATA.N}`, 8, 8);
+}
+
+function drawJumps(){
+  if(!DATA) return;
+  const {cv,ctx,W,H} = getCanvas('cv-jumps');
+  const jd = DATA.jumpData;
+  if(!jd.length) return;
+  const jVals = jd.map(d=>d.jump);
+  const yMax = Math.max(...jVals.map(Math.abs))*1.2;
+  const {toX,toY} = drawGrid(ctx,W,H, 2, DATA.ps[DATA.ps.length-1], -yMax, yMax);
+
+  // Stem plot
+  jd.forEach(d=>{
+    const gx=toX(d.p), gy=toY(d.jump), gy0=toY(0);
+    if(d.chi===0){
+      ctx.fillStyle='rgba(100,100,150,0.5)';
+      ctx.fillRect(gx-1,Math.min(gy,gy0),2,Math.max(Math.abs(gy-gy0),2));
+    } else {
+      ctx.fillStyle = d.chi>0?'rgba(61,200,184,0.85)':'rgba(224,80,96,0.85)';
+      const bw = Math.max(2, W/DATA.ps.length*0.7);
+      ctx.fillRect(gx-bw/2, Math.min(gy,gy0), bw, Math.max(Math.abs(gy-gy0),1));
+    }
+    // Dot at top
+    if(d.chi!==0){
+      ctx.fillStyle = d.chi>0?'#3dc8b8':'#e05060';
+      ctx.beginPath(); ctx.arc(gx,gy,2.5,0,2*Math.PI); ctx.fill();
+    }
+  });
+
+  // Label baseline
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,toY(0)); ctx.lineTo(W,toY(0)); ctx.stroke();
+
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font=`10px ${MONO}`;
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`Jump sizes χ(p)/p(p−1)  [${chiObj.name}]`, 8, 8);
+}
+
+function drawJchi(){
+  if(!DATA) return;
+  const {cv,ctx,W,H} = getCanvas('cv-jchi');
+  const pts = DATA.jRunArr;
+  const ys = pts.map(d=>d.j);
+  const yMin=Math.min(...ys,0)*1.1, yMax=Math.max(...ys,0)*1.1;
+  const {toX,toY} = drawGrid(ctx,W,H, pts[0].p, pts[pts.length-1].p, Math.min(yMin,-0.01), Math.max(yMax,0.01));
+
+  ctx.strokeStyle = chiObj.color; ctx.lineWidth = 2;
+  ctx.beginPath();
+  pts.forEach((d,i)=>{ const gx=toX(d.p),gy=toY(d.j); i===0?ctx.moveTo(gx,gy):ctx.lineTo(gx,gy); });
+  ctx.stroke();
+
+  // Final value line
+  const jFin = DATA.jFinal;
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(0,toY(jFin)); ctx.lineTo(W,toY(jFin)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`9px ${MONO}`;
+  ctx.textAlign='right'; ctx.textBaseline='bottom';
+  ctx.fillText(`J_χ→${jFin.toFixed(5)}`, W-6, toY(jFin)-3);
+
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font=`10px ${MONO}`;
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`J_χ(N) running sum  [${chiObj.name}]`, 8, 8);
+}
+
+function drawCchi(){
+  if(!DATA) return;
+  const {cv,ctx,W,H} = getCanvas('cv-cchi');
+  const pts = DATA.cRunArr;
+  const ys = pts.map(d=>d.c);
+  const yMin=Math.min(...ys)*0.95, yMax=Math.max(...ys)*1.05;
+  const {toX,toY} = drawGrid(ctx,W,H, pts[0].p, pts[pts.length-1].p, Math.min(yMin,0), Math.max(yMax,1.1));
+
+  // Reference line at 1
+  if(yMin<=1&&yMax>=1){
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(0,toY(1)); ctx.lineTo(W,toY(1)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font=`8px ${MONO}`;
+    ctx.textAlign='left'; ctx.fillText('1.0', 3, toY(1)-2);
+  }
+
+  // C line (principal reference)
+  const C = 0.530711806246;
+  if(yMin<=C&&yMax>=C){
+    ctx.strokeStyle='rgba(200,168,74,0.35)'; ctx.lineWidth=1; ctx.setLineDash([3,5]);
+    ctx.beginPath(); ctx.moveTo(0,toY(C)); ctx.lineTo(W,toY(C)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(200,168,74,0.6)'; ctx.font=`8px ${MONO}`;
+    ctx.textAlign='left'; ctx.fillText('C≈0.5307', 3, toY(C)-2);
+  }
+
+  ctx.strokeStyle = chiObj.color; ctx.lineWidth = 2;
+  ctx.beginPath();
+  pts.forEach((d,i)=>{ const gx=toX(d.p),gy=toY(d.c); i===0?ctx.moveTo(gx,gy):ctx.lineTo(gx,gy); });
+  ctx.stroke();
+
+  // Final dot
+  const last=pts[pts.length-1];
+  ctx.fillStyle=chiObj.color;
+  ctx.beginPath(); ctx.arc(toX(last.p),toY(last.c),4,0,2*Math.PI); ctx.fill();
+
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font=`10px ${MONO}`;
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`C_χ(N) Euler product  [${chiObj.name}]`, 8, 8);
+}
+
+function drawCompare(){
+  if(!DATA) return;
+  const {cv,ctx,W,H} = getCanvas('cv-compare');
+
+  const series = Object.entries(CHARS).map(([k,c])=>({
+    key:k, name:c.name, color:c.color,
+    pts: DATA.allChiData[k]
+  }));
+  const allY = series.flatMap(s=>s.pts.map(d=>d.j));
+  const yMin=Math.min(...allY,-0.01)*1.1, yMax=Math.max(...allY,0.01)*1.1;
+  const ps = DATA.ps;
+  const {toX,toY} = drawGrid(ctx,W,H, ps[0], ps[ps.length-1], yMin, yMax);
+
+  series.forEach(s=>{
+    ctx.strokeStyle=s.color; ctx.lineWidth=1.5; ctx.globalAlpha=0.85;
+    ctx.beginPath();
+    s.pts.forEach((d,i)=>{
+      const gx=toX(d.p),gy=toY(d.j);
+      i===0?ctx.moveTo(gx,gy):ctx.lineTo(gx,gy);
+    });
+    ctx.stroke(); ctx.globalAlpha=1;
+    // Label at end
+    if(s.pts.length){
+      const last=s.pts[s.pts.length-1];
+      ctx.fillStyle=s.color; ctx.font=`8px ${MONO}`;
+      ctx.textAlign='left'; ctx.textBaseline='middle';
+      const shortName = s.name.split('—')[0].trim();
+      const gy = toY(last.j);
+      // Clamp label to visible area
+      const clampedY = Math.max(8, Math.min(H-8, gy));
+      ctx.fillText(`${shortName} →${last.j.toFixed(4)}`, toX(last.p)+3, clampedY);
+    }
+  });
+
+  // Zero line label
+  if(yMin<0&&yMax>0){
+    ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font=`8px ${MONO}`;
+    ctx.textAlign='left'; ctx.textBaseline='bottom';
+    ctx.fillText('0', 3, toY(0)-1);
+  }
+
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font=`10px ${MONO}`;
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`J_χ(N) comparison — all characters  N=${DATA.N}`, 8, 8);
+}
+
+function populateTable(){
+  if(!DATA) return;
+  const tbody = document.getElementById('jtable-body');
+  const mod = chiObj.mod;
+  let html = '';
+  let jr = 0;
+  DATA.jumpData.forEach(d=>{
+    jr += d.jump;
+    const pClass = d.chi>0?'jump-pos':d.chi<0?'jump-neg':'jump-zero';
+    html += `<tr>
+      <td>${d.p}</td>
+      <td>${mod<=1?"−":d.p%mod}</td>
+      <td class="${pClass}">${d.chi > 0 ? '+1' : d.chi < 0 ? '−1' : '0'}</td>
+      <td class="${pClass}">${d.chi===0?'—':(d.chi>0?'+':'')+d.jump.toFixed(8)}</td>
+      <td>${jr.toFixed(8)}</td>
+      <td>${d.chi===0?'1.000000':(1-d.chi/(d.p*d.p-1)).toFixed(8)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html || `<tr><td colspan="6" style="color:var(--muted);padding:20px;text-align:center">No data</td></tr>`;
+}
+
+function drawAll(){
+  drawDchi();
+  drawJumps();
+  drawJchi();
+  drawCchi();
+  drawCompare();
+  populateTable();
+  updateStats();
+}
+
+function runAll(){
+  compute();
+  drawAll();
+}
+
+// ── Tab switching ──────────────────────────────────────────────────────────
+function showPane(name, el){
+  document.querySelectorAll('.chart-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  // Redraw on switch
+  setTimeout(()=>{
+    if(name==='dchi') drawDchi();
+    else if(name==='jumps') drawJumps();
+    else if(name==='jchi') drawJchi();
+    else if(name==='cchi') drawCchi();
+    else if(name==='compare') drawCompare();
+    else if(name==='jumptable') populateTable();
+  },20);
+}
+
+// ── Export ─────────────────────────────────────────────────────────────────
+function exportPNG(){
+  if(!DATA){ alert('Run computation first'); return; }
+
+  // Redraw all charts at full res first
+  drawAll();
+
+  // Use html2canvas to capture the full visible page
+  const target = document.getElementById('page-body');
+  const opts = {
+    backgroundColor: '#050510',
+    scale: 2,
+    useCORS: true,
+    allowTaint: false,
+    logging: false,
+    scrollX: 0, scrollY: 0,
+    windowWidth: document.documentElement.scrollWidth,
+    windowHeight: document.documentElement.scrollHeight,
+    // Include the fixed nav too
+    onclone: function(doc){
+      // Make sure tab-nav is included by making page-body start from top
+      const pb = doc.getElementById('page-body');
+      if(pb){ pb.style.top='0'; pb.style.position='relative'; }
+    }
+  };
+
+  // Capture nav + page-body together via document.body
+  html2canvas(document.documentElement, {
+    backgroundColor: '#050510',
+    scale: 2,
+    useCORS: true,
+    allowTaint: false,
+    logging: false,
+    x: 0, y: 0,
+    width: window.innerWidth,
+    height: window.innerHeight
+  }).then(function(canvas){
+    const a = document.createElement('a');
+    const chi = chiObj.name.split('—')[0].trim().replace(/[\s_]/g,'');
+    const tab = (document.querySelector('.chart-tab.active')||{}).textContent||'chart';
+    a.download = 'dchi_'+chiKey+'_N'+DATA.N+'_'+tab.replace(/\s/g,'_')+'.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }).catch(function(e){
+    console.error('html2canvas failed:', e);
+    // Fallback: export just the active chart canvas
+    const activePane = document.querySelector('.chart-pane.active');
+    const cv = activePane ? activePane.querySelector('canvas') : null;
+    if(!cv){ alert('Nothing to export'); return; }
+    const a = document.createElement('a');
+    a.download = 'dchi_'+chiKey+'_N'+DATA.N+'.png';
+    a.href = cv.toDataURL('image/png');
+    a.click();
+  });
+}
+
+function exportCSV(){
+  if(!DATA) return;
+  const rows = ['p,mod_q,chi_p,jump,J_chi_running,C_chi_factor'];
+  const mod = chiObj.mod;
+  let jr = 0;
+  DATA.jumpData.forEach(d=>{
+    jr += d.jump;
+    const cf = d.chi===0?1:1-d.chi/(d.p*d.p-1);
+    rows.push([d.p, d.p%Math.max(mod,1), d.chi, d.jump.toFixed(10), jr.toFixed(10), cf.toFixed(10)].join(','));
+  });
+  const a = document.createElement('a');
+  a.download = `dchi_${chiKey}_N${DATA.N}.csv`;
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(rows.join('\n'));
+  a.click();
+}
+
+// ── Resize ─────────────────────────────────────────────────────────────────
+window.addEventListener('resize', ()=>{ if(DATA) drawAll(); });
+
+// ── Init ───────────────────────────────────────────────────────────────────
+window.addEventListener('load', ()=>{
+  runAll();
+});
+</script>
+</body>
+</html>
